@@ -1,0 +1,23 @@
+---
+description: Read architecture and the task file before changing code
+alwaysApply: true
+---
+
+# Before starting
+
+Before implementing, fixing, refactoring, or starting a task, follow this order. Write `docs/` and task files in English.
+
+1. When no task file matches, add one to the highest id in `docs/tasks/` and `docs/tasks/archive/` and create a five-digit file (`00001-short-name.md`). Write the Outcome from the request and fill `reads:`. In the same turn, reply with the id, outcome, and files, then start. Do not reuse ids. Refer to tasks by id.
+2. Read `synced_commit` in `docs/architecture.md`. When the field is missing, set it to the current `HEAD` and compare only uncommitted changes this time.
+3. Diff that commit against the worktree for `lib/`, `test/`, `pubspec.yaml`, `analysis_options.yaml`, and any changed `android/` or `ios/` settings.
+4. Leave documented differences unchanged. Ask before adding missing facts to any section of `docs/architecture.md` other than `synced_commit`. Update the task file directly when the change sits inside an open task's Outcome. Stop when it conflicts with an open task or the architecture.
+5. Read `docs/architecture.md`, this task file, and its `reads:` list. Read `archive/` only when the user names a task. To continue an archived task, move it back to `docs/tasks/`, set `status` to `in-progress`, then resume at step 2.
+6. Ask before writing code that changes Tech stack, Layout, Data flow, Models, Widgets, BLoC, or Invariants. Name the section and the new text.
+
+# After finishing
+
+1. Run `flutter test`. Finish only after it passes. Fix failures before continuing.
+2. Write the actual result, set `status` to `done`, and move the file to `docs/tasks/archive/`.
+3. Remove the row from In progress in `docs/tasks/README.md` and add the id and title under Archive.
+4. Ask before editing `docs/architecture.md` when the result differs from it.
+5. Set `synced_commit` to the current `HEAD` only when the worktree is clean.
