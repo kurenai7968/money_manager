@@ -62,5 +62,21 @@
   "balance": "Balance",
   "monthBalance": "Balance",
   "recent": "Recent",
-  "emptyMonth": "No transactions this month"
+  "emptyMonth": "No transactions this month",
+  "general": "General",
+  "ledger": "Ledger",
+  "language": "Language",
+  "appearance": "Appearance",
+  "currency": "Currency",
+  "weekStart": "Week starts",
+  "followSystem": "System",
+  "light": "Light",
+  "dark": "Dark",
+  "english": "English",
+  "traditionalChinese": "Traditional Chinese",
+  "monday": "Monday",
+  "sunday": "Sunday",
+  "comparedWithLastMonth": "Compared with last month",
+  "lastSixMonths": "Last six months",
+  "lastMonth": "Last month"
 }

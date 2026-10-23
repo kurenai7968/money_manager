@@ -59,5 +59,21 @@
   "balance": "餘額",
   "monthBalance": "結餘",
   "recent": "最近",
-  "emptyMonth": "這個月還沒有紀錄"
+  "emptyMonth": "這個月還沒有紀錄",
+  "general": "一般",
+  "ledger": "帳本",
+  "language": "語言",
+  "appearance": "外觀",
+  "currency": "貨幣",
+  "weekStart": "週始",
+  "followSystem": "跟隨系統",
+  "light": "淺色",
+  "dark": "深色",
+  "english": "English",
+  "traditionalChinese": "繁體中文",
+  "monday": "星期一",
+  "sunday": "星期日",
+  "comparedWithLastMonth": "較上月",
+  "lastSixMonths": "近六月",
+  "lastMonth": "上月"
 }

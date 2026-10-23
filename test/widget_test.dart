@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:intl/intl.dart';
 import 'package:money_manager/app.dart';
+import 'package:money_manager/widgets/app_tab_bar.dart';
 
 import 'support/memory_account_repository.dart';
 import 'support/memory_category_repository.dart';
@@ -37,21 +38,36 @@ void main() {
     await tester.pump();
     expect(find.byTooltip('Summary'), findsOneWidget);
 
-    await tester.tap(find.text('Analysis'));
+    await tester.tap(
+      find.descendant(
+        of: find.byType(AppTabBar),
+        matching: find.text('Analysis'),
+      ),
+    );
     await tester.pumpAndSettle();
     expect(
       find.descendant(of: find.byType(AppBar), matching: find.text('Analysis')),
       findsOneWidget,
     );
 
-    await tester.tap(find.text('Accounts'));
+    await tester.tap(
+      find.descendant(
+        of: find.byType(AppTabBar),
+        matching: find.text('Accounts'),
+      ),
+    );
     await tester.pumpAndSettle();
     expect(
       find.descendant(of: find.byType(AppBar), matching: find.text('Accounts')),
       findsOneWidget,
     );
 
-    await tester.tap(find.text('Settings'));
+    await tester.tap(
+      find.descendant(
+        of: find.byType(AppTabBar),
+        matching: find.text('Settings'),
+      ),
+    );
     await tester.pumpAndSettle();
     expect(
       find.descendant(of: find.byType(AppBar), matching: find.text('Settings')),

@@ -1,6 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:money_manager/blocs/app_setting_bloc/app_setting_bloc.dart';
+import 'package:money_manager/blocs/app_setting_bloc/app_setting_event.dart';
+import 'package:money_manager/blocs/app_setting_bloc/app_setting_state.dart';
+import 'package:money_manager/database/shared_preferences/settings_store.dart';
 import 'package:money_manager/database/sqlite/app_database.dart';
+import 'package:money_manager/models/app_setting.dart';
 import 'package:money_manager/l10n/app_localizations.dart';
 import 'package:money_manager/core/extensions/context_extension.dart';
 import 'package:money_manager/models/category_defaults.dart';
@@ -22,6 +27,7 @@ class MoneyManagerApp extends StatefulWidget {
     this.accounts,
     this.categories,
     this.transactions,
+    this.settings,
     super.key,
   });
 
@@ -29,6 +35,7 @@ class MoneyManagerApp extends StatefulWidget {
   final AccountRepository? accounts;
   final CategoryRepository? categories;
   final TransactionRepository? transactions;
+  final SettingsStore? settings;
 
   @override
   State<MoneyManagerApp> createState() => _MoneyManagerAppState();
@@ -57,6 +64,11 @@ class _MoneyManagerAppState extends State<MoneyManagerApp> {
       ],
       child: MultiBlocProvider(
         providers: [
+          BlocProvider(
+            create: (_) =>
+                AppSettingBloc(widget.settings ?? SettingsStore.memory())
+                  ..add(const AppSettingStarted()),
+          ),
           BlocProvider(create: (context) => AccountsBloc(context.read())),
           BlocProvider(create: (context) => TransactionsBloc(context.read())),
           BlocProvider(
@@ -64,18 +76,30 @@ class _MoneyManagerAppState extends State<MoneyManagerApp> {
                 CategoriesBloc(context.read(), transactions: context.read()),
           ),
         ],
-        child: MaterialApp.router(
-          debugShowCheckedModeBanner: false,
-          onGenerateTitle: (context) => AppLocalizations.of(context).home,
-          routerConfig: _router,
-          theme: AppThemes.light,
-          darkTheme: AppThemes.dark,
-          themeMode: ThemeMode.system,
-          localeResolutionCallback: _resolveLocale,
-          localizationsDelegates: AppLocalizations.localizationsDelegates,
-          supportedLocales: AppLocalizations.supportedLocales,
-          builder: (context, child) {
-            return _LedgerBootstrap(child: child ?? const SizedBox.shrink());
+        child: BlocBuilder<AppSettingBloc, AppSettingState>(
+          builder: (context, settings) {
+            final language = settings.setting.languageCode;
+            return MaterialApp.router(
+              debugShowCheckedModeBanner: false,
+              onGenerateTitle: (context) => AppLocalizations.of(context).home,
+              routerConfig: _router,
+              theme: AppThemes.light,
+              darkTheme: AppThemes.dark,
+              themeMode: switch (settings.setting.themeChoice) {
+                AppThemeChoice.light => ThemeMode.light,
+                AppThemeChoice.dark => ThemeMode.dark,
+                AppThemeChoice.system => ThemeMode.system,
+              },
+              locale: language == null ? null : Locale(language),
+              localeResolutionCallback: _resolveLocale,
+              localizationsDelegates: AppLocalizations.localizationsDelegates,
+              supportedLocales: AppLocalizations.supportedLocales,
+              builder: (context, child) {
+                return _LedgerBootstrap(
+                  child: child ?? const SizedBox.shrink(),
+                );
+              },
+            );
           },
         ),
       ),

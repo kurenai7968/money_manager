@@ -188,4 +188,52 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get emptyMonth => 'No transactions this month';
+
+  @override
+  String get general => 'General';
+
+  @override
+  String get ledger => 'Ledger';
+
+  @override
+  String get language => 'Language';
+
+  @override
+  String get appearance => 'Appearance';
+
+  @override
+  String get currency => 'Currency';
+
+  @override
+  String get weekStart => 'Week starts';
+
+  @override
+  String get followSystem => 'System';
+
+  @override
+  String get light => 'Light';
+
+  @override
+  String get dark => 'Dark';
+
+  @override
+  String get english => 'English';
+
+  @override
+  String get traditionalChinese => 'Traditional Chinese';
+
+  @override
+  String get monday => 'Monday';
+
+  @override
+  String get sunday => 'Sunday';
+
+  @override
+  String get comparedWithLastMonth => 'Compared with last month';
+
+  @override
+  String get lastSixMonths => 'Last six months';
+
+  @override
+  String get lastMonth => 'Last month';
 }

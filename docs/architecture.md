@@ -6,7 +6,7 @@ synced_commit: 2cbf8238ee3122105448040f1c5729f743ad957a
 
 Use a maintainable layered architecture. Keep code testable, and do not add abstraction until a task needs it.
 
-The navigation shell is in place. Accounts and categories can be stored. The sections below remain the target for transactions, the home summary, and analysis.
+The navigation shell, ledger, home, analysis, and settings are implemented. New feature code follows the sections below.
 
 ## Tech stack
 

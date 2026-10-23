@@ -188,6 +188,54 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get emptyMonth => '這個月還沒有紀錄';
+
+  @override
+  String get general => '一般';
+
+  @override
+  String get ledger => '帳本';
+
+  @override
+  String get language => '語言';
+
+  @override
+  String get appearance => '外觀';
+
+  @override
+  String get currency => '貨幣';
+
+  @override
+  String get weekStart => '週始';
+
+  @override
+  String get followSystem => '跟隨系統';
+
+  @override
+  String get light => '淺色';
+
+  @override
+  String get dark => '深色';
+
+  @override
+  String get english => 'English';
+
+  @override
+  String get traditionalChinese => '繁體中文';
+
+  @override
+  String get monday => '星期一';
+
+  @override
+  String get sunday => '星期日';
+
+  @override
+  String get comparedWithLastMonth => '較上月';
+
+  @override
+  String get lastSixMonths => '近六月';
+
+  @override
+  String get lastMonth => '上月';
 }
 
 /// The translations for Chinese, as used in Taiwan (`zh_TW`).
@@ -373,4 +421,52 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get emptyMonth => '這個月還沒有紀錄';
+
+  @override
+  String get general => '一般';
+
+  @override
+  String get ledger => '帳本';
+
+  @override
+  String get language => '語言';
+
+  @override
+  String get appearance => '外觀';
+
+  @override
+  String get currency => '貨幣';
+
+  @override
+  String get weekStart => '週始';
+
+  @override
+  String get followSystem => '跟隨系統';
+
+  @override
+  String get light => '淺色';
+
+  @override
+  String get dark => '深色';
+
+  @override
+  String get english => 'English';
+
+  @override
+  String get traditionalChinese => '繁體中文';
+
+  @override
+  String get monday => '星期一';
+
+  @override
+  String get sunday => '星期日';
+
+  @override
+  String get comparedWithLastMonth => '較上月';
+
+  @override
+  String get lastSixMonths => '近六月';
+
+  @override
+  String get lastMonth => '上月';
 }

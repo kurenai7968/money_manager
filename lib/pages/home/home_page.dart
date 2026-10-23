@@ -4,8 +4,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
+import 'package:money_manager/blocs/app_setting_bloc/app_setting_bloc.dart';
 import 'package:money_manager/core/extensions/context_extension.dart';
 import 'package:money_manager/core/utils/ledger_balance.dart';
+import 'package:money_manager/models/app_setting.dart';
 import 'package:money_manager/core/utils/money_format.dart';
 import 'package:money_manager/models/category_model.dart';
 import 'package:money_manager/models/ledger_kinds.dart';
@@ -52,6 +54,7 @@ class _HomePageState extends State<HomePage> {
               item.date.year == _month.year && item.date.month == _month.month,
         )
         .toList();
+    final weekStart = context.watch<AppSettingBloc>().state.setting.weekStart;
     final figures = monthFigures(transactions, _month);
 
     return Scaffold(
@@ -94,6 +97,7 @@ class _HomePageState extends State<HomePage> {
               transactions: inMonth,
               categories: categories,
               selectedDay: _selectedDay,
+              weekStart: weekStart,
               locale: locale,
               onSelect: (day) => setState(() => _selectedDay = day),
             ),
@@ -324,6 +328,7 @@ class _CalendarView extends StatelessWidget {
     required this.transactions,
     required this.categories,
     required this.selectedDay,
+    required this.weekStart,
     required this.locale,
     required this.onSelect,
   });
@@ -332,6 +337,7 @@ class _CalendarView extends StatelessWidget {
   final List<TransactionModel> transactions;
   final List<CategoryModel> categories;
   final DateTime? selectedDay;
+  final WeekStart weekStart;
   final String locale;
   final ValueChanged<DateTime> onSelect;
 
@@ -340,7 +346,7 @@ class _CalendarView extends StatelessWidget {
     final scheme = Theme.of(context).colorScheme;
     final first = DateTime(month.year, month.month);
     final days = DateTime(month.year, month.month + 1, 0).day;
-    final leading = first.weekday - 1;
+    final leading = leadingCalendarBlanks(first, weekStart);
     final selected = selectedDay;
     final dayItems = selected == null
         ? const <TransactionModel>[]
