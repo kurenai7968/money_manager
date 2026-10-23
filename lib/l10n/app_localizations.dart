@@ -440,6 +440,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Balance'**
   String get balance;
+
+  /// No description provided for @monthBalance.
+  ///
+  /// In en, this message translates to:
+  /// **'Balance'**
+  String get monthBalance;
+
+  /// No description provided for @recent.
+  ///
+  /// In en, this message translates to:
+  /// **'Recent'**
+  String get recent;
+
+  /// No description provided for @emptyMonth.
+  ///
+  /// In en, this message translates to:
+  /// **'No transactions this month'**
+  String get emptyMonth;
 }
 
 class _AppLocalizationsDelegate

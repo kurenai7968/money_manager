@@ -59,5 +59,8 @@
   "needCategory": "Choose a category",
   "invalidTransaction": "Enter an amount greater than zero",
   "cancel": "Cancel",
-  "balance": "Balance"
+  "balance": "Balance",
+  "monthBalance": "Balance",
+  "recent": "Recent",
+  "emptyMonth": "No transactions this month"
 }

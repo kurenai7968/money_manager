@@ -43,4 +43,35 @@ void main() {
     expect(balanceOf(card, [expense, payment]), 0);
     expect(netWorthOf([cash, card], [expense, payment]), 8000);
   });
+
+  test('month balance ignores transfers', () {
+    final figures = monthFigures(
+      [
+        TransactionModel(
+          id: 'pay',
+          type: TransactionType.income,
+          amountMinor: 5000,
+          date: DateTime(2026, 10, 1),
+        ),
+        TransactionModel(
+          id: 'meal',
+          type: TransactionType.expense,
+          amountMinor: 1200,
+          date: DateTime(2026, 10, 2),
+        ),
+        TransactionModel(
+          id: 'move',
+          type: TransactionType.transfer,
+          amountMinor: 9000,
+          date: DateTime(2026, 10, 3),
+          fromAccountId: 'bank',
+          toAccountId: 'cash',
+        ),
+      ],
+      DateTime(2026, 10),
+    );
+    expect(figures.incomeMinor, 5000);
+    expect(figures.expenseMinor, 1200);
+    expect(figures.balanceMinor, 3800);
+  });
 }

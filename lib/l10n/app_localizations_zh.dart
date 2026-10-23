@@ -179,6 +179,15 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get balance => '餘額';
+
+  @override
+  String get monthBalance => '結餘';
+
+  @override
+  String get recent => '最近';
+
+  @override
+  String get emptyMonth => '這個月還沒有紀錄';
 }
 
 /// The translations for Chinese, as used in Taiwan (`zh_TW`).
@@ -355,4 +364,13 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get balance => '餘額';
+
+  @override
+  String get monthBalance => '結餘';
+
+  @override
+  String get recent => '最近';
+
+  @override
+  String get emptyMonth => '這個月還沒有紀錄';
 }

@@ -56,5 +56,8 @@
   "needCategory": "請選擇分類",
   "invalidTransaction": "請輸入大於 0 的金額",
   "cancel": "取消",
-  "balance": "餘額"
+  "balance": "餘額",
+  "monthBalance": "結餘",
+  "recent": "最近",
+  "emptyMonth": "這個月還沒有紀錄"
 }

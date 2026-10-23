@@ -179,4 +179,13 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get balance => 'Balance';
+
+  @override
+  String get monthBalance => 'Balance';
+
+  @override
+  String get recent => 'Recent';
+
+  @override
+  String get emptyMonth => 'No transactions this month';
 }

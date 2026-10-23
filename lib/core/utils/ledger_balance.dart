@@ -32,3 +32,36 @@ int netWorthOf(
   }
   return total;
 }
+
+class MonthFigures {
+  const MonthFigures({required this.incomeMinor, required this.expenseMinor});
+
+  final int incomeMinor;
+  final int expenseMinor;
+
+  int get balanceMinor => incomeMinor - expenseMinor;
+}
+
+MonthFigures monthFigures(
+  Iterable<TransactionModel> transactions,
+  DateTime month,
+) {
+  var income = 0;
+  var expense = 0;
+  for (final transaction in transactions) {
+    if (transaction.date.year != month.year ||
+        transaction.date.month != month.month) {
+      continue;
+    }
+    if (transaction.type == TransactionType.income) {
+      income += transaction.amountMinor;
+    } else if (transaction.type == TransactionType.expense) {
+      expense += transaction.amountMinor;
+    }
+  }
+  return MonthFigures(incomeMinor: income, expenseMinor: expense);
+}
+
+bool sameDay(DateTime a, DateTime b) {
+  return a.year == b.year && a.month == b.month && a.day == b.day;
+}
