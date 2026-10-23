@@ -4,7 +4,7 @@ description: >-
   Reads docs/architecture.md and the matching task file before code changes,
   syncs docs with manual edits, asks before architecture changes, runs flutter test,
   and archives finished tasks. Use when the user asks to implement, fix, add,
-  change, refactor, or start a task (做、改、修、加、任務) in this repository.
+  change, refactor, or start a task in this repository.
 ---
 
 # Before starting

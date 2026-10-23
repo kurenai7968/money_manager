@@ -1,30 +1,74 @@
-// This is a basic Flutter widget test.
-//
-// To perform an interaction with a widget in your test, use the WidgetTester
-// utility in the flutter_test package. For example, you can send tap and scroll
-// gestures. You can also use WidgetTester to find child widgets in the widget
-// tree, read text, and verify that the values of widget properties are correct.
-
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-
-import 'package:money_manager/main.dart';
+import 'package:intl/intl.dart';
+import 'package:money_manager/app.dart';
 
 void main() {
-  testWidgets('Counter increments smoke test', (WidgetTester tester) async {
-    // Build our app and trigger a frame.
-    await tester.pumpWidget(const MyApp());
+  testWidgets('Shell opens Home and reaches the other tabs', (tester) async {
+    tester.platformDispatcher.localeTestValue = const Locale('en');
+    addTearDown(tester.platformDispatcher.clearLocaleTestValue);
 
-    // Verify that our counter starts at 0.
-    expect(find.text('0'), findsOneWidget);
-    expect(find.text('1'), findsNothing);
+    await tester.pumpWidget(const MoneyManagerApp());
+    await tester.pumpAndSettle();
 
-    // Tap the '+' icon and trigger a frame.
-    await tester.tap(find.byIcon(Icons.add));
+    final now = DateTime.now();
+    final month = DateFormat.yMMMM('en').format(DateTime(now.year, now.month));
+    expect(find.text(month), findsOneWidget);
+    expect(find.text('Home'), findsOneWidget);
+    expect(find.byTooltip('Calendar'), findsOneWidget);
+
+    await tester.tap(find.byTooltip('Next month'));
     await tester.pump();
+    final nextMonth = DateFormat.yMMMM(
+      'en',
+    ).format(DateTime(now.year, now.month + 1));
+    expect(find.text(nextMonth), findsOneWidget);
 
-    // Verify that our counter has incremented.
-    expect(find.text('0'), findsNothing);
-    expect(find.text('1'), findsOneWidget);
+    await tester.tap(find.byTooltip('Calendar'));
+    await tester.pump();
+    expect(find.byTooltip('Summary'), findsOneWidget);
+
+    await tester.tap(find.text('Analysis'));
+    await tester.pumpAndSettle();
+    expect(
+      find.descendant(
+        of: find.byType(AppBar),
+        matching: find.text('Analysis'),
+      ),
+      findsOneWidget,
+    );
+
+    await tester.tap(find.text('Accounts'));
+    await tester.pumpAndSettle();
+    expect(
+      find.descendant(of: find.byType(AppBar), matching: find.text('Accounts')),
+      findsOneWidget,
+    );
+
+    await tester.tap(find.text('Settings'));
+    await tester.pumpAndSettle();
+    expect(
+      find.descendant(of: find.byType(AppBar), matching: find.text('Settings')),
+      findsOneWidget,
+    );
+  });
+
+  testWidgets('Record hides the tab bar', (tester) async {
+    tester.platformDispatcher.localeTestValue = const Locale('en');
+    addTearDown(tester.platformDispatcher.clearLocaleTestValue);
+
+    await tester.pumpWidget(const MoneyManagerApp());
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.byTooltip('Record'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Home'), findsNothing);
+    expect(find.byTooltip('Record'), findsNothing);
+    expect(find.byType(BackButton), findsOneWidget);
+
+    await tester.tap(find.byType(BackButton));
+    await tester.pumpAndSettle();
+    expect(find.text('Home'), findsOneWidget);
   });
 }

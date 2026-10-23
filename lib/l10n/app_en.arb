@@ -1,0 +1,15 @@
+{
+  "@@locale": "en",
+  "home": "Home",
+  "analysis": "Analysis",
+  "accounts": "Accounts",
+  "settings": "Settings",
+  "record": "Record",
+  "@record": {
+    "description": "Label for the button that opens the record page."
+  },
+  "showCalendar": "Calendar",
+  "showSummary": "Summary",
+  "previousMonth": "Previous month",
+  "nextMonth": "Next month"
+}
