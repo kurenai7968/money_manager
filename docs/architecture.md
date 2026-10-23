@@ -1,5 +1,5 @@
 ---
-synced_commit: 2cbf8238ee3122105448040f1c5729f743ad957a
+synced_commit: bab577133619c34d9b18d9284e23757c5bad1612
 ---
 
 # Architecture
