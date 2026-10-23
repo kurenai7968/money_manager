@@ -19,9 +19,16 @@ import 'package:money_manager/themes/app_themes.dart';
 import 'package:money_manager/themes/ledger_palette.dart';
 
 class RecordPage extends StatefulWidget {
-  const RecordPage({this.transactionId, super.key});
+  const RecordPage({
+    this.transactionId,
+    this.initialType,
+    this.initialAccountId,
+    super.key,
+  });
 
   final String? transactionId;
+  final TransactionType? initialType;
+  final String? initialAccountId;
 
   @override
   State<RecordPage> createState() => _RecordPageState();
@@ -52,6 +59,9 @@ class _RecordPageState extends State<RecordPage> {
       (item) => item.id == widget.transactionId,
     );
     if (existing.isEmpty) {
+      _type = widget.initialType ?? TransactionType.expense;
+      _accountId = widget.initialAccountId;
+      _fromId = widget.initialAccountId;
       return;
     }
     final transaction = existing.first;

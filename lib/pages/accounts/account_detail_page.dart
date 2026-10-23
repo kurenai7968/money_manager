@@ -35,6 +35,11 @@ class AccountDetailPage extends StatelessWidget {
             .transactions;
         final balance = balanceOf(account, transactions);
         final isCredit = account.type == AccountType.credit;
+        final history = transactions.where((item) {
+          return item.accountId == account.id ||
+              item.fromAccountId == account.id ||
+              item.toAccountId == account.id;
+        }).toList();
         return Scaffold(
           appBar: AppBar(
             title: Text(account.name),
@@ -46,27 +51,75 @@ class AccountDetailPage extends StatelessWidget {
               ),
             ],
           ),
-          body: Padding(
-            padding: const EdgeInsets.all(AppSpacing.l),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  isCredit ? l10n.owed : l10n.balance,
-                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: Theme.of(context).colorScheme.onSurfaceVariant,
+          body: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(AppSpacing.l),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      isCredit ? l10n.owed : l10n.balance,
+                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                        color: Theme.of(context).colorScheme.onSurfaceVariant,
+                      ),
+                    ),
+                    Text(
+                      formatMinor(balance, locale: locale),
+                      style: Theme.of(context).textTheme.headlineMedium
+                          ?.copyWith(
+                            color: isCredit
+                                ? Theme.of(context).colorScheme.primary
+                                : null,
+                          ),
+                    ),
+                  ],
+                ),
+              ),
+              Expanded(
+                child: ListView.separated(
+                  itemCount: history.length,
+                  separatorBuilder: (_, _) => Divider(
+                    height: 1,
+                    color: Theme.of(context).colorScheme.outline,
+                  ),
+                  itemBuilder: (context, index) {
+                    final item = history[index];
+                    return ListTile(
+                      title: Text(
+                        item.note.isEmpty
+                            ? switch (item.type) {
+                                TransactionType.expense => l10n.expense,
+                                TransactionType.income => l10n.income,
+                                TransactionType.transfer => l10n.transfer,
+                              }
+                            : item.note,
+                      ),
+                      subtitle: Text(item.date.toString().split(' ').first),
+                      trailing: Text(
+                        formatMinor(item.amountMinor, locale: locale),
+                      ),
+                      onTap: () => context.push(
+                        '${AppRoutes.record.path}?id=${item.id}',
+                      ),
+                    );
+                  },
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(AppSpacing.l),
+                child: SizedBox(
+                  width: double.infinity,
+                  child: FilledButton(
+                    onPressed: () => context.push(
+                      '${AppRoutes.record.path}?type=transfer&from=${account.id}',
+                    ),
+                    child: Text(l10n.transfer),
                   ),
                 ),
-                Text(
-                  formatMinor(balance, locale: locale),
-                  style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                    color: isCredit
-                        ? Theme.of(context).colorScheme.primary
-                        : null,
-                  ),
-                ),
-              ],
-            ),
+              ),
+            ],
           ),
         );
       },

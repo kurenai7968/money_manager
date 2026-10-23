@@ -13,3 +13,4 @@ Ids are five digits, starting at `00001`. The next id is one greater than the hi
 - 00003 Accounts and categories
 - 00004 Record a transaction
 - 00005 Home summary and calendar
+- 00006 Account history and transfer

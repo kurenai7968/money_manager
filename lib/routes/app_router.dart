@@ -1,5 +1,6 @@
 import 'package:flutter/widgets.dart';
 import 'package:go_router/go_router.dart';
+import 'package:money_manager/models/ledger_kinds.dart';
 import 'package:money_manager/pages/pages.dart';
 import 'package:money_manager/routes/app_routes.dart';
 import 'package:money_manager/widgets/app_shell.dart';
@@ -58,8 +59,20 @@ GoRouter createAppRouter() {
       GoRoute(
         path: AppRoutes.record.path,
         parentNavigatorKey: rootNavigatorKey,
-        builder: (context, state) =>
-            RecordPage(transactionId: state.uri.queryParameters['id']),
+        builder: (context, state) {
+          final typeName = state.uri.queryParameters['type'];
+          TransactionType? type;
+          for (final item in TransactionType.values) {
+            if (item.name == typeName) {
+              type = item;
+            }
+          }
+          return RecordPage(
+            transactionId: state.uri.queryParameters['id'],
+            initialType: type,
+            initialAccountId: state.uri.queryParameters['from'],
+          );
+        },
       ),
       GoRoute(
         path: AppRoutes.accountNew.path,
