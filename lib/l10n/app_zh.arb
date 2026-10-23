@@ -5,6 +5,7 @@
   "accounts": "帳戶",
   "settings": "設定",
   "record": "記一筆",
+  "transfer": "轉帳",
   "showCalendar": "日曆",
   "showSummary": "摘要",
   "previousMonth": "上個月",
@@ -45,5 +46,15 @@
   "categoryMedical": "醫療",
   "categorySalary": "薪資",
   "categoryBonus": "獎金",
-  "categoryOther": "其他"
+  "categoryOther": "其他",
+  "remark": "備註",
+  "fromAccount": "從",
+  "toAccount": "到",
+  "chooseAccount": "選擇帳戶",
+  "netUnchanged": "淨資產不變",
+  "needAccount": "請先新增帳戶",
+  "needCategory": "請選擇分類",
+  "invalidTransaction": "請輸入大於 0 的金額",
+  "cancel": "取消",
+  "balance": "餘額"
 }

@@ -5,6 +5,7 @@
   "accounts": "Accounts",
   "settings": "Settings",
   "record": "Record",
+  "transfer": "Transfer",
   "@record": {
     "description": "Label for the button that opens the record page."
   },
@@ -48,5 +49,15 @@
   "categoryMedical": "Medical",
   "categorySalary": "Salary",
   "categoryBonus": "Bonus",
-  "categoryOther": "Other"
+  "categoryOther": "Other",
+  "remark": "Note",
+  "fromAccount": "From",
+  "toAccount": "To",
+  "chooseAccount": "Choose account",
+  "netUnchanged": "Net worth stays the same",
+  "needAccount": "Add an account first",
+  "needCategory": "Choose a category",
+  "invalidTransaction": "Enter an amount greater than zero",
+  "cancel": "Cancel",
+  "balance": "Balance"
 }

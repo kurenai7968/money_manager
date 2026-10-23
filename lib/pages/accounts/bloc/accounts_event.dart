@@ -22,12 +22,13 @@ class AccountSavePressed extends AccountsEvent {
 }
 
 class AccountArchivePressed extends AccountsEvent {
-  const AccountArchivePressed(this.account);
+  const AccountArchivePressed(this.account, {required this.balanceMinor});
 
   final AccountModel account;
+  final int balanceMinor;
 
   @override
-  List<Object?> get props => [account];
+  List<Object?> get props => [account, balanceMinor];
 }
 
 class AccountsReorderPressed extends AccountsEvent {

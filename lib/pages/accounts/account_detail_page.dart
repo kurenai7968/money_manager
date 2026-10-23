@@ -2,10 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:money_manager/core/extensions/context_extension.dart';
+import 'package:money_manager/core/utils/ledger_balance.dart';
 import 'package:money_manager/core/utils/money_format.dart';
 import 'package:money_manager/models/ledger_kinds.dart';
 import 'package:money_manager/pages/accounts/bloc/accounts_bloc.dart';
 import 'package:money_manager/pages/accounts/bloc/accounts_state.dart';
+import 'package:money_manager/pages/transactions/bloc/transactions_bloc.dart';
 import 'package:money_manager/routes/app_routes.dart';
 import 'package:money_manager/themes/app_themes.dart';
 
@@ -27,6 +29,11 @@ class AccountDetailPage extends StatelessWidget {
         }
         final account = matches.first;
         final locale = Localizations.localeOf(context).toString();
+        final transactions = context
+            .watch<TransactionsBloc>()
+            .state
+            .transactions;
+        final balance = balanceOf(account, transactions);
         final isCredit = account.type == AccountType.credit;
         return Scaffold(
           appBar: AppBar(
@@ -45,13 +52,13 @@ class AccountDetailPage extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  isCredit ? l10n.owed : l10n.openingBalance,
+                  isCredit ? l10n.owed : l10n.balance,
                   style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                     color: Theme.of(context).colorScheme.onSurfaceVariant,
                   ),
                 ),
                 Text(
-                  formatMinor(account.openingBalanceMinor, locale: locale),
+                  formatMinor(balance, locale: locale),
                   style: Theme.of(context).textTheme.headlineMedium?.copyWith(
                     color: isCredit
                         ? Theme.of(context).colorScheme.primary

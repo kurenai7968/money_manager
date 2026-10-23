@@ -25,6 +25,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get record => '記一筆';
 
   @override
+  String get transfer => '轉帳';
+
+  @override
   String get showCalendar => '日曆';
 
   @override
@@ -146,6 +149,36 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get categoryOther => '其他';
+
+  @override
+  String get remark => '備註';
+
+  @override
+  String get fromAccount => '從';
+
+  @override
+  String get toAccount => '到';
+
+  @override
+  String get chooseAccount => '選擇帳戶';
+
+  @override
+  String get netUnchanged => '淨資產不變';
+
+  @override
+  String get needAccount => '請先新增帳戶';
+
+  @override
+  String get needCategory => '請選擇分類';
+
+  @override
+  String get invalidTransaction => '請輸入大於 0 的金額';
+
+  @override
+  String get cancel => '取消';
+
+  @override
+  String get balance => '餘額';
 }
 
 /// The translations for Chinese, as used in Taiwan (`zh_TW`).
@@ -168,6 +201,9 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   String get record => '記一筆';
 
   @override
+  String get transfer => '轉帳';
+
+  @override
   String get showCalendar => '日曆';
 
   @override
@@ -289,4 +325,34 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get categoryOther => '其他';
+
+  @override
+  String get remark => '備註';
+
+  @override
+  String get fromAccount => '從';
+
+  @override
+  String get toAccount => '到';
+
+  @override
+  String get chooseAccount => '選擇帳戶';
+
+  @override
+  String get netUnchanged => '淨資產不變';
+
+  @override
+  String get needAccount => '請先新增帳戶';
+
+  @override
+  String get needCategory => '請選擇分類';
+
+  @override
+  String get invalidTransaction => '請輸入大於 0 的金額';
+
+  @override
+  String get cancel => '取消';
+
+  @override
+  String get balance => '餘額';
 }

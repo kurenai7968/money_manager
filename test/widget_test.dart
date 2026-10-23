@@ -5,6 +5,7 @@ import 'package:money_manager/app.dart';
 
 import 'support/memory_account_repository.dart';
 import 'support/memory_category_repository.dart';
+import 'support/memory_transaction_repository.dart';
 
 void main() {
   testWidgets('Shell opens Home and reaches the other tabs', (tester) async {
@@ -15,6 +16,7 @@ void main() {
       MoneyManagerApp(
         accounts: MemoryAccountRepository(),
         categories: MemoryCategoryRepository(),
+        transactions: MemoryTransactionRepository(),
       ),
     );
     await tester.pumpAndSettle();
@@ -65,6 +67,7 @@ void main() {
       MoneyManagerApp(
         accounts: MemoryAccountRepository(),
         categories: MemoryCategoryRepository(),
+        transactions: MemoryTransactionRepository(),
       ),
     );
     await tester.pumpAndSettle();
@@ -89,6 +92,7 @@ void main() {
       MoneyManagerApp(
         accounts: MemoryAccountRepository(),
         categories: MemoryCategoryRepository(),
+        transactions: MemoryTransactionRepository(),
       ),
     );
     await tester.pumpAndSettle();

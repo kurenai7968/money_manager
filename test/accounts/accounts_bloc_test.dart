@@ -70,7 +70,8 @@ void main() {
   blocTest<AccountsBloc, AccountsState>(
     'blocks archiving an account that still has a balance',
     build: () => AccountsBloc(repository),
-    act: (bloc) => bloc.add(const AccountArchivePressed(cash)),
+    act: (bloc) =>
+        bloc.add(const AccountArchivePressed(cash, balanceMinor: 1500)),
     expect: () => const [
       AccountsState(
         status: AccountsStatus.failure,
@@ -85,8 +86,12 @@ void main() {
     setUp: () {
       repository.accounts.add(cash.copyWith(openingBalanceMinor: 0));
     },
-    act: (bloc) =>
-        bloc.add(AccountArchivePressed(cash.copyWith(openingBalanceMinor: 0))),
+    act: (bloc) => bloc.add(
+      AccountArchivePressed(
+        cash.copyWith(openingBalanceMinor: 0),
+        balanceMinor: 0,
+      ),
+    ),
     verify: (bloc) {
       expect(bloc.state.active, isEmpty);
       expect(bloc.state.accounts.single.archived, isTrue);

@@ -8,8 +8,11 @@ import 'package:money_manager/pages/accounts/bloc/accounts_bloc.dart';
 import 'package:money_manager/pages/accounts/bloc/accounts_event.dart';
 import 'package:money_manager/pages/categories/bloc/categories_bloc.dart';
 import 'package:money_manager/pages/categories/bloc/categories_event.dart';
-import 'package:money_manager/repositories/account_repository.dart';
 import 'package:money_manager/repositories/category_repository.dart';
+import 'package:money_manager/pages/transactions/bloc/transactions_bloc.dart';
+import 'package:money_manager/pages/transactions/bloc/transactions_event.dart';
+import 'package:money_manager/repositories/account_repository.dart';
+import 'package:money_manager/repositories/transaction_repository.dart';
 import 'package:money_manager/routes/app_router.dart';
 import 'package:money_manager/themes/app_themes.dart';
 
@@ -18,12 +21,14 @@ class MoneyManagerApp extends StatefulWidget {
     this.database,
     this.accounts,
     this.categories,
+    this.transactions,
     super.key,
   });
 
   final AppDatabase? database;
   final AccountRepository? accounts;
   final CategoryRepository? categories;
+  final TransactionRepository? transactions;
 
   @override
   State<MoneyManagerApp> createState() => _MoneyManagerAppState();
@@ -44,11 +49,20 @@ class _MoneyManagerAppState extends State<MoneyManagerApp> {
           create: (_) =>
               widget.categories ?? SqliteCategoryRepository(widget.database!),
         ),
+        RepositoryProvider<TransactionRepository>(
+          create: (_) =>
+              widget.transactions ??
+              SqliteTransactionRepository(widget.database!),
+        ),
       ],
       child: MultiBlocProvider(
         providers: [
           BlocProvider(create: (context) => AccountsBloc(context.read())),
-          BlocProvider(create: (context) => CategoriesBloc(context.read())),
+          BlocProvider(create: (context) => TransactionsBloc(context.read())),
+          BlocProvider(
+            create: (context) =>
+                CategoriesBloc(context.read(), transactions: context.read()),
+          ),
         ],
         child: MaterialApp.router(
           debugShowCheckedModeBanner: false,
@@ -87,6 +101,7 @@ class _LedgerBootstrapState extends State<_LedgerBootstrap> {
         return;
       }
       context.read<AccountsBloc>().add(const AccountsStarted());
+      context.read<TransactionsBloc>().add(const TransactionsStarted());
       context.read<CategoriesBloc>().add(
         CategoriesStarted(defaultCategories(context.l10n)),
       );

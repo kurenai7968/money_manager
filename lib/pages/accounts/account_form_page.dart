@@ -4,12 +4,14 @@ import 'package:go_router/go_router.dart';
 import 'package:money_manager/l10n/app_localizations.dart';
 import 'package:money_manager/core/extensions/context_extension.dart';
 import 'package:money_manager/core/utils/id.dart';
+import 'package:money_manager/core/utils/ledger_balance.dart';
 import 'package:money_manager/core/utils/money_format.dart';
 import 'package:money_manager/models/account_model.dart';
 import 'package:money_manager/models/ledger_kinds.dart';
 import 'package:money_manager/pages/accounts/bloc/accounts_bloc.dart';
 import 'package:money_manager/pages/accounts/bloc/accounts_event.dart';
 import 'package:money_manager/pages/accounts/bloc/accounts_state.dart';
+import 'package:money_manager/pages/transactions/bloc/transactions_bloc.dart';
 import 'package:money_manager/themes/app_themes.dart';
 
 class AccountFormPage extends StatefulWidget {
@@ -171,8 +173,12 @@ class _AccountFormPageState extends State<AccountFormPage> {
     if (existing.isEmpty) {
       return;
     }
+    final transactions = context.watch<TransactionsBloc>().state.transactions;
+    final balance = balanceOf(existing.first, transactions);
     _waiting = true;
-    context.read<AccountsBloc>().add(AccountArchivePressed(existing.first));
+    context.read<AccountsBloc>().add(
+      AccountArchivePressed(existing.first, balanceMinor: balance),
+    );
   }
 
   String _typeLabel(AppLocalizations l10n, AccountType type) {

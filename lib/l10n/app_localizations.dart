@@ -129,6 +129,12 @@ abstract class AppLocalizations {
   /// **'Record'**
   String get record;
 
+  /// No description provided for @transfer.
+  ///
+  /// In en, this message translates to:
+  /// **'Transfer'**
+  String get transfer;
+
   /// No description provided for @showCalendar.
   ///
   /// In en, this message translates to:
@@ -374,6 +380,66 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Other'**
   String get categoryOther;
+
+  /// No description provided for @remark.
+  ///
+  /// In en, this message translates to:
+  /// **'Note'**
+  String get remark;
+
+  /// No description provided for @fromAccount.
+  ///
+  /// In en, this message translates to:
+  /// **'From'**
+  String get fromAccount;
+
+  /// No description provided for @toAccount.
+  ///
+  /// In en, this message translates to:
+  /// **'To'**
+  String get toAccount;
+
+  /// No description provided for @chooseAccount.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose account'**
+  String get chooseAccount;
+
+  /// No description provided for @netUnchanged.
+  ///
+  /// In en, this message translates to:
+  /// **'Net worth stays the same'**
+  String get netUnchanged;
+
+  /// No description provided for @needAccount.
+  ///
+  /// In en, this message translates to:
+  /// **'Add an account first'**
+  String get needAccount;
+
+  /// No description provided for @needCategory.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose a category'**
+  String get needCategory;
+
+  /// No description provided for @invalidTransaction.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter an amount greater than zero'**
+  String get invalidTransaction;
+
+  /// No description provided for @cancel.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel'**
+  String get cancel;
+
+  /// No description provided for @balance.
+  ///
+  /// In en, this message translates to:
+  /// **'Balance'**
+  String get balance;
 }
 
 class _AppLocalizationsDelegate

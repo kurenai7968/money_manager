@@ -2,12 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:money_manager/core/extensions/context_extension.dart';
+import 'package:money_manager/core/utils/ledger_balance.dart';
 import 'package:money_manager/core/utils/money_format.dart';
 import 'package:money_manager/models/account_model.dart';
+import 'package:money_manager/models/transaction_model.dart';
 import 'package:money_manager/models/ledger_kinds.dart';
 import 'package:money_manager/pages/accounts/bloc/accounts_bloc.dart';
 import 'package:money_manager/pages/accounts/bloc/accounts_event.dart';
 import 'package:money_manager/pages/accounts/bloc/accounts_state.dart';
+import 'package:money_manager/pages/transactions/bloc/transactions_bloc.dart';
 import 'package:money_manager/routes/app_routes.dart';
 import 'package:money_manager/themes/app_themes.dart';
 import 'package:money_manager/themes/ledger_palette.dart';
@@ -37,6 +40,10 @@ class AccountsPage extends StatelessWidget {
           }
         },
         builder: (context, state) {
+          final transactions = context
+              .watch<TransactionsBloc>()
+              .state
+              .transactions;
           final accounts = state.active;
           if (accounts.isEmpty) {
             return Center(child: Text(l10n.emptyAccounts));
@@ -48,6 +55,7 @@ class AccountsPage extends StatelessWidget {
               .where((account) => account.type == AccountType.credit)
               .toList();
           final locale = Localizations.localeOf(context).toString();
+          final worth = netWorthOf(accounts, transactions);
           return CustomScrollView(
             slivers: [
               SliverToBoxAdapter(
@@ -68,7 +76,7 @@ class AccountsPage extends StatelessWidget {
                         ),
                       ),
                       Text(
-                        formatMinor(state.netWorth, locale: locale),
+                        formatMinor(worth, locale: locale),
                         style: Theme.of(context).textTheme.headlineMedium,
                       ),
                     ],
@@ -79,6 +87,7 @@ class AccountsPage extends StatelessWidget {
                 SliverToBoxAdapter(child: _SectionLabel(l10n.assets)),
                 _AccountSliver(
                   accounts: assets,
+                  transactions: transactions,
                   onReorder: (ids) => context.read<AccountsBloc>().add(
                     AccountsReorderPressed(ids),
                   ),
@@ -88,6 +97,7 @@ class AccountsPage extends StatelessWidget {
                 SliverToBoxAdapter(child: _SectionLabel(l10n.liabilities)),
                 _AccountSliver(
                   accounts: liabilities,
+                  transactions: transactions,
                   onReorder: (ids) => context.read<AccountsBloc>().add(
                     AccountsReorderPressed(ids),
                   ),
@@ -125,9 +135,14 @@ class _SectionLabel extends StatelessWidget {
 }
 
 class _AccountSliver extends StatelessWidget {
-  const _AccountSliver({required this.accounts, required this.onReorder});
+  const _AccountSliver({
+    required this.accounts,
+    required this.transactions,
+    required this.onReorder,
+  });
 
   final List<AccountModel> accounts;
+  final List<TransactionModel> transactions;
   final ValueChanged<List<String>> onReorder;
 
   @override
@@ -145,6 +160,7 @@ class _AccountSliver extends StatelessWidget {
         return _AccountRow(
           key: ValueKey(account.id),
           account: account,
+          transactions: transactions,
           index: index,
         );
       },
@@ -153,9 +169,15 @@ class _AccountSliver extends StatelessWidget {
 }
 
 class _AccountRow extends StatelessWidget {
-  const _AccountRow({required this.account, required this.index, super.key});
+  const _AccountRow({
+    required this.account,
+    required this.transactions,
+    required this.index,
+    super.key,
+  });
 
   final AccountModel account;
+  final List<TransactionModel> transactions;
   final int index;
 
   @override
@@ -179,7 +201,7 @@ class _AccountRow extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           Text(
-            formatMinor(account.openingBalanceMinor, locale: locale),
+            formatMinor(balanceOf(account, transactions), locale: locale),
             style: Theme.of(context).textTheme.titleMedium
                 ?.copyWith(color: isCredit ? scheme.primary : scheme.onSurface),
           ),

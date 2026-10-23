@@ -79,7 +79,7 @@ class AccountsBloc extends Bloc<AccountsEvent, AccountsState> {
     AccountArchivePressed event,
     Emitter<AccountsState> emit,
   ) async {
-    if (event.account.openingBalanceMinor != 0) {
+    if (event.balanceMinor != 0) {
       emit(
         state.copyWith(
           status: AccountsStatus.failure,

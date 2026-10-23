@@ -58,7 +58,8 @@ GoRouter createAppRouter() {
       GoRoute(
         path: AppRoutes.record.path,
         parentNavigatorKey: rootNavigatorKey,
-        builder: (context, state) => const RecordPage(),
+        builder: (context, state) =>
+            RecordPage(transactionId: state.uri.queryParameters['id']),
       ),
       GoRoute(
         path: AppRoutes.accountNew.path,

@@ -25,6 +25,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get record => 'Record';
 
   @override
+  String get transfer => 'Transfer';
+
+  @override
   String get showCalendar => 'Calendar';
 
   @override
@@ -146,4 +149,34 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get categoryOther => 'Other';
+
+  @override
+  String get remark => 'Note';
+
+  @override
+  String get fromAccount => 'From';
+
+  @override
+  String get toAccount => 'To';
+
+  @override
+  String get chooseAccount => 'Choose account';
+
+  @override
+  String get netUnchanged => 'Net worth stays the same';
+
+  @override
+  String get needAccount => 'Add an account first';
+
+  @override
+  String get needCategory => 'Choose a category';
+
+  @override
+  String get invalidTransaction => 'Enter an amount greater than zero';
+
+  @override
+  String get cancel => 'Cancel';
+
+  @override
+  String get balance => 'Balance';
 }

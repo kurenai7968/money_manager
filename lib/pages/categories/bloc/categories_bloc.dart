@@ -2,9 +2,11 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:money_manager/pages/categories/bloc/categories_event.dart';
 import 'package:money_manager/pages/categories/bloc/categories_state.dart';
 import 'package:money_manager/repositories/category_repository.dart';
+import 'package:money_manager/repositories/transaction_repository.dart';
 
 class CategoriesBloc extends Bloc<CategoriesEvent, CategoriesState> {
-  CategoriesBloc(this._repository) : super(const CategoriesState()) {
+  CategoriesBloc(this._repository, {this.transactions})
+    : super(const CategoriesState()) {
     on<CategoriesStarted>(_onCategoriesStarted);
     on<CategorySavePressed>(_onCategorySavePressed);
     on<CategoryDeletePressed>(_onCategoryDeletePressed);
@@ -12,6 +14,7 @@ class CategoriesBloc extends Bloc<CategoriesEvent, CategoriesState> {
   }
 
   final CategoryRepository _repository;
+  final TransactionRepository? transactions;
 
   Future<void> _onCategoriesStarted(
     CategoriesStarted event,
@@ -84,7 +87,16 @@ class CategoriesBloc extends Bloc<CategoriesEvent, CategoriesState> {
     Emitter<CategoriesState> emit,
   ) async {
     try {
-      await _repository.delete(event.id);
+      final existing = state.categories.where(
+        (category) => category.id == event.id,
+      );
+      final source = transactions;
+      final used = source == null ? 0 : await source.countForCategory(event.id);
+      if (existing.isNotEmpty && used > 0) {
+        await _repository.save(existing.first.copyWith(archived: true));
+      } else {
+        await _repository.delete(event.id);
+      }
       final categories = await _repository.getAll();
       emit(
         state.copyWith(
