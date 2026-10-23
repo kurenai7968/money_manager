@@ -35,4 +35,115 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get nextMonth => 'Next month';
+
+  @override
+  String get add => 'Add';
+
+  @override
+  String get save => 'Save';
+
+  @override
+  String get edit => 'Edit';
+
+  @override
+  String get delete => 'Delete';
+
+  @override
+  String get name => 'Name';
+
+  @override
+  String get openingBalance => 'Opening balance';
+
+  @override
+  String get cash => 'Cash';
+
+  @override
+  String get bank => 'Bank';
+
+  @override
+  String get savings => 'Savings';
+
+  @override
+  String get credit => 'Credit card';
+
+  @override
+  String get owed => 'Owed';
+
+  @override
+  String get netWorth => 'Net worth';
+
+  @override
+  String get assets => 'Assets';
+
+  @override
+  String get liabilities => 'Liabilities';
+
+  @override
+  String get emptyAccounts => 'No accounts yet';
+
+  @override
+  String get archiveBlocked => 'Transfer the balance out before archiving';
+
+  @override
+  String get nameRequired => 'Enter a name';
+
+  @override
+  String get amountInvalid => 'Enter a valid amount';
+
+  @override
+  String get categories => 'Categories';
+
+  @override
+  String get expenseAndIncome => 'Expense and income';
+
+  @override
+  String get expense => 'Expense';
+
+  @override
+  String get income => 'Income';
+
+  @override
+  String get newAccount => 'New account';
+
+  @override
+  String get editAccount => 'Edit account';
+
+  @override
+  String get newCategory => 'New category';
+
+  @override
+  String get editCategory => 'Edit category';
+
+  @override
+  String get icon => 'Icon';
+
+  @override
+  String get color => 'Color';
+
+  @override
+  String get categoryFood => 'Food';
+
+  @override
+  String get categoryTransit => 'Transit';
+
+  @override
+  String get categoryHousing => 'Housing';
+
+  @override
+  String get categoryShopping => 'Shopping';
+
+  @override
+  String get categoryEntertainment => 'Entertainment';
+
+  @override
+  String get categoryMedical => 'Medical';
+
+  @override
+  String get categorySalary => 'Salary';
+
+  @override
+  String get categoryBonus => 'Bonus';
+
+  @override
+  String get categoryOther => 'Other';
 }

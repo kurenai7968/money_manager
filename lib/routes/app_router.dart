@@ -60,6 +60,39 @@ GoRouter createAppRouter() {
         parentNavigatorKey: rootNavigatorKey,
         builder: (context, state) => const RecordPage(),
       ),
+      GoRoute(
+        path: AppRoutes.accountNew.path,
+        parentNavigatorKey: rootNavigatorKey,
+        builder: (context, state) => const AccountFormPage(),
+      ),
+      GoRoute(
+        path: '/account/:id/edit',
+        parentNavigatorKey: rootNavigatorKey,
+        builder: (context, state) =>
+            AccountFormPage(accountId: state.pathParameters['id']),
+      ),
+      GoRoute(
+        path: '/account/:id',
+        parentNavigatorKey: rootNavigatorKey,
+        builder: (context, state) =>
+            AccountDetailPage(accountId: state.pathParameters['id']!),
+      ),
+      GoRoute(
+        path: AppRoutes.categories.path,
+        parentNavigatorKey: rootNavigatorKey,
+        builder: (context, state) => const CategoriesPage(),
+      ),
+      GoRoute(
+        path: AppRoutes.categoryNew.path,
+        parentNavigatorKey: rootNavigatorKey,
+        builder: (context, state) => const CategoryFormPage(),
+      ),
+      GoRoute(
+        path: '/category/:id',
+        parentNavigatorKey: rootNavigatorKey,
+        builder: (context, state) =>
+            CategoryFormPage(categoryId: state.pathParameters['id']),
+      ),
     ],
   );
 }

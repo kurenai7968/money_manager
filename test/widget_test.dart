@@ -3,12 +3,20 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:intl/intl.dart';
 import 'package:money_manager/app.dart';
 
+import 'support/memory_account_repository.dart';
+import 'support/memory_category_repository.dart';
+
 void main() {
   testWidgets('Shell opens Home and reaches the other tabs', (tester) async {
     tester.platformDispatcher.localeTestValue = const Locale('en');
     addTearDown(tester.platformDispatcher.clearLocaleTestValue);
 
-    await tester.pumpWidget(const MoneyManagerApp());
+    await tester.pumpWidget(
+      MoneyManagerApp(
+        accounts: MemoryAccountRepository(),
+        categories: MemoryCategoryRepository(),
+      ),
+    );
     await tester.pumpAndSettle();
 
     final now = DateTime.now();
@@ -19,9 +27,8 @@ void main() {
 
     await tester.tap(find.byTooltip('Next month'));
     await tester.pump();
-    final nextMonth = DateFormat.yMMMM(
-      'en',
-    ).format(DateTime(now.year, now.month + 1));
+    final nextMonth = DateFormat.yMMMM('en')
+        .format(DateTime(now.year, now.month + 1));
     expect(find.text(nextMonth), findsOneWidget);
 
     await tester.tap(find.byTooltip('Calendar'));
@@ -31,10 +38,7 @@ void main() {
     await tester.tap(find.text('Analysis'));
     await tester.pumpAndSettle();
     expect(
-      find.descendant(
-        of: find.byType(AppBar),
-        matching: find.text('Analysis'),
-      ),
+      find.descendant(of: find.byType(AppBar), matching: find.text('Analysis')),
       findsOneWidget,
     );
 
@@ -57,7 +61,12 @@ void main() {
     tester.platformDispatcher.localeTestValue = const Locale('en');
     addTearDown(tester.platformDispatcher.clearLocaleTestValue);
 
-    await tester.pumpWidget(const MoneyManagerApp());
+    await tester.pumpWidget(
+      MoneyManagerApp(
+        accounts: MemoryAccountRepository(),
+        categories: MemoryCategoryRepository(),
+      ),
+    );
     await tester.pumpAndSettle();
 
     await tester.tap(find.byTooltip('Record'));
@@ -70,5 +79,28 @@ void main() {
     await tester.tap(find.byType(BackButton));
     await tester.pumpAndSettle();
     expect(find.text('Home'), findsOneWidget);
+  });
+
+  testWidgets('Adding an account shows it in the list', (tester) async {
+    tester.platformDispatcher.localeTestValue = const Locale('en');
+    addTearDown(tester.platformDispatcher.clearLocaleTestValue);
+
+    await tester.pumpWidget(
+      MoneyManagerApp(
+        accounts: MemoryAccountRepository(),
+        categories: MemoryCategoryRepository(),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text('Accounts'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Add'));
+    await tester.pumpAndSettle();
+    await tester.enterText(find.byType(TextField).first, 'Wallet');
+    await tester.tap(find.text('Save'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Wallet'), findsOneWidget);
   });
 }

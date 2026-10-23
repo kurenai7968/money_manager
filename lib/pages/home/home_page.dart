@@ -39,9 +39,7 @@ class _HomePageState extends State<HomePage> {
               onPressed: () => _shiftMonth(-1),
               icon: const Icon(Icons.chevron_left),
             ),
-            Flexible(
-              child: Text(monthLabel, overflow: TextOverflow.ellipsis),
-            ),
+            Flexible(child: Text(monthLabel, overflow: TextOverflow.ellipsis)),
             IconButton(
               tooltip: l10n.nextMonth,
               onPressed: () => _shiftMonth(1),
@@ -54,9 +52,7 @@ class _HomePageState extends State<HomePage> {
             tooltip: showingSummary ? l10n.showCalendar : l10n.showSummary,
             onPressed: _toggleView,
             icon: Icon(
-              showingSummary
-                  ? Icons.calendar_today_outlined
-                  : Icons.bar_chart,
+              showingSummary ? Icons.calendar_today_outlined : Icons.bar_chart,
             ),
           ),
         ],
@@ -72,9 +68,7 @@ class _HomePageState extends State<HomePage> {
 
   void _toggleView() {
     setState(() {
-      _view = _view == HomeView.summary
-          ? HomeView.calendar
-          : HomeView.summary;
+      _view = _view == HomeView.summary ? HomeView.calendar : HomeView.summary;
     });
   }
 }

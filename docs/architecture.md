@@ -6,7 +6,7 @@ synced_commit: 2cbf8238ee3122105448040f1c5729f743ad957a
 
 Use a maintainable layered architecture. Keep code testable, and do not add abstraction until a task needs it.
 
-The checked-in app is still the Flutter template: `lib/main.dart` with the counter `MyHomePage`, and `test/widget_test.dart`. The sections below are the target. New code follows them. Add packages and folders only when a task needs them.
+The navigation shell is in place. Accounts and categories can be stored. The sections below remain the target for transactions, the home summary, and analysis.
 
 ## Tech stack
 

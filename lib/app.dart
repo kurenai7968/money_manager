@@ -1,32 +1,100 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:money_manager/database/sqlite/app_database.dart';
 import 'package:money_manager/l10n/app_localizations.dart';
+import 'package:money_manager/core/extensions/context_extension.dart';
+import 'package:money_manager/models/category_defaults.dart';
+import 'package:money_manager/pages/accounts/bloc/accounts_bloc.dart';
+import 'package:money_manager/pages/accounts/bloc/accounts_event.dart';
+import 'package:money_manager/pages/categories/bloc/categories_bloc.dart';
+import 'package:money_manager/pages/categories/bloc/categories_event.dart';
+import 'package:money_manager/repositories/account_repository.dart';
+import 'package:money_manager/repositories/category_repository.dart';
 import 'package:money_manager/routes/app_router.dart';
 import 'package:money_manager/themes/app_themes.dart';
 
 class MoneyManagerApp extends StatefulWidget {
-  const MoneyManagerApp({super.key});
+  const MoneyManagerApp({
+    this.database,
+    this.accounts,
+    this.categories,
+    super.key,
+  });
+
+  final AppDatabase? database;
+  final AccountRepository? accounts;
+  final CategoryRepository? categories;
 
   @override
   State<MoneyManagerApp> createState() => _MoneyManagerAppState();
 }
 
 class _MoneyManagerAppState extends State<MoneyManagerApp> {
-  final _router = createAppRouter();
+  late final _router = createAppRouter();
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp.router(
-      debugShowCheckedModeBanner: false,
-      onGenerateTitle: (context) => AppLocalizations.of(context).home,
-      routerConfig: _router,
-      theme: AppThemes.light,
-      darkTheme: AppThemes.dark,
-      themeMode: ThemeMode.system,
-      localeResolutionCallback: _resolveLocale,
-      localizationsDelegates: AppLocalizations.localizationsDelegates,
-      supportedLocales: AppLocalizations.supportedLocales,
+    return MultiRepositoryProvider(
+      providers: [
+        RepositoryProvider<AccountRepository>(
+          create: (_) =>
+              widget.accounts ?? SqliteAccountRepository(widget.database!),
+        ),
+        RepositoryProvider<CategoryRepository>(
+          create: (_) =>
+              widget.categories ?? SqliteCategoryRepository(widget.database!),
+        ),
+      ],
+      child: MultiBlocProvider(
+        providers: [
+          BlocProvider(create: (context) => AccountsBloc(context.read())),
+          BlocProvider(create: (context) => CategoriesBloc(context.read())),
+        ],
+        child: MaterialApp.router(
+          debugShowCheckedModeBanner: false,
+          onGenerateTitle: (context) => AppLocalizations.of(context).home,
+          routerConfig: _router,
+          theme: AppThemes.light,
+          darkTheme: AppThemes.dark,
+          themeMode: ThemeMode.system,
+          localeResolutionCallback: _resolveLocale,
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+          builder: (context, child) {
+            return _LedgerBootstrap(child: child ?? const SizedBox.shrink());
+          },
+        ),
+      ),
     );
   }
+}
+
+class _LedgerBootstrap extends StatefulWidget {
+  const _LedgerBootstrap({required this.child});
+
+  final Widget child;
+
+  @override
+  State<_LedgerBootstrap> createState() => _LedgerBootstrapState();
+}
+
+class _LedgerBootstrapState extends State<_LedgerBootstrap> {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) {
+        return;
+      }
+      context.read<AccountsBloc>().add(const AccountsStarted());
+      context.read<CategoriesBloc>().add(
+        CategoriesStarted(defaultCategories(context.l10n)),
+      );
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) => widget.child;
 }
 
 Locale _resolveLocale(Locale? locale, Iterable<Locale> supported) {

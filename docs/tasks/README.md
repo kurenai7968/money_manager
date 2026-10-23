@@ -10,3 +10,4 @@ Ids are five digits, starting at `00001`. The next id is one greater than the hi
 
 - 00001 Document the ledger domain
 - 00002 Theme and navigation shell
+- 00003 Accounts and categories

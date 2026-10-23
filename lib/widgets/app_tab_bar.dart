@@ -44,9 +44,7 @@ class AppTabBar extends StatelessWidget {
                   onTap: () => onSelected(1),
                 ),
                 Padding(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: AppSpacing.s,
-                  ),
+                  padding: const EdgeInsets.symmetric(horizontal: AppSpacing.s),
                   child: IconButton(
                     tooltip: l10n.record,
                     onPressed: onRecord,
