@@ -223,6 +223,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get traditionalChinese => 'Traditional Chinese';
 
   @override
+  String get simplifiedChinese => 'Simplified Chinese';
+
+  @override
   String get monday => 'Monday';
 
   @override

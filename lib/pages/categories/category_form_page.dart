@@ -26,6 +26,11 @@ class _CategoryFormPageState extends State<CategoryFormPage> {
   var _color = 'coral';
   var _kind = CategoryKind.expense;
   var _sortOrder = 0;
+  var _archived = false;
+  String? _languageEn;
+  String? _languageZh;
+  String? _languageZhCn;
+  var _localized = false;
   var _ready = false;
   var _waiting = false;
   String? _error;
@@ -43,11 +48,19 @@ class _CategoryFormPageState extends State<CategoryFormPage> {
     );
     if (existing.isNotEmpty) {
       final category = existing.first;
-      _name.text = category.name;
+      _name.text = category.labelFor(context.categoryLanguageCode);
       _icon = category.icon;
       _color = category.color;
       _kind = category.kind;
       _sortOrder = category.sortOrder;
+      _archived = category.archived;
+      _languageEn = category.languageEn;
+      _languageZh = category.languageZh;
+      _languageZhCn = category.languageZhCn;
+      _localized =
+          category.languageEn != null ||
+          category.languageZh != null ||
+          category.languageZhCn != null;
     } else {
       final sameKind = categories.where((category) => category.kind == _kind);
       final orders = sameKind.map((category) => category.sortOrder);
@@ -164,15 +177,23 @@ class _CategoryFormPageState extends State<CategoryFormPage> {
       return;
     }
     _waiting = true;
+    final text = _name.text.trim();
+    final code = context.categoryLanguageCode;
     context.read<CategoriesBloc>().add(
       CategorySavePressed(
         CategoryModel(
           id: widget.categoryId ?? createId(),
-          name: _name.text.trim(),
+          name: _localized ? null : text,
+          languageEn: _localized ? (code == 'en' ? text : _languageEn) : null,
+          languageZh: _localized ? (code == 'zh' ? text : _languageZh) : null,
+          languageZhCn: _localized
+              ? (code == 'zh_CN' ? text : _languageZhCn)
+              : null,
           icon: _icon,
           color: _color,
           kind: _kind,
           sortOrder: _sortOrder,
+          archived: _archived,
         ),
       ),
     );

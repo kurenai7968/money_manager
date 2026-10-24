@@ -85,12 +85,17 @@ An account with transactions is not deleted. It can be archived only when its ba
 ### CategoryModel
 
 - `id`
-- `name`
+- `name`, optional
+- `languageEn`, optional
+- `languageZh`, optional. Traditional Chinese for `zh` and `zh_TW`
+- `languageZhCn`, optional. Simplified Chinese
 - `icon`
 - `color`, one of the seven fixed colors in `DESIGN.md`
 - `kind`: `expense` or `income`
 - `sortOrder`
 - `archived`
+
+`name`, `languageEn`, `languageZh`, and `languageZhCn` have no default. An initial category stores the three language names and leaves `name` empty. A category the user creates stores `name` and leaves the language fields empty. The visible name is `languageZh` for Traditional Chinese, `languageZhCn` for Simplified Chinese, `languageEn` for English, and `name` when that language field is empty.
 
 Expense and income keep separate lists. A transfer has no category. A category that has transactions is archived, not deleted. A category with no transactions can be deleted. Creating and editing categories happens in Settings. The record page only selects one.
 

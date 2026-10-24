@@ -7,6 +7,9 @@ extension CategoryEntityMapping on CategoryEntity {
     return CategoryModel(
       id: id,
       name: name,
+      languageEn: languageEn,
+      languageZh: languageZh,
+      languageZhCn: languageZhCn,
       icon: icon,
       color: color,
       kind: CategoryKind.values.byName(kind),
@@ -21,6 +24,9 @@ extension CategoryModelMapping on CategoryModel {
     return CategoryEntity(
       id: id,
       name: name,
+      languageEn: languageEn,
+      languageZh: languageZh,
+      languageZhCn: languageZhCn,
       icon: icon,
       color: color,
       kind: kind.name,

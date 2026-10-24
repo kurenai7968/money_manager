@@ -390,7 +390,7 @@ class _CategoryGrid extends StatelessWidget {
               ),
               const SizedBox(height: AppSpacing.xs),
               Text(
-                category.name,
+                category.labelFor(context.categoryLanguageCode),
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
                 style: Theme.of(context).textTheme.labelMedium?.copyWith(

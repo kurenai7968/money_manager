@@ -15,3 +15,4 @@ Ids are five digits, starting at `00001`. The next id is one greater than the hi
 - 00005 Home summary and calendar
 - 00006 Account history and transfer
 - 00007 Settings and analysis
+- 00008 Category language

@@ -8,7 +8,10 @@ part 'category_entity.g.dart';
 class CategoryEntity extends Equatable {
   const CategoryEntity({
     required this.id,
-    required this.name,
+    this.name,
+    this.languageEn,
+    this.languageZh,
+    this.languageZhCn,
     required this.icon,
     required this.color,
     required this.kind,
@@ -20,7 +23,10 @@ class CategoryEntity extends Equatable {
       _$CategoryEntityFromJson(json);
 
   final String id;
-  final String name;
+  final String? name;
+  final String? languageEn;
+  final String? languageZh;
+  final String? languageZhCn;
   final String icon;
   final String color;
   final String kind;
@@ -32,5 +38,16 @@ class CategoryEntity extends Equatable {
   Map<String, dynamic> toJson() => _$CategoryEntityToJson(this);
 
   @override
-  List<Object?> get props => [id, name, icon, color, kind, sortOrder, archived];
+  List<Object?> get props => [
+    id,
+    name,
+    languageEn,
+    languageZh,
+    languageZhCn,
+    icon,
+    color,
+    kind,
+    sortOrder,
+    archived,
+  ];
 }

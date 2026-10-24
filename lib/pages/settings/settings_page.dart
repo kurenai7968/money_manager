@@ -27,6 +27,7 @@ class SettingsPage extends StatelessWidget {
                 title: l10n.language,
                 value: switch (setting.languageCode) {
                   'zh' => l10n.traditionalChinese,
+                  'zh_CN' => l10n.simplifiedChinese,
                   'en' => l10n.english,
                   _ => l10n.followSystem,
                 },
@@ -36,6 +37,7 @@ class SettingsPage extends StatelessWidget {
                   options: [
                     (null, l10n.followSystem),
                     ('zh', l10n.traditionalChinese),
+                    ('zh_CN', l10n.simplifiedChinese),
                     ('en', l10n.english),
                   ],
                   selected: setting.languageCode,

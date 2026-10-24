@@ -10,7 +10,7 @@ class AppDatabase {
   static Future<AppDatabase> open({String? path}) async {
     final database = await openDatabase(
       path ?? await _defaultPath(),
-      version: 2,
+      version: 3,
       onCreate: (db, version) async {
         await _createAccounts(db);
         await _createCategories(db);
@@ -19,6 +19,9 @@ class AppDatabase {
       onUpgrade: (db, oldVersion, newVersion) async {
         if (oldVersion < 2) {
           await _createTransactions(db);
+        }
+        if (oldVersion < 3) {
+          await _addCategoryLanguages(db);
         }
       },
     );
@@ -47,14 +50,43 @@ class AppDatabase {
     return db.execute('''
       CREATE TABLE categories (
         id TEXT PRIMARY KEY,
-        name TEXT NOT NULL,
+        name TEXT,
         icon TEXT NOT NULL,
         color TEXT NOT NULL,
         kind TEXT NOT NULL,
         sort_order INTEGER NOT NULL,
-        archived INTEGER NOT NULL
+        archived INTEGER NOT NULL,
+        language_en TEXT,
+        language_zh TEXT,
+        language_zh_cn TEXT
       )
     ''');
+  }
+
+  static Future<void> _addCategoryLanguages(Database db) async {
+    await db.execute('''
+      CREATE TABLE categories_next (
+        id TEXT PRIMARY KEY,
+        name TEXT,
+        icon TEXT NOT NULL,
+        color TEXT NOT NULL,
+        kind TEXT NOT NULL,
+        sort_order INTEGER NOT NULL,
+        archived INTEGER NOT NULL,
+        language_en TEXT,
+        language_zh TEXT,
+        language_zh_cn TEXT
+      )
+    ''');
+    await db.execute('''
+      INSERT INTO categories_next (
+        id, name, icon, color, kind, sort_order, archived
+      )
+      SELECT id, name, icon, color, kind, sort_order, archived
+      FROM categories
+    ''');
+    await db.execute('DROP TABLE categories');
+    await db.execute('ALTER TABLE categories_next RENAME TO categories');
   }
 
   static Future<void> _createTransactions(Database db) {

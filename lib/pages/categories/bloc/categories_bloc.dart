@@ -53,7 +53,7 @@ class CategoriesBloc extends Bloc<CategoriesEvent, CategoriesState> {
     CategorySavePressed event,
     Emitter<CategoriesState> emit,
   ) async {
-    if (event.category.name.trim().isEmpty) {
+    if (!event.category.hasLabel) {
       emit(
         state.copyWith(
           status: CategoriesStatus.failure,

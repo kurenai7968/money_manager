@@ -57,6 +57,29 @@ void main() {
   );
 
   blocTest<CategoriesBloc, CategoriesState>(
+    'saves a category that only has language names',
+    build: () => CategoriesBloc(repository),
+    act: (bloc) => bloc.add(
+      const CategorySavePressed(
+        CategoryModel(
+          id: 'food',
+          languageEn: 'Food',
+          languageZh: '飲食',
+          languageZhCn: '饮食',
+          icon: 'food',
+          color: 'coral',
+          kind: CategoryKind.expense,
+          sortOrder: 0,
+        ),
+      ),
+    ),
+    verify: (bloc) {
+      expect(bloc.state.categories.single.name, isNull);
+      expect(bloc.state.categories.single.languageZh, '飲食');
+    },
+  );
+
+  blocTest<CategoriesBloc, CategoriesState>(
     'rejects an empty name',
     build: () => CategoriesBloc(repository),
     seed: () => const CategoriesState(status: CategoriesStatus.success),

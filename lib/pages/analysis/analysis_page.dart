@@ -146,7 +146,11 @@ class _AnalysisPageState extends State<AnalysisPage> {
           for (final entry in byCategory.entries)
             _TotalRow(
               color: LedgerPalette.color(_colorKey(categories, entry.key)),
-              title: _categoryName(categories, entry.key),
+              title: _categoryName(
+                categories,
+                entry.key,
+                context.categoryLanguageCode,
+              ),
               amount: formatMinor(entry.value, locale: locale),
               share: current == 0
                   ? ''
@@ -205,10 +209,14 @@ String _colorKey(List<CategoryModel> categories, String? id) {
   return 'slate';
 }
 
-String _categoryName(List<CategoryModel> categories, String? id) {
+String _categoryName(
+  List<CategoryModel> categories,
+  String? id,
+  String languageCode,
+) {
   for (final category in categories) {
     if (category.id == id) {
-      return category.name;
+      return category.labelFor(languageCode);
     }
   }
   return '';

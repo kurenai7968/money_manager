@@ -7,7 +7,6 @@ import 'package:money_manager/database/shared_preferences/settings_store.dart';
 import 'package:money_manager/database/sqlite/app_database.dart';
 import 'package:money_manager/models/app_setting.dart';
 import 'package:money_manager/l10n/app_localizations.dart';
-import 'package:money_manager/core/extensions/context_extension.dart';
 import 'package:money_manager/models/category_defaults.dart';
 import 'package:money_manager/pages/accounts/bloc/accounts_bloc.dart';
 import 'package:money_manager/pages/accounts/bloc/accounts_event.dart';
@@ -90,7 +89,7 @@ class _MoneyManagerAppState extends State<MoneyManagerApp> {
                 AppThemeChoice.dark => ThemeMode.dark,
                 AppThemeChoice.system => ThemeMode.system,
               },
-              locale: language == null ? null : Locale(language),
+              locale: _localeFor(language),
               localeResolutionCallback: _resolveLocale,
               localizationsDelegates: AppLocalizations.localizationsDelegates,
               supportedLocales: AppLocalizations.supportedLocales,
@@ -127,7 +126,7 @@ class _LedgerBootstrapState extends State<_LedgerBootstrap> {
       context.read<AccountsBloc>().add(const AccountsStarted());
       context.read<TransactionsBloc>().add(const TransactionsStarted());
       context.read<CategoriesBloc>().add(
-        CategoriesStarted(defaultCategories(context.l10n)),
+        CategoriesStarted(defaultCategories()),
       );
     });
   }
@@ -136,9 +135,22 @@ class _LedgerBootstrapState extends State<_LedgerBootstrap> {
   Widget build(BuildContext context) => widget.child;
 }
 
+Locale? _localeFor(String? languageCode) {
+  return switch (languageCode) {
+    'en' => const Locale('en'),
+    'zh' => const Locale('zh'),
+    'zh_CN' => const Locale('zh', 'CN'),
+    _ => null,
+  };
+}
+
 Locale _resolveLocale(Locale? locale, Iterable<Locale> supported) {
   if (locale != null && locale.languageCode == 'zh') {
-    return const Locale('zh');
+    final simplified =
+        locale.scriptCode == 'Hans' ||
+        locale.countryCode == 'CN' ||
+        locale.countryCode == 'SG';
+    return simplified ? const Locale('zh', 'CN') : const Locale('zh');
   }
   return const Locale('en');
 }

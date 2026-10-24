@@ -95,7 +95,7 @@ class _CategorySliver extends StatelessWidget {
               color: Theme.of(context).colorScheme.onPrimary,
             ),
           ),
-          title: Text(category.name),
+          title: Text(category.labelFor(context.categoryLanguageCode)),
           trailing: ReorderableDragStartListener(
             index: index,
             child: Icon(

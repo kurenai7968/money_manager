@@ -96,6 +96,7 @@ abstract class AppLocalizations {
   static const List<Locale> supportedLocales = <Locale>[
     Locale('en'),
     Locale('zh'),
+    Locale('zh', 'CN'),
     Locale('zh', 'TW'),
   ];
 
@@ -525,6 +526,12 @@ abstract class AppLocalizations {
   /// **'Traditional Chinese'**
   String get traditionalChinese;
 
+  /// No description provided for @simplifiedChinese.
+  ///
+  /// In en, this message translates to:
+  /// **'Simplified Chinese'**
+  String get simplifiedChinese;
+
   /// No description provided for @monday.
   ///
   /// In en, this message translates to:
@@ -579,6 +586,8 @@ AppLocalizations lookupAppLocalizations(Locale locale) {
     case 'zh':
       {
         switch (locale.countryCode) {
+          case 'CN':
+            return AppLocalizationsZhCn();
           case 'TW':
             return AppLocalizationsZhTw();
         }
