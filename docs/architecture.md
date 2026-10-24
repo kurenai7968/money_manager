@@ -72,11 +72,16 @@ Visual design is recorded in `DESIGN.md`.
 ### AccountModel
 
 - `id`
-- `name`
+- `name`, optional
+- `languageEn`, optional
+- `languageZh`, optional. Traditional Chinese for `zh` and `zh_TW`
+- `languageZhCn`, optional. Simplified Chinese
 - `type`: `cash`, `bank`, `savings`, or `credit`
 - `openingBalance`
 - `sortOrder`
 - `archived`
+
+`name`, `languageEn`, `languageZh`, and `languageZhCn` have no default. An empty account list gets one cash account with opening balance 0. That account stores Cash, 現金, and 现金 in those language fields and has no `name`. An account the user creates stores `name` and leaves the language fields empty. The visible name follows the active language the same way a category does.
 
 Cash, bank, and savings are assets. Credit is a liability, and its balance is the amount owed. Balance is the opening balance, plus income and transfers in, minus expenses and transfers out. Spending on a credit account increases the amount owed. A transfer into a credit account decreases it. Net worth is assets minus credit owed.
 
@@ -116,7 +121,7 @@ An expense decreases its account. An income increases its account. A transfer mo
 
 ### Settings
 
-`AppSettingBloc` stores language, appearance (`light`, `dark`, or `system`), one currency, and the first weekday. Amounts are stored as numbers. The currency symbol comes from the currency setting.
+`AppSettingBloc` stores language, appearance (`light`, `dark`, or `system`), and the first weekday. Amounts are stored as numbers.
 
 ### Month
 
@@ -132,7 +137,7 @@ The tab bar is Home, Analysis, Accounts, and Settings, with the record button in
 - The record page title is the date and opens the date picker. A segment switches expense, income, and transfer. Expense and income use a category grid and one account, chosen from a bottom sheet. Transfer uses from and to, and has no account button. The check key commits. Edit uses the same page, and delete is the app bar action. Keypad layout is specified in `DESIGN.md`.
 - Accounts shows assets, liabilities, and net worth. An account opens its detail: balance, movement for the month, history, and transfer.
 - Analysis compares the selected month with the previous month, shows the last six months, then totals by category and by account.
-- Settings edits language, appearance, currency, the first weekday, and categories.
+- Settings edits language, appearance, the first weekday, and categories.
 
 ## Widgets
 

@@ -7,6 +7,9 @@ extension AccountEntityMapping on AccountEntity {
     return AccountModel(
       id: id,
       name: name,
+      languageEn: languageEn,
+      languageZh: languageZh,
+      languageZhCn: languageZhCn,
       type: AccountType.values.byName(type),
       openingBalanceMinor: openingBalance,
       sortOrder: sortOrder,
@@ -20,6 +23,9 @@ extension AccountModelMapping on AccountModel {
     return AccountEntity(
       id: id,
       name: name,
+      languageEn: languageEn,
+      languageZh: languageZh,
+      languageZhCn: languageZhCn,
       type: type.name,
       openingBalance: openingBalanceMinor,
       sortOrder: sortOrder,

@@ -11,6 +11,9 @@ class MemoryAccountRepository implements AccountRepository {
   }
 
   @override
+  Future<bool> isEmpty() async => accounts.isEmpty;
+
+  @override
   Future<List<AccountModel>> getAll() async {
     final copy = [...accounts];
     copy.sort((a, b) => a.sortOrder.compareTo(b.sortOrder));

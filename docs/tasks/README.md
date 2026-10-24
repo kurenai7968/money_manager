@@ -16,3 +16,4 @@ Ids are five digits, starting at `00001`. The next id is one greater than the hi
 - 00006 Account history and transfer
 - 00007 Settings and analysis
 - 00008 Category language
+- 00009 Default account

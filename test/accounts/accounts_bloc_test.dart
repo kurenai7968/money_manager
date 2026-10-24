@@ -24,13 +24,18 @@ void main() {
   );
 
   blocTest<AccountsBloc, AccountsState>(
-    'loads an empty list',
+    'seeds a cash account when the store is empty',
     build: () => AccountsBloc(repository),
     act: (bloc) => bloc.add(const AccountsStarted()),
-    expect: () => const [
-      AccountsState(status: AccountsStatus.loading),
-      AccountsState(status: AccountsStatus.success),
-    ],
+    verify: (bloc) {
+      final account = bloc.state.accounts.single;
+      expect(account.type, AccountType.cash);
+      expect(account.name, isNull);
+      expect(account.languageEn, 'Cash');
+      expect(account.languageZh, '現金');
+      expect(account.languageZhCn, '现金');
+      expect(account.openingBalanceMinor, 0);
+    },
   );
 
   blocTest<AccountsBloc, AccountsState>(

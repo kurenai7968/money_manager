@@ -28,6 +28,11 @@ class _AccountFormPageState extends State<AccountFormPage> {
   final _balance = TextEditingController();
   var _type = AccountType.cash;
   var _sortOrder = 0;
+  var _archived = false;
+  String? _languageEn;
+  String? _languageZh;
+  String? _languageZhCn;
+  var _localized = false;
   var _ready = false;
   var _waiting = false;
   String? _error;
@@ -45,9 +50,17 @@ class _AccountFormPageState extends State<AccountFormPage> {
     );
     if (existing.isNotEmpty) {
       final account = existing.first;
-      _name.text = account.name;
+      _name.text = account.labelFor(context.categoryLanguageCode);
       _type = account.type;
       _sortOrder = account.sortOrder;
+      _archived = account.archived;
+      _languageEn = account.languageEn;
+      _languageZh = account.languageZh;
+      _languageZhCn = account.languageZhCn;
+      _localized =
+          account.languageEn != null ||
+          account.languageZh != null ||
+          account.languageZhCn != null;
       _balance.text = formatMinor(
         account.openingBalanceMinor,
         locale: Localizations.localeOf(context).toString(),
@@ -151,15 +164,23 @@ class _AccountFormPageState extends State<AccountFormPage> {
       setState(() => _error = l10n.amountInvalid);
       return;
     }
+    final text = _name.text.trim();
+    final code = context.categoryLanguageCode;
     _waiting = true;
     context.read<AccountsBloc>().add(
       AccountSavePressed(
         AccountModel(
           id: widget.accountId ?? createId(),
-          name: _name.text.trim(),
+          name: _localized ? null : text,
+          languageEn: _localized ? (code == 'en' ? text : _languageEn) : null,
+          languageZh: _localized ? (code == 'zh' ? text : _languageZh) : null,
+          languageZhCn: _localized
+              ? (code == 'zh_CN' ? text : _languageZhCn)
+              : null,
           type: _type,
           openingBalanceMinor: minor,
           sortOrder: _sortOrder,
+          archived: _archived,
         ),
       ),
     );

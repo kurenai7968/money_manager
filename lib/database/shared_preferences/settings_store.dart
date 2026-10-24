@@ -8,7 +8,6 @@ class SettingsStore {
 
   static const languageKey = 'language';
   static const themeKey = 'theme';
-  static const currencyKey = 'currency';
   static const weekStartKey = 'week_start';
 
   final SharedPreferences? _preferences;
@@ -26,7 +25,6 @@ class SettingsStore {
       themeChoice: themeName == null
           ? AppThemeChoice.system
           : AppThemeChoice.values.byName(themeName),
-      currency: preferences.getString(currencyKey) ?? 'HKD',
       weekStart: weekName == null
           ? WeekStart.monday
           : WeekStart.values.byName(weekName),
@@ -45,7 +43,6 @@ class SettingsStore {
       await preferences.setString(languageKey, setting.languageCode!);
     }
     await preferences.setString(themeKey, setting.themeChoice.name);
-    await preferences.setString(currencyKey, setting.currency);
     await preferences.setString(weekStartKey, setting.weekStart.name);
   }
 }

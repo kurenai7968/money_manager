@@ -202,9 +202,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get appearance => 'Appearance';
 
   @override
-  String get currency => 'Currency';
-
-  @override
   String get weekStart => 'Week starts';
 
   @override

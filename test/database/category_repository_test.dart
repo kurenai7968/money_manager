@@ -52,6 +52,16 @@ void main() {
       version: 2,
       onCreate: (db, version) async {
         await db.execute('''
+          CREATE TABLE accounts (
+            id TEXT PRIMARY KEY,
+            name TEXT NOT NULL,
+            type TEXT NOT NULL,
+            opening_balance INTEGER NOT NULL,
+            sort_order INTEGER NOT NULL,
+            archived INTEGER NOT NULL
+          )
+        ''');
+        await db.execute('''
           CREATE TABLE categories (
             id TEXT PRIMARY KEY,
             name TEXT NOT NULL,

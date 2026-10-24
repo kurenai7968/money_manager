@@ -7,6 +7,8 @@ import 'package:sqflite/sqflite.dart';
 abstract interface class AccountRepository {
   Future<List<AccountModel>> getAll();
 
+  Future<bool> isEmpty();
+
   Future<void> save(AccountModel account);
 
   Future<void> archive(String id);
@@ -29,6 +31,14 @@ class SqliteAccountRepository implements AccountRepository {
       for (final row in rows)
         AccountEntity.fromJson(Map<String, dynamic>.from(row)).toModel(),
     ];
+  }
+
+  @override
+  Future<bool> isEmpty() async {
+    final count = Sqflite.firstIntValue(
+      await _database.db.rawQuery('SELECT COUNT(*) FROM accounts'),
+    );
+    return (count ?? 0) == 0;
   }
 
   @override

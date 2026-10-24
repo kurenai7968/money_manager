@@ -42,7 +42,7 @@ class AccountDetailPage extends StatelessWidget {
         }).toList();
         return Scaffold(
           appBar: AppBar(
-            title: Text(account.name),
+            title: Text(account.labelFor(context.categoryLanguageCode)),
             actions: [
               TextButton(
                 onPressed: () =>

@@ -1,4 +1,5 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:money_manager/models/account_defaults.dart';
 import 'package:money_manager/pages/accounts/bloc/accounts_event.dart';
 import 'package:money_manager/pages/accounts/bloc/accounts_state.dart';
 import 'package:money_manager/repositories/account_repository.dart';
@@ -21,6 +22,9 @@ class AccountsBloc extends Bloc<AccountsEvent, AccountsState> {
       state.copyWith(status: AccountsStatus.loading, error: AccountsError.none),
     );
     try {
+      if (await _repository.isEmpty()) {
+        await _repository.save(defaultAccount());
+      }
       final accounts = await _repository.getAll();
       emit(state.copyWith(status: AccountsStatus.success, accounts: accounts));
     } catch (_) {
@@ -37,7 +41,7 @@ class AccountsBloc extends Bloc<AccountsEvent, AccountsState> {
     AccountSavePressed event,
     Emitter<AccountsState> emit,
   ) async {
-    if (event.account.name.trim().isEmpty) {
+    if (!event.account.hasLabel) {
       emit(
         state.copyWith(
           status: AccountsStatus.failure,

@@ -8,32 +8,28 @@ class AppSetting extends Equatable {
   const AppSetting({
     this.languageCode,
     this.themeChoice = AppThemeChoice.system,
-    this.currency = 'HKD',
     this.weekStart = WeekStart.monday,
   });
 
   final String? languageCode;
   final AppThemeChoice themeChoice;
-  final String currency;
   final WeekStart weekStart;
 
   AppSetting copyWith({
     String? languageCode,
     AppThemeChoice? themeChoice,
-    String? currency,
     WeekStart? weekStart,
     bool clearLanguage = false,
   }) {
     return AppSetting(
       languageCode: clearLanguage ? null : languageCode ?? this.languageCode,
       themeChoice: themeChoice ?? this.themeChoice,
-      currency: currency ?? this.currency,
       weekStart: weekStart ?? this.weekStart,
     );
   }
 
   @override
-  List<Object?> get props => [languageCode, themeChoice, currency, weekStart];
+  List<Object?> get props => [languageCode, themeChoice, weekStart];
 }
 
 int leadingCalendarBlanks(DateTime firstOfMonth, WeekStart weekStart) {

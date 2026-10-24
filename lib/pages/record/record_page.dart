@@ -228,7 +228,9 @@ class _RecordPageState extends State<RecordPage> {
 
   String _accountName(List<AccountModel> accounts, String fallback) {
     final match = accounts.where((account) => account.id == _accountId);
-    return match.isEmpty ? fallback : match.first.name;
+    return match.isEmpty
+        ? fallback
+        : match.first.labelFor(context.categoryLanguageCode);
   }
 
   void _setType(TransactionType type) {
@@ -427,12 +429,16 @@ class _TransferFields extends StatelessWidget {
       children: [
         ListTile(
           title: Text(l10n.fromAccount),
-          trailing: Text(_name(fromId, l10n.chooseAccount)),
+          trailing: Text(
+            _name(fromId, l10n.chooseAccount, context.categoryLanguageCode),
+          ),
           onTap: () => _pick(context, onFrom),
         ),
         ListTile(
           title: Text(l10n.toAccount),
-          trailing: Text(_name(toId, l10n.chooseAccount)),
+          trailing: Text(
+            _name(toId, l10n.chooseAccount, context.categoryLanguageCode),
+          ),
           onTap: () => _pick(context, onTo),
         ),
         Padding(
@@ -448,9 +454,9 @@ class _TransferFields extends StatelessWidget {
     );
   }
 
-  String _name(String? id, String fallback) {
+  String _name(String? id, String fallback, String languageCode) {
     final match = accounts.where((account) => account.id == id);
-    return match.isEmpty ? fallback : match.first.name;
+    return match.isEmpty ? fallback : match.first.labelFor(languageCode);
   }
 
   Future<void> _pick(
@@ -489,7 +495,7 @@ class _AccountSheet extends StatelessWidget {
           ),
           for (final account in accounts)
             ListTile(
-              title: Text(account.name),
+              title: Text(account.labelFor(context.categoryLanguageCode)),
               trailing: account.id == selectedId
                   ? Icon(
                       Icons.check,

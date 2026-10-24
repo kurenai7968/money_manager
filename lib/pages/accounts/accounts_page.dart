@@ -195,7 +195,7 @@ class _AccountRow extends StatelessWidget {
     return ListTile(
       onTap: () => context.push(AppRoutes.account(account.id)),
       leading: Icon(Icons.circle, color: color, size: 12),
-      title: Text(account.name),
+      title: Text(account.labelFor(context.categoryLanguageCode)),
       subtitle: isCredit ? Text(l10n.owed) : null,
       trailing: Row(
         mainAxisSize: MainAxisSize.min,

@@ -97,7 +97,6 @@ abstract class AppLocalizations {
     Locale('en'),
     Locale('zh'),
     Locale('zh', 'CN'),
-    Locale('zh', 'TW'),
   ];
 
   /// No description provided for @home.
@@ -484,12 +483,6 @@ abstract class AppLocalizations {
   /// **'Appearance'**
   String get appearance;
 
-  /// No description provided for @currency.
-  ///
-  /// In en, this message translates to:
-  /// **'Currency'**
-  String get currency;
-
   /// No description provided for @weekStart.
   ///
   /// In en, this message translates to:
@@ -588,8 +581,6 @@ AppLocalizations lookupAppLocalizations(Locale locale) {
         switch (locale.countryCode) {
           case 'CN':
             return AppLocalizationsZhCn();
-          case 'TW':
-            return AppLocalizationsZhTw();
         }
         break;
       }

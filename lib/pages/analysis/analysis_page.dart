@@ -161,7 +161,11 @@ class _AnalysisPageState extends State<AnalysisPage> {
           for (final entry in byAccount.entries)
             _TotalRow(
               color: Theme.of(context).colorScheme.primary,
-              title: _accountName(accounts, entry.key),
+              title: _accountName(
+                accounts,
+                entry.key,
+                context.categoryLanguageCode,
+              ),
               amount: formatMinor(entry.value, locale: locale),
             ),
         ],
@@ -222,10 +226,14 @@ String _categoryName(
   return '';
 }
 
-String _accountName(List<AccountModel> accounts, String? id) {
+String _accountName(
+  List<AccountModel> accounts,
+  String? id,
+  String languageCode,
+) {
   for (final account in accounts) {
     if (account.id == id) {
-      return account.name;
+      return account.labelFor(languageCode);
     }
   }
   return '';

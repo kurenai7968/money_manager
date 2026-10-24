@@ -8,7 +8,10 @@ part 'account_entity.g.dart';
 class AccountEntity extends Equatable {
   const AccountEntity({
     required this.id,
-    required this.name,
+    this.name,
+    this.languageEn,
+    this.languageZh,
+    this.languageZhCn,
     required this.type,
     required this.openingBalance,
     required this.sortOrder,
@@ -19,7 +22,10 @@ class AccountEntity extends Equatable {
       _$AccountEntityFromJson(json);
 
   final String id;
-  final String name;
+  final String? name;
+  final String? languageEn;
+  final String? languageZh;
+  final String? languageZhCn;
   final String type;
   final int openingBalance;
   final int sortOrder;
@@ -33,6 +39,9 @@ class AccountEntity extends Equatable {
   List<Object?> get props => [
     id,
     name,
+    languageEn,
+    languageZh,
+    languageZhCn,
     type,
     openingBalance,
     sortOrder,

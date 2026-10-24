@@ -77,11 +77,6 @@ class SettingsPage extends StatelessWidget {
                 ),
               ),
               _Row(
-                title: l10n.currency,
-                value: setting.currency,
-                onTap: () => _editCurrency(context, setting),
-              ),
-              _Row(
                 title: l10n.weekStart,
                 value: setting.weekStart == WeekStart.monday
                     ? l10n.monday
@@ -113,36 +108,6 @@ class SettingsPage extends StatelessWidget {
         },
       ),
     );
-  }
-
-  Future<void> _editCurrency(BuildContext context, AppSetting setting) async {
-    final l10n = context.l10n;
-    final controller = TextEditingController(text: setting.currency);
-    final result = await showDialog<String>(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          title: Text(l10n.currency),
-          content: TextField(controller: controller, autofocus: true),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: Text(l10n.cancel),
-            ),
-            TextButton(
-              onPressed: () => Navigator.pop(context, controller.text.trim()),
-              child: Text(l10n.save),
-            ),
-          ],
-        );
-      },
-    );
-    controller.dispose();
-    if (result != null && result.isNotEmpty && context.mounted) {
-      context.read<AppSettingBloc>().add(
-        AppSettingChanged(setting.copyWith(currency: result.toUpperCase())),
-      );
-    }
   }
 }
 
