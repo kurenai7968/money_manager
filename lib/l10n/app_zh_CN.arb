@@ -55,6 +55,7 @@
   "needAccount": "请先新增账户",
   "needCategory": "请选择分类",
   "invalidTransaction": "请输入大于 0 的金额",
+  "needDifferentAccounts": "请选择两个不同的账户",
   "cancel": "取消",
   "balance": "余额",
   "monthBalance": "结余",

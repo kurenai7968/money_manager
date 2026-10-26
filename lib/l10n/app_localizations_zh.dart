@@ -175,6 +175,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get invalidTransaction => '請輸入大於 0 的金額';
 
   @override
+  String get needDifferentAccounts => '請選擇兩個不同的帳戶';
+
+  @override
   String get cancel => '取消';
 
   @override
@@ -406,6 +409,9 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
 
   @override
   String get invalidTransaction => '请输入大于 0 的金额';
+
+  @override
+  String get needDifferentAccounts => '请选择两个不同的账户';
 
   @override
   String get cancel => '取消';

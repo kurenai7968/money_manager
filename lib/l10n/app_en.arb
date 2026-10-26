@@ -58,6 +58,7 @@
   "needAccount": "Add an account first",
   "needCategory": "Choose a category",
   "invalidTransaction": "Enter an amount greater than zero",
+  "needDifferentAccounts": "Choose two different accounts",
   "cancel": "Cancel",
   "balance": "Balance",
   "monthBalance": "Balance",

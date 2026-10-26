@@ -43,36 +43,63 @@ class _RecordPageState extends State<RecordPage> {
   String? _categoryId;
   String? _fromId;
   String? _toId;
-  var _ready = false;
+  var _opened = false;
+  var _existingReady = false;
   var _waiting = false;
   String? _error;
 
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    if (_ready) {
-      return;
-    }
-    _ready = true;
-    final transactions = context.read<TransactionsBloc>().state.transactions;
-    final existing = transactions.where(
-      (item) => item.id == widget.transactionId,
-    );
-    if (existing.isEmpty) {
+  void _prepare(List<AccountModel> accounts, TransactionsState transactions) {
+    if (!_opened) {
+      _opened = true;
       _type = widget.initialType ?? TransactionType.expense;
       _accountId = widget.initialAccountId;
       _fromId = widget.initialAccountId;
+    }
+    if (!_existingReady && widget.transactionId != null) {
+      final existing = transactions.transactions.where(
+        (item) => item.id == widget.transactionId,
+      );
+      if (existing.isEmpty) {
+        if (transactions.status == TransactionsStatus.success ||
+            transactions.status == TransactionsStatus.failure) {
+          _existingReady = true;
+        } else {
+          return;
+        }
+      } else {
+        final transaction = existing.first;
+        _type = transaction.type;
+        _date = transaction.date;
+        _note = transaction.note;
+        _accountId = transaction.accountId;
+        _categoryId = transaction.categoryId;
+        _fromId = transaction.fromAccountId;
+        _toId = transaction.toAccountId;
+        _expression = AmountExpression.fromMinor(transaction.amountMinor);
+        _existingReady = true;
+      }
+    }
+    if (widget.transactionId != null || accounts.isEmpty) {
       return;
     }
-    final transaction = existing.first;
-    _type = transaction.type;
-    _date = transaction.date;
-    _note = transaction.note;
-    _accountId = transaction.accountId;
-    _categoryId = transaction.categoryId;
-    _fromId = transaction.fromAccountId;
-    _toId = transaction.toAccountId;
-    _expression = AmountExpression.fromMinor(transaction.amountMinor);
+    if (_type != TransactionType.transfer && _accountId == null) {
+      _accountId = _accountOn(accounts, widget.initialAccountId);
+    }
+    if (_fromId == null) {
+      _fromId = _accountOn(accounts, widget.initialAccountId);
+    }
+  }
+
+  String _accountOn(List<AccountModel> accounts, String? preferred) {
+    final match = accounts.where((account) => account.id == preferred);
+    return match.isEmpty ? accounts.first.id : match.first.id;
+  }
+
+  void _change(VoidCallback update) {
+    setState(() {
+      update();
+      _error = null;
+    });
   }
 
   @override
@@ -83,6 +110,8 @@ class _RecordPageState extends State<RecordPage> {
         ? DateFormat('M月d日', locale).format(_date)
         : DateFormat.MMMd(locale).format(_date);
     final accounts = context.watch<AccountsBloc>().state.active;
+    final transactions = context.watch<TransactionsBloc>().state;
+    _prepare(accounts, transactions);
     final categories = context
         .watch<CategoriesBloc>()
         .state
@@ -90,7 +119,6 @@ class _RecordPageState extends State<RecordPage> {
         .where((category) => category.kind.name == _type.name)
         .toList();
     final result = _expression.resultMinor;
-    final canSave = _canSave(result, accounts);
 
     return BlocListener<TransactionsBloc, TransactionsState>(
       listener: (context, state) {
@@ -118,20 +146,23 @@ class _RecordPageState extends State<RecordPage> {
           bottom: PreferredSize(
             preferredSize: const Size.fromHeight(48),
             child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 for (final type in TransactionType.values)
-                  TextButton(
-                    onPressed: () => _setType(type),
-                    child: Text(
-                      _typeLabel(l10n, type),
-                      style: TextStyle(
-                        color: _type == type
-                            ? Theme.of(context).colorScheme.primary
-                            : Theme.of(context).colorScheme.onSurfaceVariant,
-                        fontWeight: _type == type
-                            ? FontWeight.w600
-                            : FontWeight.w400,
+                  Expanded(
+                    child: TextButton(
+                      onPressed: () => _change(() => _setType(type)),
+                      child: Text(
+                        _typeLabel(l10n, type),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                          color: _type == type
+                              ? Theme.of(context).colorScheme.primary
+                              : Theme.of(context).colorScheme.onSurfaceVariant,
+                          fontWeight: _type == type
+                              ? FontWeight.w600
+                              : FontWeight.w400,
+                        ),
                       ),
                     ),
                   ),
@@ -139,91 +170,102 @@ class _RecordPageState extends State<RecordPage> {
             ),
           ),
         ),
-        body: Column(
-          children: [
-            Expanded(
-              child: _type == TransactionType.transfer
-                  ? _TransferFields(
-                      accounts: accounts,
-                      fromId: _fromId,
-                      toId: _toId,
-                      onFrom: (id) => setState(() => _fromId = id),
-                      onTo: (id) => setState(() => _toId = id),
-                    )
-                  : _CategoryGrid(
-                      categories: categories,
-                      selectedId: _categoryId,
-                      onSelected: (id) => setState(() => _categoryId = id),
-                    ),
-            ),
-            if (_error != null)
+        body: SafeArea(
+          top: false,
+          child: Column(
+            children: [
+              Expanded(
+                child: _type == TransactionType.transfer
+                    ? _TransferFields(
+                        accounts: accounts,
+                        fromId: _fromId,
+                        toId: _toId,
+                        onFrom: (id) => _change(() => _fromId = id),
+                        onTo: (id) => _change(() => _toId = id),
+                      )
+                    : _CategoryGrid(
+                        categories: categories,
+                        selectedId: _categoryId,
+                        onSelected: (id) => _change(() => _categoryId = id),
+                      ),
+              ),
+              if (_error != null)
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: AppSpacing.l),
+                  child: Text(
+                    _error!,
+                    style: Theme.of(context).textTheme.bodyMedium
+                        ?.copyWith(color: Theme.of(context).colorScheme.error),
+                  ),
+                ),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: AppSpacing.l),
-                child: Text(
-                  _error!,
-                  style: Theme.of(context).textTheme.bodyMedium
-                      ?.copyWith(color: Theme.of(context).colorScheme.error),
-                ),
-              ),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: AppSpacing.l),
-              child: Align(
-                alignment: AlignmentDirectional.centerEnd,
-                child: Text(
-                  _expression.display,
-                  style: Theme.of(context).textTheme.titleLarge,
-                ),
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: AppSpacing.s),
-              child: Row(
-                children: [
-                  TextButton(
-                    onPressed: _editNote,
-                    child: Text(_note.isEmpty ? l10n.remark : _note),
-                  ),
-                  const Spacer(),
-                  if (_type != TransactionType.transfer)
-                    TextButton(
-                      onPressed: accounts.isEmpty ? null : _pickAccount,
-                      child: Text(_accountName(accounts, l10n.chooseAccount)),
+                child: SizedBox(
+                  width: double.infinity,
+                  child: FittedBox(
+                    fit: BoxFit.scaleDown,
+                    alignment: AlignmentDirectional.centerEnd,
+                    child: Text(
+                      _expression.display,
+                      style: Theme.of(context).textTheme.titleLarge,
                     ),
-                ],
+                  ),
+                ),
               ),
-            ),
-            _Keypad(
-              expression: _expression,
-              enabled: canSave,
-              onDigit: (digit) =>
-                  setState(() => _expression = _expression.appendDigit(digit)),
-              onDoubleZero: () =>
-                  setState(() => _expression = _expression.appendDoubleZero()),
-              onDecimal: () =>
-                  setState(() => _expression = _expression.appendDecimal()),
-              onBackspace: () =>
-                  setState(() => _expression = _expression.backspace()),
-              onClear: () => setState(() => _expression = _expression.clear()),
-              onOperator: (op) =>
-                  setState(() => _expression = _expression.applyOperator(op)),
-              onSubmit: () => _save(result, accounts),
-            ),
-          ],
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: AppSpacing.s),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: Align(
+                        alignment: AlignmentDirectional.centerStart,
+                        child: TextButton(
+                          onPressed: _editNote,
+                          child: Text(
+                            _note.isEmpty ? l10n.remark : _note,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                      ),
+                    ),
+                    if (_type != TransactionType.transfer)
+                      Expanded(
+                        child: Align(
+                          alignment: AlignmentDirectional.centerEnd,
+                          child: TextButton(
+                            onPressed: accounts.isEmpty ? null : _pickAccount,
+                            child: Text(
+                              _accountName(accounts, l10n.chooseAccount),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                        ),
+                      ),
+                  ],
+                ),
+              ),
+              _Keypad(
+                expression: _expression,
+                onDigit: (digit) =>
+                    _change(() => _expression = _expression.appendDigit(digit)),
+                onDoubleZero: () =>
+                    _change(() => _expression = _expression.appendDoubleZero()),
+                onDecimal: () =>
+                    _change(() => _expression = _expression.appendDecimal()),
+                onBackspace: () =>
+                    _change(() => _expression = _expression.backspace()),
+                onClear: () => _change(() => _expression = _expression.clear()),
+                onOperator: (op) =>
+                    _change(() => _expression = _expression.applyOperator(op)),
+                onSubmit: () => _save(result, accounts),
+              ),
+            ],
+          ),
         ),
       ),
     );
-  }
-
-  bool _canSave(int? result, List<AccountModel> accounts) {
-    if (result == null || result <= 0) {
-      return false;
-    }
-    if (_type == TransactionType.transfer) {
-      return _fromId != null && _toId != null && _fromId != _toId;
-    }
-    return _accountId != null &&
-        accounts.any((account) => account.id == _accountId) &&
-        _categoryId != null;
   }
 
   String _accountName(List<AccountModel> accounts, String fallback) {
@@ -234,18 +276,16 @@ class _RecordPageState extends State<RecordPage> {
   }
 
   void _setType(TransactionType type) {
-    setState(() {
-      _type = type;
-      if (type == TransactionType.transfer) {
-        _categoryId = null;
-        return;
-      }
-      final categories = context.read<CategoriesBloc>().state.categories;
-      final selected = categories.where((item) => item.id == _categoryId);
-      if (selected.isNotEmpty && selected.first.kind.name != type.name) {
-        _categoryId = null;
-      }
-    });
+    _type = type;
+    if (type == TransactionType.transfer) {
+      _categoryId = null;
+      return;
+    }
+    final categories = context.read<CategoriesBloc>().state.categories;
+    final selected = categories.where((item) => item.id == _categoryId);
+    if (selected.isNotEmpty && selected.first.kind.name != type.name) {
+      _categoryId = null;
+    }
   }
 
   Future<void> _pickDate() async {
@@ -256,35 +296,17 @@ class _RecordPageState extends State<RecordPage> {
       lastDate: DateTime(2100),
     );
     if (picked != null) {
-      setState(() => _date = picked);
+      _change(() => _date = picked);
     }
   }
 
   Future<void> _editNote() async {
-    final l10n = context.l10n;
-    final controller = TextEditingController(text: _note);
     final result = await showDialog<String>(
       context: context,
-      builder: (context) {
-        return AlertDialog(
-          title: Text(l10n.remark),
-          content: TextField(controller: controller, autofocus: true),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: Text(l10n.cancel),
-            ),
-            TextButton(
-              onPressed: () => Navigator.pop(context, controller.text),
-              child: Text(l10n.save),
-            ),
-          ],
-        );
-      },
+      builder: (context) => _NoteDialog(initial: _note),
     );
-    controller.dispose();
     if (result != null) {
-      setState(() => _note = result.trim());
+      _change(() => _note = result.trim());
     }
   }
 
@@ -297,26 +319,18 @@ class _RecordPageState extends State<RecordPage> {
       },
     );
     if (selected != null) {
-      setState(() => _accountId = selected);
+      _change(() => _accountId = selected);
     }
   }
 
   void _save(int? result, List<AccountModel> accounts) {
     final l10n = context.l10n;
-    if (accounts.isEmpty) {
-      setState(() => _error = l10n.needAccount);
+    final error = _validationError(result, accounts, l10n);
+    if (error != null) {
+      setState(() => _error = error);
       return;
     }
-    if (!_canSave(result, accounts)) {
-      setState(
-        () => _error = _type == TransactionType.transfer
-            ? l10n.invalidTransaction
-            : (_categoryId == null
-                  ? l10n.needCategory
-                  : l10n.invalidTransaction),
-      );
-      return;
-    }
+    setState(() => _error = null);
     _waiting = true;
     context.read<TransactionsBloc>().add(
       TransactionSavePressed(
@@ -335,6 +349,36 @@ class _RecordPageState extends State<RecordPage> {
     );
   }
 
+  String? _validationError(
+    int? result,
+    List<AccountModel> accounts,
+    AppLocalizations l10n,
+  ) {
+    if (accounts.isEmpty) {
+      return l10n.needAccount;
+    }
+    if (result == null || result <= 0) {
+      return l10n.invalidTransaction;
+    }
+    final known = accounts.map((account) => account.id).toSet();
+    if (_type == TransactionType.transfer) {
+      final pair =
+          _fromId != null &&
+          _toId != null &&
+          _fromId != _toId &&
+          known.contains(_fromId) &&
+          known.contains(_toId);
+      return pair ? null : l10n.needDifferentAccounts;
+    }
+    if (_categoryId == null) {
+      return l10n.needCategory;
+    }
+    if (_accountId == null || !known.contains(_accountId)) {
+      return l10n.chooseAccount;
+    }
+    return null;
+  }
+
   void _delete() {
     final id = widget.transactionId;
     if (id == null) {
@@ -350,6 +394,46 @@ class _RecordPageState extends State<RecordPage> {
       TransactionType.income => l10n.income,
       TransactionType.transfer => l10n.transfer,
     };
+  }
+}
+
+class _NoteDialog extends StatefulWidget {
+  const _NoteDialog({required this.initial});
+
+  final String initial;
+
+  @override
+  State<_NoteDialog> createState() => _NoteDialogState();
+}
+
+class _NoteDialogState extends State<_NoteDialog> {
+  late final TextEditingController _controller = TextEditingController(
+    text: widget.initial,
+  );
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = context.l10n;
+    return AlertDialog(
+      title: Text(l10n.remark),
+      content: TextField(controller: _controller, autofocus: true),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(context),
+          child: Text(l10n.cancel),
+        ),
+        TextButton(
+          onPressed: () => Navigator.pop(context, _controller.text),
+          child: Text(l10n.save),
+        ),
+      ],
+    );
   }
 }
 
@@ -372,34 +456,93 @@ class _CategoryGrid extends StatelessWidget {
         crossAxisCount: 4,
         mainAxisSpacing: AppSpacing.m,
         crossAxisSpacing: AppSpacing.m,
-        childAspectRatio: 0.85,
+        childAspectRatio: 0.6,
       ),
       itemCount: categories.length,
       itemBuilder: (context, index) {
         final category = categories[index];
         final selected = category.id == selectedId;
-        return InkWell(
-          onTap: () => onSelected(category.id),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              CircleAvatar(
-                backgroundColor: LedgerPalette.color(category.color),
-                child: Icon(
-                  LedgerPalette.icon(category.icon),
-                  color: Theme.of(context).colorScheme.onPrimary,
-                ),
+        final label = category.labelFor(context.categoryLanguageCode);
+        final color = LedgerPalette.color(category.color);
+        final scheme = Theme.of(context).colorScheme;
+        return Semantics(
+          button: true,
+          selected: selected,
+          label: label,
+          excludeSemantics: true,
+          child: Material(
+            color: selected
+                ? color.withValues(alpha: 0.14)
+                : Colors.transparent,
+            borderRadius: BorderRadius.circular(AppRadius.m),
+            child: InkWell(
+              borderRadius: BorderRadius.circular(AppRadius.m),
+              onTap: () {
+                onSelected(category.id);
+                Scrollable.ensureVisible(context);
+              },
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  SizedBox(
+                    width: 52,
+                    height: 52,
+                    child: Stack(
+                      alignment: Alignment.center,
+                      children: [
+                        Container(
+                          width: 44,
+                          height: 44,
+                          alignment: Alignment.center,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            border: Border.all(
+                              color: selected ? color : Colors.transparent,
+                              width: 2,
+                            ),
+                          ),
+                          child: CircleAvatar(
+                            backgroundColor: color,
+                            child: Icon(
+                              LedgerPalette.icon(category.icon),
+                              color: scheme.onPrimary,
+                              size: 20,
+                            ),
+                          ),
+                        ),
+                        if (selected)
+                          Positioned(
+                            right: 0,
+                            bottom: 2,
+                            child: DecoratedBox(
+                              decoration: BoxDecoration(
+                                color: scheme.surface,
+                                shape: BoxShape.circle,
+                              ),
+                              child: Icon(
+                                Icons.check_circle,
+                                size: 16,
+                                color: color,
+                              ),
+                            ),
+                          ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: AppSpacing.xs),
+                  Text(
+                    label,
+                    maxLines: 2,
+                    textAlign: TextAlign.center,
+                    overflow: TextOverflow.ellipsis,
+                    style: Theme.of(context).textTheme.labelMedium?.copyWith(
+                      color: selected ? color : scheme.onSurface,
+                      fontWeight: selected ? FontWeight.w700 : FontWeight.w500,
+                    ),
+                  ),
+                ],
               ),
-              const SizedBox(height: AppSpacing.xs),
-              Text(
-                category.labelFor(context.categoryLanguageCode),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                  fontWeight: selected ? FontWeight.w700 : FontWeight.w400,
-                ),
-              ),
-            ],
+            ),
           ),
         );
       },
@@ -432,14 +575,14 @@ class _TransferFields extends StatelessWidget {
           trailing: Text(
             _name(fromId, l10n.chooseAccount, context.categoryLanguageCode),
           ),
-          onTap: () => _pick(context, onFrom),
+          onTap: () => _pick(context, onFrom, fromId),
         ),
         ListTile(
           title: Text(l10n.toAccount),
           trailing: Text(
             _name(toId, l10n.chooseAccount, context.categoryLanguageCode),
           ),
-          onTap: () => _pick(context, onTo),
+          onTap: () => _pick(context, onTo, toId),
         ),
         Padding(
           padding: const EdgeInsets.all(AppSpacing.l),
@@ -462,10 +605,12 @@ class _TransferFields extends StatelessWidget {
   Future<void> _pick(
     BuildContext context,
     ValueChanged<String> onSelected,
+    String? selectedId,
   ) async {
     final selected = await showModalBottomSheet<String>(
       context: context,
-      builder: (context) => _AccountSheet(accounts: accounts),
+      builder: (context) =>
+          _AccountSheet(accounts: accounts, selectedId: selectedId),
     );
     if (selected != null) {
       onSelected(selected);
@@ -513,7 +658,6 @@ class _AccountSheet extends StatelessWidget {
 class _Keypad extends StatelessWidget {
   const _Keypad({
     required this.expression,
-    required this.enabled,
     required this.onDigit,
     required this.onDoubleZero,
     required this.onDecimal,
@@ -524,7 +668,6 @@ class _Keypad extends StatelessWidget {
   });
 
   final AmountExpression expression;
-  final bool enabled;
   final ValueChanged<String> onDigit;
   final VoidCallback onDoubleZero;
   final VoidCallback onDecimal;
@@ -643,14 +786,17 @@ class _Keypad extends StatelessWidget {
                     SizedBox(
                       height: 96,
                       width: double.infinity,
-                      child: FilledButton(
-                        onPressed: enabled ? onSubmit : null,
-                        style: FilledButton.styleFrom(
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(AppRadius.m),
+                      child: Tooltip(
+                        message: context.l10n.save,
+                        child: FilledButton(
+                          onPressed: onSubmit,
+                          style: FilledButton.styleFrom(
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(AppRadius.m),
+                            ),
                           ),
+                          child: const Icon(Icons.check),
                         ),
-                        child: const Icon(Icons.check),
                       ),
                     ),
                   ],

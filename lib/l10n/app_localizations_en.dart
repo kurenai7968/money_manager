@@ -175,6 +175,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get invalidTransaction => 'Enter an amount greater than zero';
 
   @override
+  String get needDifferentAccounts => 'Choose two different accounts';
+
+  @override
   String get cancel => 'Cancel';
 
   @override

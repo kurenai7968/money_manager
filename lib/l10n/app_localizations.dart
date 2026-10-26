@@ -429,6 +429,12 @@ abstract class AppLocalizations {
   /// **'Enter an amount greater than zero'**
   String get invalidTransaction;
 
+  /// No description provided for @needDifferentAccounts.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose two different accounts'**
+  String get needDifferentAccounts;
+
   /// No description provided for @cancel.
   ///
   /// In en, this message translates to:

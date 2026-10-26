@@ -461,10 +461,15 @@ class _TransactionTile extends StatelessWidget {
     final category = categories.where(
       (item) => item.id == transaction.categoryId,
     );
+    final l10n = context.l10n;
     final title = transaction.note.isNotEmpty
         ? transaction.note
         : (category.isEmpty
-              ? transaction.type.name
+              ? switch (transaction.type) {
+                  TransactionType.expense => l10n.expense,
+                  TransactionType.income => l10n.income,
+                  TransactionType.transfer => l10n.transfer,
+                }
               : category.first.labelFor(context.categoryLanguageCode));
     final color = switch (transaction.type) {
       TransactionType.income => LedgerPalette.green,

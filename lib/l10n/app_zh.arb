@@ -55,6 +55,7 @@
   "needAccount": "請先新增帳戶",
   "needCategory": "請選擇分類",
   "invalidTransaction": "請輸入大於 0 的金額",
+  "needDifferentAccounts": "請選擇兩個不同的帳戶",
   "cancel": "取消",
   "balance": "餘額",
   "monthBalance": "結餘",
