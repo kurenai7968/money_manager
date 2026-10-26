@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:money_manager/blocs/app_setting_bloc/app_setting_bloc.dart';
 import 'package:money_manager/blocs/app_setting_bloc/app_setting_event.dart';
@@ -91,7 +91,10 @@ class _MoneyManagerAppState extends State<MoneyManagerApp> {
               },
               locale: _localeFor(language),
               localeResolutionCallback: _resolveLocale,
-              localizationsDelegates: AppLocalizations.localizationsDelegates,
+              localizationsDelegates: const [
+                AppLocalizations.delegate,
+                ...GlobalMaterialLocalizations.delegates,
+              ],
               supportedLocales: AppLocalizations.supportedLocales,
               builder: (context, child) {
                 return _LedgerBootstrap(

@@ -19,3 +19,4 @@ Ids are five digits, starting at `00001`. The next id is one greater than the hi
 - 00009 Default account
 - 00010 Table classes
 - 00011 Finish recording a transaction
+- 00012 Migrate to material_ui
