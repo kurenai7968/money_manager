@@ -1,5 +1,6 @@
 import 'package:money_manager/core/mapping/transaction_mapping.dart';
 import 'package:money_manager/database/sqlite/app_database.dart';
+import 'package:money_manager/database/sqlite/transaction_table.dart';
 import 'package:money_manager/entities/transaction_entity.dart';
 import 'package:money_manager/models/transaction_model.dart';
 import 'package:sqflite/sqflite.dart';
@@ -22,8 +23,9 @@ class SqliteTransactionRepository implements TransactionRepository {
   @override
   Future<List<TransactionModel>> getAll() async {
     final rows = await _database.db.query(
-      'transactions',
-      orderBy: 'date DESC, id DESC',
+      TransactionTable.tableName,
+      orderBy:
+          '${TransactionTable.date.column} DESC, ${TransactionTable.id.column} DESC',
     );
     return [
       for (final row in rows)
@@ -34,7 +36,7 @@ class SqliteTransactionRepository implements TransactionRepository {
   @override
   Future<void> save(TransactionModel transaction) async {
     await _database.db.insert(
-      'transactions',
+      TransactionTable.tableName,
       transaction.toEntity().toJson(),
       conflictAlgorithm: ConflictAlgorithm.replace,
     );
@@ -42,14 +44,18 @@ class SqliteTransactionRepository implements TransactionRepository {
 
   @override
   Future<void> delete(String id) async {
-    await _database.db.delete('transactions', where: 'id = ?', whereArgs: [id]);
+    await _database.db.delete(
+      TransactionTable.tableName,
+      where: '${TransactionTable.id.column} = ?',
+      whereArgs: [id],
+    );
   }
 
   @override
   Future<int> countForCategory(String categoryId) async {
     final count = Sqflite.firstIntValue(
       await _database.db.rawQuery(
-        'SELECT COUNT(*) FROM transactions WHERE category_id = ?',
+        'SELECT COUNT(*) FROM ${TransactionTable.tableName} WHERE ${TransactionTable.categoryId.column} = ?',
         [categoryId],
       ),
     );

@@ -1,4 +1,5 @@
 import 'package:money_manager/core/mapping/account_mapping.dart';
+import 'package:money_manager/database/sqlite/account_table.dart';
 import 'package:money_manager/database/sqlite/app_database.dart';
 import 'package:money_manager/entities/account_entity.dart';
 import 'package:money_manager/models/account_model.dart';
@@ -24,8 +25,9 @@ class SqliteAccountRepository implements AccountRepository {
   @override
   Future<List<AccountModel>> getAll() async {
     final rows = await _database.db.query(
-      'accounts',
-      orderBy: 'sort_order ASC, name ASC',
+      AccountTable.tableName,
+      orderBy:
+          '${AccountTable.sortOrder.column} ASC, ${AccountTable.name.column} ASC',
     );
     return [
       for (final row in rows)
@@ -36,7 +38,9 @@ class SqliteAccountRepository implements AccountRepository {
   @override
   Future<bool> isEmpty() async {
     final count = Sqflite.firstIntValue(
-      await _database.db.rawQuery('SELECT COUNT(*) FROM accounts'),
+      await _database.db.rawQuery(
+        'SELECT COUNT(*) FROM ${AccountTable.tableName}',
+      ),
     );
     return (count ?? 0) == 0;
   }
@@ -44,7 +48,7 @@ class SqliteAccountRepository implements AccountRepository {
   @override
   Future<void> save(AccountModel account) async {
     await _database.db.insert(
-      'accounts',
+      AccountTable.tableName,
       account.toEntity().toJson(),
       conflictAlgorithm: ConflictAlgorithm.replace,
     );
@@ -53,9 +57,9 @@ class SqliteAccountRepository implements AccountRepository {
   @override
   Future<void> archive(String id) async {
     await _database.db.update(
-      'accounts',
-      {'archived': 1},
-      where: 'id = ?',
+      AccountTable.tableName,
+      {AccountTable.archived.column: 1},
+      where: '${AccountTable.id.column} = ?',
       whereArgs: [id],
     );
   }
@@ -65,9 +69,9 @@ class SqliteAccountRepository implements AccountRepository {
     await _database.db.transaction((txn) async {
       for (var index = 0; index < ids.length; index++) {
         await txn.update(
-          'accounts',
-          {'sort_order': index},
-          where: 'id = ?',
+          AccountTable.tableName,
+          {AccountTable.sortOrder.column: index},
+          where: '${AccountTable.id.column} = ?',
           whereArgs: [ids[index]],
         );
       }

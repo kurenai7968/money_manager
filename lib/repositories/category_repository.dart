@@ -1,5 +1,6 @@
 import 'package:money_manager/core/mapping/category_mapping.dart';
 import 'package:money_manager/database/sqlite/app_database.dart';
+import 'package:money_manager/database/sqlite/category_table.dart';
 import 'package:money_manager/entities/category_entity.dart';
 import 'package:money_manager/models/category_model.dart';
 import 'package:sqflite/sqflite.dart';
@@ -24,8 +25,9 @@ class SqliteCategoryRepository implements CategoryRepository {
   @override
   Future<List<CategoryModel>> getAll() async {
     final rows = await _database.db.query(
-      'categories',
-      orderBy: 'sort_order ASC, name ASC',
+      CategoryTable.tableName,
+      orderBy:
+          '${CategoryTable.sortOrder.column} ASC, ${CategoryTable.name.column} ASC',
     );
     return [
       for (final row in rows)
@@ -36,7 +38,9 @@ class SqliteCategoryRepository implements CategoryRepository {
   @override
   Future<bool> isEmpty() async {
     final count = Sqflite.firstIntValue(
-      await _database.db.rawQuery('SELECT COUNT(*) FROM categories'),
+      await _database.db.rawQuery(
+        'SELECT COUNT(*) FROM ${CategoryTable.tableName}',
+      ),
     );
     return (count ?? 0) == 0;
   }
@@ -44,7 +48,7 @@ class SqliteCategoryRepository implements CategoryRepository {
   @override
   Future<void> save(CategoryModel category) async {
     await _database.db.insert(
-      'categories',
+      CategoryTable.tableName,
       category.toEntity().toJson(),
       conflictAlgorithm: ConflictAlgorithm.replace,
     );
@@ -52,7 +56,11 @@ class SqliteCategoryRepository implements CategoryRepository {
 
   @override
   Future<void> delete(String id) async {
-    await _database.db.delete('categories', where: 'id = ?', whereArgs: [id]);
+    await _database.db.delete(
+      CategoryTable.tableName,
+      where: '${CategoryTable.id.column} = ?',
+      whereArgs: [id],
+    );
   }
 
   @override
@@ -60,9 +68,9 @@ class SqliteCategoryRepository implements CategoryRepository {
     await _database.db.transaction((txn) async {
       for (var index = 0; index < ids.length; index++) {
         await txn.update(
-          'categories',
-          {'sort_order': index},
-          where: 'id = ?',
+          CategoryTable.tableName,
+          {CategoryTable.sortOrder.column: index},
+          where: '${CategoryTable.id.column} = ?',
           whereArgs: [ids[index]],
         );
       }

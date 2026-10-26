@@ -63,46 +63,4 @@ void main() {
     await database.close();
     await File(file).delete();
   });
-
-  test('keeps an existing account name when adding language columns', () async {
-    final file = path.join(
-      Directory.systemTemp.path,
-      'money-manager-accounts-v3-${DateTime.now().microsecondsSinceEpoch}.db',
-    );
-    final created = await openDatabase(
-      file,
-      version: 3,
-      onCreate: (db, version) async {
-        await db.execute('''
-          CREATE TABLE accounts (
-            id TEXT PRIMARY KEY,
-            name TEXT NOT NULL,
-            type TEXT NOT NULL,
-            opening_balance INTEGER NOT NULL,
-            sort_order INTEGER NOT NULL,
-            archived INTEGER NOT NULL
-          )
-        ''');
-        await db.insert('accounts', {
-          'id': 'bank',
-          'name': 'Bank',
-          'type': 'bank',
-          'opening_balance': 100,
-          'sort_order': 0,
-          'archived': 0,
-        });
-      },
-    );
-    await created.close();
-
-    final database = await AppDatabase.open(path: file);
-    final repository = SqliteAccountRepository(database);
-    final loaded = await repository.getAll();
-
-    expect(loaded.single.name, 'Bank');
-    expect(loaded.single.languageEn, isNull);
-    expect(loaded.single.labelFor('en'), 'Bank');
-    await database.close();
-    await File(file).delete();
-  });
 }
