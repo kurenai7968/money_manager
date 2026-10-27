@@ -46,6 +46,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get save => '儲存';
 
   @override
+  String get equals => '等於';
+
+  @override
   String get edit => '編輯';
 
   @override
@@ -280,6 +283,9 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
 
   @override
   String get save => '保存';
+
+  @override
+  String get equals => '等于';
 
   @override
   String get edit => '编辑';

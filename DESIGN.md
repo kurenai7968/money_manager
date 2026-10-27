@@ -10,7 +10,7 @@ Personal ledger for one person. Phone first. Utility register.
 - Motion: Calm. Press feedback only. Sheets use the platform transition.
 - Voice: Minimal and matter-of-fact. Traditional Chinese and English. Buttons name the outcome.
 - Dials: variance 3, motion 3, density 5.
-- Primary action: 記一筆. The center tab button opens the transaction page. On that page a check key in the keypad commits, and the tab bar is hidden. Default type is expense.
+- Primary action: 記一筆. The center tab button opens the transaction page. On that page the keypad commits with a check key. While an operator is pending, that key shows equals and evaluates before the check returns. The tab bar is hidden. Default type is expense. A new expense or income selects the first category of that kind.
 - Corners: 12.
 - Navigation: bottom bar 主頁, 分析, 帳戶, 設定, with the record button in the center. Every tab uses this bar. App bar titles are centered.
 - Visual lead: typography.
@@ -27,10 +27,11 @@ Personal ledger for one person. Phone first. Utility register.
 - 2026-10-23: Every screen has an app bar. Add and edit transaction are full pages, one page per type.
 - 2026-10-23: Transaction app bar title is the date and opens the date picker. A segment in the app bar switches 支出, 收入, and 轉帳.
 - 2026-10-23: Expense and income use the page body for categories. The body is a grid of four items per row, icon above the name. It scrolls when there are more rows. Transfer uses the body for from and to.
+- 2026-10-27: Category cells share one 8px gap. Each cell is at most 72 wide, and the grid is centered, so the horizontal gap stays short and even. A new expense or income selects the first category of that kind. Switching kind selects the first category of the new kind.
 - 2026-10-23: The custom keyboard stays fixed and uses the page background. Keys are 1–9, decimal, delete, and + − × ÷. Evaluation is left to right. The saved amount is the result, and it must be greater than 0.
 - 2026-10-23: The amount is its own full-width line, right aligned, only a little larger than the digit keys. It scales down only when the number would overflow. The expression is not shown. Remark and the account button sit on the next line. Delete stays inside the keypad.
-- 2026-10-23: The keypad is four columns. The top row is + − × ÷. Under it, the digits are 1 2 3, 4 5 6, 7 8 9, and the bottom row is 0 . 00, each one cell. The right column under the operators is C, delete, then a check that spans two rows. C clears the amount. Delete removes one digit. 00 appends two zeros. The operator in progress is coral. Expense and income use the account button. It opens a bottom sheet. Transfer keeps 從 and 到 in the page body and has no account button.
-- 2026-10-23: Edit keeps the same page. 刪除 is the app bar action. The check key commits. Switching type clears a category from the other kind.
+- 2026-10-23: The keypad is four columns. The top row is + − × ÷. Under it, the digits are 1 2 3, 4 5 6, 7 8 9, and the bottom row is 0 . 00, each one cell. The right column under the operators is C, delete, then a vertical check that spans two rows. C clears the amount. Delete removes one digit. 00 appends two zeros. The operator in progress is coral. While an operator is pending, that key shows equals and evaluates the expression. The check returns after the result is shown, and only then commits. Expense and income use the account button. It opens a bottom sheet. Transfer keeps 從 and 到 in the page body and has no account button.
+- 2026-10-23: Edit keeps the same page. 刪除 is the app bar action. The check key commits after any pending calculation. Switching type clears a category from the other kind and selects the first category of the new kind.
 - 2026-10-23: Layout stays minimal. Color is added on purpose: coral for actions and expenses, green for income, and seven fixed category colors. Category edit can choose one of those colors.
 - 2026-10-23: Summary shows a small income and expense pair, then a lower donut. 結餘 sits in the donut. The pair has no side labels on the chart. The list under that is transactions. Every screen uses the same off-white background, centered app bar title, and the same tab bar.
 - 2026-10-23: Accounts is a tab. An account opens its own page: balance, this month's movement, history, and 轉帳.

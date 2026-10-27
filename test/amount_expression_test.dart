@@ -38,6 +38,30 @@ void main() {
     expect(zero.resultMinor, isNull);
   });
 
+  test('evaluate finishes a pending operation', () {
+    final pending = const AmountExpression()
+        .appendDigit('8')
+        .appendDigit('0')
+        .applyOperator(AmountOperator.add)
+        .appendDigit('6');
+    final done = pending.evaluate();
+
+    expect(done, isNotNull);
+    expect(done!.display, '86');
+    expect(done.operator, isNull);
+    expect(done.resultMinor, 8600);
+
+    final dangling = const AmountExpression()
+        .appendDigit('8')
+        .applyOperator(AmountOperator.add);
+    final confirmed = dangling.evaluate();
+    expect(confirmed!.display, '8');
+    expect(confirmed.operator, isNull);
+
+    final zero = pending.applyOperator(AmountOperator.divide).appendDigit('0');
+    expect(zero.evaluate(), isNull);
+  });
+
   test('keeps two decimal places and clears', () {
     final expression = const AmountExpression()
         .appendDigit('1')

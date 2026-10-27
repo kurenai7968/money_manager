@@ -46,6 +46,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get save => 'Save';
 
   @override
+  String get equals => 'Equals';
+
+  @override
   String get edit => 'Edit';
 
   @override

@@ -41,6 +41,17 @@ class AmountExpression {
     return _apply(accumulatorMinor!, operator!, currentMinor);
   }
 
+  bool get hasOperator => operator != null;
+
+  /// Finishes a pending operation. Null when the result is undefined.
+  AmountExpression? evaluate() {
+    final result = resultMinor;
+    if (result == null) {
+      return null;
+    }
+    return AmountExpression(current: _plain(result));
+  }
+
   AmountExpression appendDigit(String digit) {
     if (replaceOnNextDigit) {
       return copyWith(current: digit, replaceOnNextDigit: false);

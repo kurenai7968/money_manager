@@ -112,12 +112,15 @@ class _RecordPageState extends State<RecordPage> {
     final accounts = context.watch<AccountsBloc>().state.active;
     final transactions = context.watch<TransactionsBloc>().state;
     _prepare(accounts, transactions);
-    final categories = context
-        .watch<CategoriesBloc>()
-        .state
-        .active
-        .where((category) => category.kind.name == _type.name)
-        .toList();
+    final categories =
+        context
+            .watch<CategoriesBloc>()
+            .state
+            .active
+            .where((category) => category.kind.name == _type.name)
+            .toList()
+          ..sort((a, b) => a.sortOrder.compareTo(b.sortOrder));
+    _ensureCategory(categories);
     final result = _expression.resultMinor;
 
     return BlocListener<TransactionsBloc, TransactionsState>(
@@ -259,6 +262,7 @@ class _RecordPageState extends State<RecordPage> {
                 onClear: () => _change(() => _expression = _expression.clear()),
                 onOperator: (op) =>
                     _change(() => _expression = _expression.applyOperator(op)),
+                onEquals: _equals,
                 onSubmit: () => _save(result, accounts),
               ),
             ],
@@ -273,6 +277,28 @@ class _RecordPageState extends State<RecordPage> {
     return match.isEmpty
         ? fallback
         : match.first.labelFor(context.categoryLanguageCode);
+  }
+
+  void _ensureCategory(List<CategoryModel> categories) {
+    if (_type == TransactionType.transfer || categories.isEmpty) {
+      return;
+    }
+    if (widget.transactionId != null && !_existingReady) {
+      return;
+    }
+    final selected = categories.where((item) => item.id == _categoryId);
+    if (selected.isEmpty) {
+      _categoryId = categories.first.id;
+    }
+  }
+
+  void _equals() {
+    final next = _expression.evaluate();
+    if (next == null) {
+      setState(() => _error = context.l10n.invalidTransaction);
+      return;
+    }
+    _change(() => _expression = next);
   }
 
   void _setType(TransactionType type) {
@@ -450,98 +476,136 @@ class _CategoryGrid extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GridView.builder(
-      padding: const EdgeInsets.all(AppSpacing.l),
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 4,
-        mainAxisSpacing: AppSpacing.m,
-        crossAxisSpacing: AppSpacing.m,
-        childAspectRatio: 0.6,
-      ),
-      itemCount: categories.length,
-      itemBuilder: (context, index) {
-        final category = categories[index];
-        final selected = category.id == selectedId;
-        final label = category.labelFor(context.categoryLanguageCode);
-        final color = LedgerPalette.color(category.color);
-        final scheme = Theme.of(context).colorScheme;
-        return Semantics(
-          button: true,
-          selected: selected,
-          label: label,
-          excludeSemantics: true,
-          child: Material(
-            color: selected
-                ? color.withValues(alpha: 0.14)
-                : Colors.transparent,
-            borderRadius: BorderRadius.circular(AppRadius.m),
-            child: InkWell(
-              borderRadius: BorderRadius.circular(AppRadius.m),
-              onTap: () {
-                onSelected(category.id);
-                Scrollable.ensureVisible(context);
-              },
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  SizedBox(
-                    width: 52,
-                    height: 52,
-                    child: Stack(
-                      alignment: Alignment.center,
-                      children: [
-                        Container(
-                          width: 44,
-                          height: 44,
-                          alignment: Alignment.center,
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            border: Border.all(
-                              color: selected ? color : Colors.transparent,
-                              width: 2,
-                            ),
-                          ),
-                          child: CircleAvatar(
-                            backgroundColor: color,
-                            child: Icon(
-                              LedgerPalette.icon(category.icon),
-                              color: scheme.onPrimary,
-                              size: 20,
-                            ),
-                          ),
-                        ),
-                        if (selected)
-                          Positioned(
-                            right: 0,
-                            bottom: 2,
-                            child: DecoratedBox(
-                              decoration: BoxDecoration(
-                                color: scheme.surface,
-                                shape: BoxShape.circle,
-                              ),
-                              child: Icon(
-                                Icons.check_circle,
-                                size: 16,
-                                color: color,
-                              ),
-                            ),
-                          ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(height: AppSpacing.xs),
-                  Text(
-                    label,
-                    maxLines: 2,
-                    textAlign: TextAlign.center,
-                    overflow: TextOverflow.ellipsis,
-                    style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                      color: selected ? color : scheme.onSurface,
-                      fontWeight: selected ? FontWeight.w700 : FontWeight.w500,
-                    ),
-                  ),
-                ],
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        const columns = 4;
+        const gap = AppSpacing.s;
+        const maxCellWidth = 72.0;
+        const cellHeight = 112.0;
+        final horizontalPadding = AppSpacing.l * 2;
+        final available = constraints.maxWidth - horizontalPadding;
+        final stretched = available <= gap * (columns - 1)
+            ? 0.0
+            : (available - gap * (columns - 1)) / columns;
+        final cellWidth = stretched < maxCellWidth ? stretched : maxCellWidth;
+        final contentWidth = cellWidth * columns + gap * (columns - 1);
+        final gridWidth = contentWidth + horizontalPadding;
+        final width = gridWidth < constraints.maxWidth
+            ? gridWidth
+            : constraints.maxWidth;
+        return Align(
+          alignment: AlignmentDirectional.topCenter,
+          child: SizedBox(
+            width: width,
+            height: constraints.maxHeight,
+            child: GridView.builder(
+              padding: const EdgeInsets.fromLTRB(
+                AppSpacing.l,
+                AppSpacing.m,
+                AppSpacing.l,
+                AppSpacing.m,
               ),
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: columns,
+                mainAxisSpacing: gap,
+                crossAxisSpacing: gap,
+                mainAxisExtent: cellHeight,
+              ),
+              itemCount: categories.length,
+              itemBuilder: (context, index) {
+                final category = categories[index];
+                final selected = category.id == selectedId;
+                final label = category.labelFor(context.categoryLanguageCode);
+                final color = LedgerPalette.color(category.color);
+                final scheme = Theme.of(context).colorScheme;
+                return Semantics(
+                  button: true,
+                  selected: selected,
+                  label: label,
+                  excludeSemantics: true,
+                  child: Material(
+                    color: selected
+                        ? color.withValues(alpha: 0.14)
+                        : Colors.transparent,
+                    borderRadius: BorderRadius.circular(AppRadius.m),
+                    child: InkWell(
+                      borderRadius: BorderRadius.circular(AppRadius.m),
+                      onTap: () {
+                        onSelected(category.id);
+                        Scrollable.ensureVisible(context);
+                      },
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          SizedBox(
+                            width: 52,
+                            height: 52,
+                            child: Stack(
+                              alignment: Alignment.center,
+                              children: [
+                                Container(
+                                  width: 44,
+                                  height: 44,
+                                  alignment: Alignment.center,
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    border: Border.all(
+                                      color: selected
+                                          ? color
+                                          : Colors.transparent,
+                                      width: 2,
+                                    ),
+                                  ),
+                                  child: CircleAvatar(
+                                    backgroundColor: color,
+                                    child: Icon(
+                                      LedgerPalette.icon(category.icon),
+                                      color: scheme.onPrimary,
+                                      size: 20,
+                                    ),
+                                  ),
+                                ),
+                                if (selected)
+                                  Positioned(
+                                    right: 0,
+                                    bottom: 2,
+                                    child: DecoratedBox(
+                                      decoration: BoxDecoration(
+                                        color: scheme.surface,
+                                        shape: BoxShape.circle,
+                                      ),
+                                      child: Icon(
+                                        Icons.check_circle,
+                                        size: 16,
+                                        color: color,
+                                      ),
+                                    ),
+                                  ),
+                              ],
+                            ),
+                          ),
+                          const SizedBox(height: AppSpacing.xs),
+                          Flexible(
+                            child: Text(
+                              label,
+                              maxLines: 2,
+                              textAlign: TextAlign.center,
+                              overflow: TextOverflow.ellipsis,
+                              style: Theme.of(context).textTheme.labelMedium
+                                  ?.copyWith(
+                                    color: selected ? color : scheme.onSurface,
+                                    fontWeight: selected
+                                        ? FontWeight.w700
+                                        : FontWeight.w500,
+                                  ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                );
+              },
             ),
           ),
         );
@@ -664,6 +728,7 @@ class _Keypad extends StatelessWidget {
     required this.onBackspace,
     required this.onClear,
     required this.onOperator,
+    required this.onEquals,
     required this.onSubmit,
   });
 
@@ -674,6 +739,7 @@ class _Keypad extends StatelessWidget {
   final VoidCallback onBackspace;
   final VoidCallback onClear;
   final ValueChanged<AmountOperator> onOperator;
+  final VoidCallback onEquals;
   final VoidCallback onSubmit;
 
   @override
@@ -783,21 +849,10 @@ class _Keypad extends StatelessWidget {
                   children: [
                     key('C', onClear, color: scheme.onSurfaceVariant),
                     key('←', onBackspace, color: scheme.onSurfaceVariant),
-                    SizedBox(
-                      height: 96,
-                      width: double.infinity,
-                      child: Tooltip(
-                        message: context.l10n.save,
-                        child: FilledButton(
-                          onPressed: onSubmit,
-                          style: FilledButton.styleFrom(
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(AppRadius.m),
-                            ),
-                          ),
-                          child: const Icon(Icons.check),
-                        ),
-                      ),
+                    _CommitKey(
+                      calculating: expression.hasOperator,
+                      onEquals: onEquals,
+                      onSubmit: onSubmit,
                     ),
                   ],
                 ),
@@ -806,6 +861,63 @@ class _Keypad extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+}
+
+class _CommitKey extends StatelessWidget {
+  const _CommitKey({
+    required this.calculating,
+    required this.onEquals,
+    required this.onSubmit,
+  });
+
+  final bool calculating;
+  final VoidCallback onEquals;
+  final VoidCallback onSubmit;
+
+  static const _height = 96.0;
+  static const _maxWidth = 72.0;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = context.l10n;
+    final scheme = Theme.of(context).colorScheme;
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final width = constraints.maxWidth < _maxWidth
+            ? constraints.maxWidth
+            : _maxWidth;
+        return SizedBox(
+          height: _height,
+          width: double.infinity,
+          child: Align(
+            child: SizedBox(
+              width: width,
+              height: _height,
+              child: Tooltip(
+                message: calculating ? l10n.equals : l10n.save,
+                child: FilledButton(
+                  onPressed: calculating ? onEquals : onSubmit,
+                  style: FilledButton.styleFrom(
+                    padding: EdgeInsets.zero,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(AppRadius.m),
+                    ),
+                  ),
+                  child: calculating
+                      ? Text(
+                          '=',
+                          style: Theme.of(context).textTheme.titleLarge
+                              ?.copyWith(color: scheme.onPrimary),
+                        )
+                      : const Icon(Icons.check),
+                ),
+              ),
+            ),
+          ),
+        );
+      },
     );
   }
 }

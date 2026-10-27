@@ -15,8 +15,8 @@ void main() {
     await pumpLedger(tester);
 
     await openRecord(tester);
-    expect(selectedCategory('Food'), findsNothing);
-    expect(find.byIcon(Icons.check_circle), findsNothing);
+    expect(selectedCategory('Food'), findsOneWidget);
+    expect(find.byIcon(Icons.check_circle), findsOneWidget);
     expect(find.text('Cash'), findsOneWidget);
 
     await tester.tap(find.text('Food'));
@@ -91,7 +91,7 @@ void main() {
     await tester.pump();
     expect(find.text('Food'), findsNothing);
     expect(find.text('Salary'), findsOneWidget);
-    expect(selectedCategory('Salary'), findsNothing);
+    expect(selectedCategory('Salary'), findsOneWidget);
 
     await tester.tap(find.text('Salary'));
     await tester.pump();
@@ -153,7 +153,7 @@ void main() {
     expect(find.text('20'), findsWidgets);
   });
 
-  testWidgets('Check explains a missing amount and category', (tester) async {
+  testWidgets('Check explains a missing amount', (tester) async {
     await pumpLedger(tester, size: const Size(320, 568));
     await openRecord(tester);
 
@@ -169,13 +169,7 @@ void main() {
     expect(find.text('999,999'), findsOneWidget);
 
     await commit(tester);
-    expect(find.text('Choose a category'), findsOneWidget);
-
-    await tester.tap(find.text('Food'));
-    await tester.pump();
-    expect(selectedCategory('Food'), findsOneWidget);
     expect(find.text('Choose a category'), findsNothing);
-    await commit(tester);
     expect(find.text('Food'), findsWidgets);
     expect(find.text('-999,999'), findsWidgets);
     expect(tester.takeException(), isNull);
@@ -190,7 +184,7 @@ void main() {
 
     expect(find.text('飲食'), findsOneWidget);
     expect(find.text('現金'), findsOneWidget);
-    expect(selectedCategory('飲食'), findsNothing);
+    expect(selectedCategory('飲食'), findsOneWidget);
 
     await tester.tap(find.text('飲食'));
     await tester.pump();
@@ -204,6 +198,85 @@ void main() {
 
     expect(find.text('飲食'), findsWidgets);
     expect(find.text('-8'), findsWidgets);
+  });
+
+  testWidgets('Equals finishes a calculation before save', (tester) async {
+    await pumpLedger(tester);
+    await openRecord(tester);
+
+    await tapKey(tester, '8');
+    await tapKey(tester, '+');
+    expect(find.byTooltip('Save'), findsNothing);
+    expect(find.byTooltip('Equals'), findsOneWidget);
+    expect(find.byIcon(Icons.check), findsNothing);
+
+    await tapKey(tester, '2');
+    await tester.tap(find.byTooltip('Equals'));
+    await tester.pump();
+    expect(find.text('10'), findsOneWidget);
+    expect(find.byTooltip('Save'), findsOneWidget);
+
+    await commit(tester);
+    expect(find.text('-10'), findsWidgets);
+  });
+
+  testWidgets('Divide by zero keeps the equals key', (tester) async {
+    await pumpLedger(tester);
+    await openRecord(tester);
+    await tapKey(tester, '8');
+    await tapKey(tester, '÷');
+    await tapKey(tester, '0');
+    await tester.tap(find.byTooltip('Equals'));
+    await tester.pump();
+    expect(find.text('Enter an amount greater than zero'), findsOneWidget);
+    expect(find.byTooltip('Save'), findsNothing);
+  });
+
+  testWidgets('Commit key is taller than wide and category gaps match', (
+    tester,
+  ) async {
+    await pumpLedger(tester);
+    await openRecord(tester);
+
+    final button = tester.getSize(find.byType(FilledButton));
+    expect(button.height, greaterThan(button.width));
+
+    double centerOf(IconData icon) {
+      return tester.getCenter(find.byIcon(icon)).dx;
+    }
+
+    final food = centerOf(Icons.restaurant_outlined);
+    final transit = centerOf(Icons.directions_transit_outlined);
+    final housing = centerOf(Icons.home_outlined);
+    final shopping = centerOf(Icons.shopping_bag_outlined);
+    final gaps = [transit - food, housing - transit, shopping - housing];
+    expect(gaps[0], closeTo(gaps[1], 0.5));
+    expect(gaps[1], closeTo(gaps[2], 0.5));
+    expect(gaps[0], lessThan(84));
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('Record page lays out at a larger text scale', (tester) async {
+    tester.platformDispatcher.textScaleFactorTestValue = 1.3;
+    addTearDown(tester.platformDispatcher.clearTextScaleFactorTestValue);
+    await pumpLedger(tester, size: const Size(360, 640));
+    await openRecord(tester);
+    expect(selectedCategory('Food'), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('Record page lays out in dark mode at double text scale', (
+    tester,
+  ) async {
+    tester.platformDispatcher.textScaleFactorTestValue = 2;
+    tester.platformDispatcher.platformBrightnessTestValue = Brightness.dark;
+    addTearDown(tester.platformDispatcher.clearTextScaleFactorTestValue);
+    addTearDown(tester.platformDispatcher.clearPlatformBrightnessTestValue);
+    await pumpLedger(tester, size: const Size(320, 568));
+    await openRecord(tester);
+    expect(selectedCategory('Food'), findsOneWidget);
+    expect(find.byTooltip('Save'), findsOneWidget);
+    expect(tester.takeException(), isNull);
   });
 }
 

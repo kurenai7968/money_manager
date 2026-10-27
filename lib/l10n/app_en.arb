@@ -15,6 +15,10 @@
   "nextMonth": "Next month",
   "add": "Add",
   "save": "Save",
+  "equals": "Equals",
+  "@equals": {
+    "description": "Keypad key that finishes a pending calculation."
+  },
   "edit": "Edit",
   "delete": "Delete",
   "name": "Name",

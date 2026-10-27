@@ -171,6 +171,12 @@ abstract class AppLocalizations {
   /// **'Save'**
   String get save;
 
+  /// Keypad key that finishes a pending calculation.
+  ///
+  /// In en, this message translates to:
+  /// **'Equals'**
+  String get equals;
+
   /// No description provided for @edit.
   ///
   /// In en, this message translates to:
