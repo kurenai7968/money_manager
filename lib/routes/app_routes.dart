@@ -5,8 +5,11 @@ enum AppRoutes {
   settings('/settings'),
   record('/record'),
   accountNew('/account/new'),
+  accountDetail('/account/:id'),
+  accountEdit('/account/:id/edit'),
   categories('/categories'),
-  categoryNew('/category/new');
+  categoryNew('/category/new'),
+  categoryEdit('/category/:id');
 
   const AppRoutes(this.path);
 

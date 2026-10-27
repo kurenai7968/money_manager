@@ -5,7 +5,8 @@ import 'package:money_manager/blocs/app_setting_bloc/app_setting_bloc.dart';
 import 'package:money_manager/blocs/app_setting_bloc/app_setting_event.dart';
 import 'package:money_manager/blocs/app_setting_bloc/app_setting_state.dart';
 import 'package:money_manager/core/extensions/context_extension.dart';
-import 'package:money_manager/models/app_setting.dart';
+import 'package:money_manager/models/enums/app_appearance.dart';
+import 'package:money_manager/models/enums/week_start.dart';
 import 'package:money_manager/routes/app_routes.dart';
 import 'package:money_manager/themes/app_themes.dart';
 
@@ -19,7 +20,7 @@ class SettingsPage extends StatelessWidget {
       appBar: AppBar(title: Text(l10n.settings)),
       body: BlocBuilder<AppSettingBloc, AppSettingState>(
         builder: (context, state) {
-          final setting = state.setting;
+          final setting = state.appSetting;
           return ListView(
             children: [
               _Section(l10n.general),
@@ -55,23 +56,23 @@ class SettingsPage extends StatelessWidget {
               ),
               _Row(
                 title: l10n.appearance,
-                value: switch (setting.themeChoice) {
-                  AppThemeChoice.light => l10n.light,
-                  AppThemeChoice.dark => l10n.dark,
-                  AppThemeChoice.system => l10n.followSystem,
+                value: switch (setting.appearance) {
+                  AppAppearance.light => l10n.light,
+                  AppAppearance.dark => l10n.dark,
+                  AppAppearance.system => l10n.followSystem,
                 },
-                onTap: () => _choose<AppThemeChoice>(
+                onTap: () => _choose<AppAppearance>(
                   context,
                   title: l10n.appearance,
                   options: [
-                    (AppThemeChoice.system, l10n.followSystem),
-                    (AppThemeChoice.light, l10n.light),
-                    (AppThemeChoice.dark, l10n.dark),
+                    (AppAppearance.system, l10n.followSystem),
+                    (AppAppearance.light, l10n.light),
+                    (AppAppearance.dark, l10n.dark),
                   ],
-                  selected: setting.themeChoice,
+                  selected: setting.appearance,
                   onSelected: (value) {
                     context.read<AppSettingBloc>().add(
-                      AppSettingChanged(setting.copyWith(themeChoice: value)),
+                      AppSettingChanged(setting.copyWith(appearance: value)),
                     );
                   },
                 ),

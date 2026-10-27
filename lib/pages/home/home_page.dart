@@ -7,7 +7,8 @@ import 'package:intl/intl.dart';
 import 'package:money_manager/blocs/app_setting_bloc/app_setting_bloc.dart';
 import 'package:money_manager/core/extensions/context_extension.dart';
 import 'package:money_manager/core/utils/ledger_balance.dart';
-import 'package:money_manager/models/app_setting.dart';
+import 'package:money_manager/models/app_setting_model.dart';
+import 'package:money_manager/models/enums/week_start.dart';
 import 'package:money_manager/core/utils/money_format.dart';
 import 'package:money_manager/models/category_model.dart';
 import 'package:money_manager/models/ledger_kinds.dart';
@@ -54,7 +55,11 @@ class _HomePageState extends State<HomePage> {
               item.date.year == _month.year && item.date.month == _month.month,
         )
         .toList();
-    final weekStart = context.watch<AppSettingBloc>().state.setting.weekStart;
+    final weekStart = context
+        .watch<AppSettingBloc>()
+        .state
+        .appSetting
+        .weekStart;
     final figures = monthFigures(transactions, _month);
 
     return Scaffold(

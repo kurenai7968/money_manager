@@ -5,6 +5,7 @@ import 'package:money_manager/app.dart';
 import 'package:money_manager/widgets/app_tab_bar.dart';
 
 import 'support/memory_account_repository.dart';
+import 'support/memory_app_setting_repository.dart';
 import 'support/memory_category_repository.dart';
 import 'support/memory_transaction_repository.dart';
 
@@ -14,10 +15,11 @@ void main() {
     addTearDown(tester.platformDispatcher.clearLocaleTestValue);
 
     await tester.pumpWidget(
-      MoneyManagerApp(
+      App(
         accounts: MemoryAccountRepository(),
         categories: MemoryCategoryRepository(),
         transactions: MemoryTransactionRepository(),
+        settings: MemoryAppSettingRepository(),
       ),
     );
     await tester.pumpAndSettle();
@@ -80,10 +82,11 @@ void main() {
     addTearDown(tester.platformDispatcher.clearLocaleTestValue);
 
     await tester.pumpWidget(
-      MoneyManagerApp(
+      App(
         accounts: MemoryAccountRepository(),
         categories: MemoryCategoryRepository(),
         transactions: MemoryTransactionRepository(),
+        settings: MemoryAppSettingRepository(),
       ),
     );
     await tester.pumpAndSettle();
@@ -105,10 +108,11 @@ void main() {
     addTearDown(tester.platformDispatcher.clearLocaleTestValue);
 
     await tester.pumpWidget(
-      MoneyManagerApp(
+      App(
         accounts: MemoryAccountRepository(),
         categories: MemoryCategoryRepository(),
         transactions: MemoryTransactionRepository(),
+        settings: MemoryAppSettingRepository(),
       ),
     );
     await tester.pumpAndSettle();

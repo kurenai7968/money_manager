@@ -1,35 +1,33 @@
 import 'package:equatable/equatable.dart';
+import 'package:money_manager/models/enums/app_appearance.dart';
+import 'package:money_manager/models/enums/week_start.dart';
 
-enum AppThemeChoice { system, light, dark }
-
-enum WeekStart { monday, sunday }
-
-class AppSetting extends Equatable {
-  const AppSetting({
+class AppSettingModel extends Equatable {
+  const AppSettingModel({
     this.languageCode,
-    this.themeChoice = AppThemeChoice.system,
+    this.appearance = AppAppearance.system,
     this.weekStart = WeekStart.monday,
   });
 
   final String? languageCode;
-  final AppThemeChoice themeChoice;
+  final AppAppearance appearance;
   final WeekStart weekStart;
 
-  AppSetting copyWith({
+  AppSettingModel copyWith({
     String? languageCode,
-    AppThemeChoice? themeChoice,
+    AppAppearance? appearance,
     WeekStart? weekStart,
     bool clearLanguage = false,
   }) {
-    return AppSetting(
+    return AppSettingModel(
       languageCode: clearLanguage ? null : languageCode ?? this.languageCode,
-      themeChoice: themeChoice ?? this.themeChoice,
+      appearance: appearance ?? this.appearance,
       weekStart: weekStart ?? this.weekStart,
     );
   }
 
   @override
-  List<Object?> get props => [languageCode, themeChoice, weekStart];
+  List<Object?> get props => [languageCode, appearance, weekStart];
 }
 
 int leadingCalendarBlanks(DateTime firstOfMonth, WeekStart weekStart) {

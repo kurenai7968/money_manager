@@ -1,40 +1,53 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:money_manager/blocs/app_setting_bloc/app_setting_event.dart';
 import 'package:money_manager/blocs/app_setting_bloc/app_setting_state.dart';
-import 'package:money_manager/database/shared_preferences/settings_store.dart';
+import 'package:money_manager/core/errors/app_exception.dart';
+import 'package:money_manager/repositories/app_setting_repository.dart';
 
 class AppSettingBloc extends Bloc<AppSettingEvent, AppSettingState> {
-  AppSettingBloc(this._store) : super(const AppSettingState()) {
-    on<AppSettingStarted>(_onStarted);
-    on<AppSettingChanged>(_onChanged);
+  AppSettingBloc({required this.appSettingRepository})
+    : super(const AppSettingState()) {
+    on<AppSettingInitialized>(_onAppSettingInitialized);
+    on<AppSettingChanged>(_onAppSettingChanged);
+    add(const AppSettingInitialized());
   }
 
-  final SettingsStore _store;
+  final AppSettingRepository appSettingRepository;
 
-  Future<void> _onStarted(
-    AppSettingStarted event,
+  Future<void> _onAppSettingInitialized(
+    AppSettingInitialized event,
     Emitter<AppSettingState> emit,
   ) async {
-    emit(state.copyWith(status: AppSettingStatus.loading));
+    if (state.status == AppSettingStatus.initial) {
+      emit(state.copyWith(status: AppSettingStatus.loading));
+    }
     try {
+      final appSetting = await appSettingRepository.getAppSetting();
       emit(
         state.copyWith(
           status: AppSettingStatus.success,
-          setting: await _store.load(),
+          appSetting: appSetting,
         ),
       );
-    } catch (_) {
+    } on AppException {
       emit(state.copyWith(status: AppSettingStatus.failure));
     }
   }
 
-  Future<void> _onChanged(
+  Future<void> _onAppSettingChanged(
     AppSettingChanged event,
     Emitter<AppSettingState> emit,
   ) async {
-    await _store.save(event.setting);
-    emit(
-      state.copyWith(status: AppSettingStatus.success, setting: event.setting),
-    );
+    try {
+      await appSettingRepository.updateAppSetting(event.appSetting);
+      emit(
+        state.copyWith(
+          status: AppSettingStatus.success,
+          appSetting: event.appSetting,
+        ),
+      );
+    } on AppException {
+      emit(state.copyWith(status: AppSettingStatus.failure));
+    }
   }
 }
