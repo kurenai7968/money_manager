@@ -15,8 +15,12 @@ import 'package:money_manager/pages/categories/bloc/categories_bloc.dart';
 import 'package:money_manager/pages/transactions/bloc/transactions_bloc.dart';
 import 'package:money_manager/pages/transactions/bloc/transactions_event.dart';
 import 'package:money_manager/pages/transactions/bloc/transactions_state.dart';
+import 'package:money_manager/pages/record/widgets/record_account_sheet.dart';
+import 'package:money_manager/pages/record/widgets/record_category_grid.dart';
+import 'package:money_manager/pages/record/widgets/record_keypad.dart';
+import 'package:money_manager/pages/record/widgets/record_note_dialog.dart';
+import 'package:money_manager/pages/record/widgets/record_transfer_fields.dart';
 import 'package:money_manager/themes/app_themes.dart';
-import 'package:money_manager/themes/ledger_palette.dart';
 import 'package:money_manager/widgets/ledger_sheet.dart';
 
 class RecordPage extends StatefulWidget {
@@ -180,14 +184,14 @@ class _RecordPageState extends State<RecordPage> {
             children: [
               Expanded(
                 child: _type == TransactionType.transfer
-                    ? _TransferFields(
+                    ? RecordTransferFields(
                         accounts: accounts,
                         fromId: _fromId,
                         toId: _toId,
                         onFrom: (id) => _change(() => _fromId = id),
                         onTo: (id) => _change(() => _toId = id),
                       )
-                    : _CategoryGrid(
+                    : RecordCategoryGrid(
                         categories: categories,
                         selectedId: _categoryId,
                         onSelected: (id) => _change(() => _categoryId = id),
@@ -250,7 +254,7 @@ class _RecordPageState extends State<RecordPage> {
                   ],
                 ),
               ),
-              _Keypad(
+              RecordKeypad(
                 expression: _expression,
                 onDigit: (digit) =>
                     _change(() => _expression = _expression.appendDigit(digit)),
@@ -330,7 +334,7 @@ class _RecordPageState extends State<RecordPage> {
   Future<void> _editNote() async {
     final result = await showDialog<String>(
       context: context,
-      builder: (context) => _NoteDialog(initial: _note),
+      builder: (context) => RecordNoteDialog(initial: _note),
     );
     if (result != null) {
       _change(() => _note = result.trim());
@@ -342,7 +346,7 @@ class _RecordPageState extends State<RecordPage> {
     final selected = await showLedgerSheet<String>(
       context: context,
       builder: (context) {
-        return _AccountSheet(accounts: accounts, selectedId: _accountId);
+        return RecordAccountSheet(accounts: accounts, selectedId: _accountId);
       },
     );
     if (selected != null) {
@@ -421,504 +425,5 @@ class _RecordPageState extends State<RecordPage> {
       TransactionType.income => l10n.income,
       TransactionType.transfer => l10n.transfer,
     };
-  }
-}
-
-class _NoteDialog extends StatefulWidget {
-  const _NoteDialog({required this.initial});
-
-  final String initial;
-
-  @override
-  State<_NoteDialog> createState() => _NoteDialogState();
-}
-
-class _NoteDialogState extends State<_NoteDialog> {
-  late final TextEditingController _controller = TextEditingController(
-    text: widget.initial,
-  );
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final l10n = context.l10n;
-    return AlertDialog(
-      title: Text(l10n.remark),
-      content: TextField(controller: _controller, autofocus: true),
-      actions: [
-        TextButton(
-          onPressed: () => Navigator.pop(context),
-          child: Text(l10n.cancel),
-        ),
-        TextButton(
-          onPressed: () => Navigator.pop(context, _controller.text),
-          child: Text(l10n.save),
-        ),
-      ],
-    );
-  }
-}
-
-class _CategoryGrid extends StatelessWidget {
-  const _CategoryGrid({
-    required this.categories,
-    required this.selectedId,
-    required this.onSelected,
-  });
-
-  final List<CategoryModel> categories;
-  final String? selectedId;
-  final ValueChanged<String> onSelected;
-
-  @override
-  Widget build(BuildContext context) {
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        const columns = 4;
-        const gap = AppSpacing.s;
-        const maxCellWidth = 72.0;
-        const cellHeight = 112.0;
-        final horizontalPadding = AppSpacing.l * 2;
-        final available = constraints.maxWidth - horizontalPadding;
-        final stretched = available <= gap * (columns - 1)
-            ? 0.0
-            : (available - gap * (columns - 1)) / columns;
-        final cellWidth = stretched < maxCellWidth ? stretched : maxCellWidth;
-        final contentWidth = cellWidth * columns + gap * (columns - 1);
-        final gridWidth = contentWidth + horizontalPadding;
-        final width = gridWidth < constraints.maxWidth
-            ? gridWidth
-            : constraints.maxWidth;
-        return Align(
-          alignment: AlignmentDirectional.topCenter,
-          child: SizedBox(
-            width: width,
-            height: constraints.maxHeight,
-            child: GridView.builder(
-              padding: const EdgeInsets.fromLTRB(
-                AppSpacing.l,
-                AppSpacing.m,
-                AppSpacing.l,
-                AppSpacing.m,
-              ),
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: columns,
-                mainAxisSpacing: gap,
-                crossAxisSpacing: gap,
-                mainAxisExtent: cellHeight,
-              ),
-              itemCount: categories.length,
-              itemBuilder: (context, index) {
-                final category = categories[index];
-                final selected = category.id == selectedId;
-                final label = category.labelFor(context.categoryLanguageCode);
-                final color = LedgerPalette.color(category.color);
-                final scheme = Theme.of(context).colorScheme;
-                return Semantics(
-                  button: true,
-                  selected: selected,
-                  label: label,
-                  excludeSemantics: true,
-                  child: Material(
-                    color: selected
-                        ? color.withValues(alpha: 0.14)
-                        : Colors.transparent,
-                    borderRadius: BorderRadius.circular(AppRadius.m),
-                    child: InkWell(
-                      borderRadius: BorderRadius.circular(AppRadius.m),
-                      onTap: () {
-                        onSelected(category.id);
-                        Scrollable.ensureVisible(context);
-                      },
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          SizedBox(
-                            width: 52,
-                            height: 52,
-                            child: Stack(
-                              alignment: Alignment.center,
-                              children: [
-                                Container(
-                                  width: 44,
-                                  height: 44,
-                                  alignment: Alignment.center,
-                                  decoration: BoxDecoration(
-                                    shape: BoxShape.circle,
-                                    border: Border.all(
-                                      color: selected
-                                          ? color
-                                          : Colors.transparent,
-                                      width: 2,
-                                    ),
-                                  ),
-                                  child: CircleAvatar(
-                                    backgroundColor: color,
-                                    child: Icon(
-                                      LedgerPalette.icon(category.icon),
-                                      color: scheme.onPrimary,
-                                      size: 20,
-                                    ),
-                                  ),
-                                ),
-                                if (selected)
-                                  Positioned(
-                                    right: 0,
-                                    bottom: 2,
-                                    child: DecoratedBox(
-                                      decoration: BoxDecoration(
-                                        color: scheme.surface,
-                                        shape: BoxShape.circle,
-                                      ),
-                                      child: Icon(
-                                        Icons.check_circle,
-                                        size: 16,
-                                        color: color,
-                                      ),
-                                    ),
-                                  ),
-                              ],
-                            ),
-                          ),
-                          const SizedBox(height: AppSpacing.xs),
-                          Flexible(
-                            child: Text(
-                              label,
-                              maxLines: 2,
-                              textAlign: TextAlign.center,
-                              overflow: TextOverflow.ellipsis,
-                              style: Theme.of(context).textTheme.labelMedium
-                                  ?.copyWith(
-                                    color: selected ? color : scheme.onSurface,
-                                    fontWeight: selected
-                                        ? FontWeight.w700
-                                        : FontWeight.w500,
-                                  ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                );
-              },
-            ),
-          ),
-        );
-      },
-    );
-  }
-}
-
-class _TransferFields extends StatelessWidget {
-  const _TransferFields({
-    required this.accounts,
-    required this.fromId,
-    required this.toId,
-    required this.onFrom,
-    required this.onTo,
-  });
-
-  final List<AccountModel> accounts;
-  final String? fromId;
-  final String? toId;
-  final ValueChanged<String> onFrom;
-  final ValueChanged<String> onTo;
-
-  @override
-  Widget build(BuildContext context) {
-    final l10n = context.l10n;
-    return ListView(
-      children: [
-        ListTile(
-          title: Text(l10n.fromAccount),
-          trailing: Text(
-            _name(fromId, l10n.chooseAccount, context.categoryLanguageCode),
-          ),
-          onTap: () => _pick(context, onFrom, fromId),
-        ),
-        ListTile(
-          title: Text(l10n.toAccount),
-          trailing: Text(
-            _name(toId, l10n.chooseAccount, context.categoryLanguageCode),
-          ),
-          onTap: () => _pick(context, onTo, toId),
-        ),
-        Padding(
-          padding: const EdgeInsets.all(AppSpacing.l),
-          child: Text(
-            l10n.netUnchanged,
-            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-              color: Theme.of(context).colorScheme.onSurfaceVariant,
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-
-  String _name(String? id, String fallback, String languageCode) {
-    final match = accounts.where((account) => account.id == id);
-    return match.isEmpty ? fallback : match.first.labelFor(languageCode);
-  }
-
-  Future<void> _pick(
-    BuildContext context,
-    ValueChanged<String> onSelected,
-    String? selectedId,
-  ) async {
-    final selected = await showLedgerSheet<String>(
-      context: context,
-      builder: (context) =>
-          _AccountSheet(accounts: accounts, selectedId: selectedId),
-    );
-    if (selected != null) {
-      onSelected(selected);
-    }
-  }
-}
-
-class _AccountSheet extends StatelessWidget {
-  const _AccountSheet({required this.accounts, this.selectedId});
-
-  final List<AccountModel> accounts;
-  final String? selectedId;
-
-  @override
-  Widget build(BuildContext context) {
-    final l10n = context.l10n;
-    return SafeArea(
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(AppSpacing.l),
-            child: Text(
-              l10n.chooseAccount,
-              style: Theme.of(context).textTheme.titleMedium,
-            ),
-          ),
-          for (final account in accounts)
-            ListTile(
-              title: Text(account.labelFor(context.categoryLanguageCode)),
-              trailing: account.id == selectedId
-                  ? Icon(
-                      Icons.check,
-                      color: Theme.of(context).colorScheme.primary,
-                    )
-                  : null,
-              onTap: () => Navigator.pop(context, account.id),
-            ),
-        ],
-      ),
-    );
-  }
-}
-
-class _Keypad extends StatelessWidget {
-  const _Keypad({
-    required this.expression,
-    required this.onDigit,
-    required this.onDoubleZero,
-    required this.onDecimal,
-    required this.onBackspace,
-    required this.onClear,
-    required this.onOperator,
-    required this.onEquals,
-    required this.onSubmit,
-  });
-
-  final AmountExpression expression;
-  final ValueChanged<String> onDigit;
-  final VoidCallback onDoubleZero;
-  final VoidCallback onDecimal;
-  final VoidCallback onBackspace;
-  final VoidCallback onClear;
-  final ValueChanged<AmountOperator> onOperator;
-  final VoidCallback onEquals;
-  final VoidCallback onSubmit;
-
-  @override
-  Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
-    Color operatorColor(AmountOperator op) {
-      return expression.operator == op
-          ? scheme.primary
-          : scheme.onSurfaceVariant;
-    }
-
-    Widget key(String label, VoidCallback? onPressed, {Color? color}) {
-      return SizedBox(
-        height: 48,
-        child: TextButton(
-          onPressed: onPressed,
-          child: Text(
-            label,
-            style: Theme.of(context).textTheme.titleMedium
-                ?.copyWith(color: color ?? scheme.onSurface),
-          ),
-        ),
-      );
-    }
-
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(
-        AppSpacing.s,
-        AppSpacing.s,
-        AppSpacing.s,
-        AppSpacing.l,
-      ),
-      child: Column(
-        children: [
-          Row(
-            children: [
-              Expanded(
-                child: key(
-                  '+',
-                  () => onOperator(AmountOperator.add),
-                  color: operatorColor(AmountOperator.add),
-                ),
-              ),
-              Expanded(
-                child: key(
-                  '−',
-                  () => onOperator(AmountOperator.subtract),
-                  color: operatorColor(AmountOperator.subtract),
-                ),
-              ),
-              Expanded(
-                child: key(
-                  '×',
-                  () => onOperator(AmountOperator.multiply),
-                  color: operatorColor(AmountOperator.multiply),
-                ),
-              ),
-              Expanded(
-                child: key(
-                  '÷',
-                  () => onOperator(AmountOperator.divide),
-                  color: operatorColor(AmountOperator.divide),
-                ),
-              ),
-            ],
-          ),
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Expanded(
-                flex: 3,
-                child: Column(
-                  children: [
-                    Row(
-                      children: [
-                        Expanded(child: key('1', () => onDigit('1'))),
-                        Expanded(child: key('2', () => onDigit('2'))),
-                        Expanded(child: key('3', () => onDigit('3'))),
-                      ],
-                    ),
-                    Row(
-                      children: [
-                        Expanded(child: key('4', () => onDigit('4'))),
-                        Expanded(child: key('5', () => onDigit('5'))),
-                        Expanded(child: key('6', () => onDigit('6'))),
-                      ],
-                    ),
-                    Row(
-                      children: [
-                        Expanded(child: key('7', () => onDigit('7'))),
-                        Expanded(child: key('8', () => onDigit('8'))),
-                        Expanded(child: key('9', () => onDigit('9'))),
-                      ],
-                    ),
-                    Row(
-                      children: [
-                        Expanded(child: key('0', () => onDigit('0'))),
-                        Expanded(child: key('.', onDecimal)),
-                        Expanded(child: key('00', onDoubleZero)),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-              Expanded(
-                child: Column(
-                  children: [
-                    key('C', onClear, color: scheme.onSurfaceVariant),
-                    key('←', onBackspace, color: scheme.onSurfaceVariant),
-                    _CommitKey(
-                      calculating: expression.hasOperator,
-                      onEquals: onEquals,
-                      onSubmit: onSubmit,
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _CommitKey extends StatelessWidget {
-  const _CommitKey({
-    required this.calculating,
-    required this.onEquals,
-    required this.onSubmit,
-  });
-
-  final bool calculating;
-  final VoidCallback onEquals;
-  final VoidCallback onSubmit;
-
-  static const _height = 96.0;
-  static const _maxWidth = 72.0;
-
-  @override
-  Widget build(BuildContext context) {
-    final l10n = context.l10n;
-    final scheme = Theme.of(context).colorScheme;
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        final width = constraints.maxWidth < _maxWidth
-            ? constraints.maxWidth
-            : _maxWidth;
-        return SizedBox(
-          height: _height,
-          width: double.infinity,
-          child: Align(
-            child: SizedBox(
-              width: width,
-              height: _height,
-              child: Tooltip(
-                message: calculating ? l10n.equals : l10n.save,
-                child: FilledButton(
-                  onPressed: calculating ? onEquals : onSubmit,
-                  style: FilledButton.styleFrom(
-                    padding: EdgeInsets.zero,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(AppRadius.m),
-                    ),
-                  ),
-                  child: calculating
-                      ? Text(
-                          '=',
-                          style: Theme.of(context).textTheme.titleLarge
-                              ?.copyWith(color: scheme.onPrimary),
-                        )
-                      : const Icon(Icons.check),
-                ),
-              ),
-            ),
-          ),
-        );
-      },
-    );
   }
 }

@@ -4,17 +4,15 @@ import 'package:go_router/go_router.dart';
 import 'package:money_manager/core/extensions/context_extension.dart';
 import 'package:money_manager/core/utils/ledger_balance.dart';
 import 'package:money_manager/core/utils/money_format.dart';
-import 'package:money_manager/models/account_model.dart';
-import 'package:money_manager/models/transaction_model.dart';
 import 'package:money_manager/models/ledger_kinds.dart';
 import 'package:money_manager/pages/accounts/bloc/accounts_bloc.dart';
 import 'package:money_manager/pages/accounts/bloc/accounts_event.dart';
 import 'package:money_manager/pages/accounts/bloc/accounts_state.dart';
+import 'package:money_manager/pages/accounts/widgets/account_section_label.dart';
+import 'package:money_manager/pages/accounts/widgets/account_sliver.dart';
 import 'package:money_manager/pages/transactions/bloc/transactions_bloc.dart';
 import 'package:money_manager/routes/app_routes.dart';
 import 'package:money_manager/themes/app_themes.dart';
-import 'package:money_manager/themes/ledger_palette.dart';
-import 'package:money_manager/widgets/ledger_reorder.dart';
 
 class AccountsPage extends StatelessWidget {
   const AccountsPage({super.key});
@@ -85,8 +83,8 @@ class AccountsPage extends StatelessWidget {
                 ),
               ),
               if (assets.isNotEmpty) ...[
-                SliverToBoxAdapter(child: _SectionLabel(l10n.assets)),
-                _AccountSliver(
+                SliverToBoxAdapter(child: AccountSectionLabel(l10n.assets)),
+                AccountSliver(
                   key: const ValueKey('assets'),
                   accounts: assets,
                   transactions: transactions,
@@ -96,8 +94,10 @@ class AccountsPage extends StatelessWidget {
                 ),
               ],
               if (liabilities.isNotEmpty) ...[
-                SliverToBoxAdapter(child: _SectionLabel(l10n.liabilities)),
-                _AccountSliver(
+                SliverToBoxAdapter(
+                  child: AccountSectionLabel(l10n.liabilities),
+                ),
+                AccountSliver(
                   key: const ValueKey('liabilities'),
                   accounts: liabilities,
                   transactions: transactions,
@@ -109,144 +109,6 @@ class AccountsPage extends StatelessWidget {
             ],
           );
         },
-      ),
-    );
-  }
-}
-
-class _SectionLabel extends StatelessWidget {
-  const _SectionLabel(this.text);
-
-  final String text;
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(
-        AppSpacing.l,
-        AppSpacing.xl,
-        AppSpacing.l,
-        AppSpacing.s,
-      ),
-      child: Text(
-        text,
-        style: Theme.of(context).textTheme.labelLarge
-            ?.copyWith(color: Theme.of(context).colorScheme.onSurfaceVariant),
-      ),
-    );
-  }
-}
-
-class _AccountSliver extends StatefulWidget {
-  const _AccountSliver({
-    required this.accounts,
-    required this.transactions,
-    required this.onReorder,
-    super.key,
-  });
-
-  final List<AccountModel> accounts;
-  final List<TransactionModel> transactions;
-  final ValueChanged<List<String>> onReorder;
-
-  @override
-  State<_AccountSliver> createState() => _AccountSliverState();
-}
-
-class _AccountSliverState extends State<_AccountSliver> {
-  late List<AccountModel> _accounts = widget.accounts;
-
-  @override
-  void didUpdateWidget(_AccountSliver oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    _accounts = syncReorder(
-      _accounts,
-      widget.accounts,
-      (account) => account.id,
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return SliverReorderableList(
-      itemCount: _accounts.length,
-      proxyDecorator: ledgerReorderProxy,
-      onReorderItem: _reorder,
-      itemBuilder: (context, index) {
-        final account = _accounts[index];
-        return _AccountRow(
-          key: ValueKey(account.id),
-          account: account,
-          transactions: widget.transactions,
-          index: index,
-        );
-      },
-    );
-  }
-
-  void _reorder(int oldIndex, int newIndex) {
-    if (oldIndex < 0 || oldIndex >= _accounts.length || oldIndex == newIndex) {
-      return;
-    }
-    final updated = [..._accounts];
-    final moved = updated.removeAt(oldIndex);
-    var target = newIndex;
-    if (target < 0) {
-      target = 0;
-    } else if (target > updated.length) {
-      target = updated.length;
-    }
-    updated.insert(target, moved);
-    setState(() => _accounts = updated);
-    widget.onReorder([for (final account in updated) account.id]);
-  }
-}
-
-class _AccountRow extends StatelessWidget {
-  const _AccountRow({
-    required this.account,
-    required this.transactions,
-    required this.index,
-    super.key,
-  });
-
-  final AccountModel account;
-  final List<TransactionModel> transactions;
-  final int index;
-
-  @override
-  Widget build(BuildContext context) {
-    final l10n = context.l10n;
-    final locale = Localizations.localeOf(context).toString();
-    final scheme = Theme.of(context).colorScheme;
-    final isCredit = account.type == AccountType.credit;
-    final color = switch (account.type) {
-      AccountType.bank => LedgerPalette.blue,
-      AccountType.cash => LedgerPalette.coral,
-      AccountType.savings => LedgerPalette.teal,
-      AccountType.credit => LedgerPalette.slate,
-    };
-    return ListTile(
-      onTap: () => context.push(AppRoutes.account(account.id)),
-      leading: Icon(Icons.circle, color: color, size: 12),
-      title: Text(account.labelFor(context.categoryLanguageCode)),
-      subtitle: isCredit ? Text(l10n.owed) : null,
-      trailing: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Text(
-            formatMinor(balanceOf(account, transactions), locale: locale),
-            style: Theme.of(context).textTheme.titleMedium
-                ?.copyWith(color: isCredit ? scheme.primary : scheme.onSurface),
-          ),
-          ReorderableDragStartListener(
-            index: index,
-            child: Padding(
-              padding: const EdgeInsetsDirectional.only(start: AppSpacing.s),
-              child: Icon(Icons.drag_handle, color: scheme.onSurfaceVariant),
-            ),
-          ),
-        ],
       ),
     );
   }

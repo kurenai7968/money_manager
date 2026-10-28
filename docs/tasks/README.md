@@ -24,3 +24,4 @@ Ids are five digits, starting at `00001`. The next id is one greater than the hi
 - 00014 Transaction page keypad and category
 - 00015 Category list and default names
 - 00016 Category icon, reorder, and sheets
+- 00017 Split page widgets

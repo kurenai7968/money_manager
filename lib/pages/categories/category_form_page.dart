@@ -8,6 +8,7 @@ import 'package:money_manager/models/ledger_kinds.dart';
 import 'package:money_manager/pages/categories/bloc/categories_bloc.dart';
 import 'package:money_manager/pages/categories/bloc/categories_event.dart';
 import 'package:money_manager/pages/categories/bloc/categories_state.dart';
+import 'package:money_manager/pages/categories/widgets/category_icon_choice.dart';
 import 'package:money_manager/themes/app_themes.dart';
 import 'package:money_manager/themes/ledger_palette.dart';
 
@@ -133,7 +134,7 @@ class _CategoryFormPageState extends State<CategoryFormPage> {
               runSpacing: AppSpacing.s,
               children: [
                 for (final key in LedgerPalette.iconKeys)
-                  _IconChoice(
+                  CategoryIconChoice(
                     iconKey: key,
                     selected: key == _icon,
                     color: LedgerPalette.color(_color),
@@ -211,36 +212,6 @@ class _CategoryFormPageState extends State<CategoryFormPage> {
     }
     _waiting = true;
     context.read<CategoriesBloc>().add(CategoryDeletePressed(id));
-  }
-}
-
-class _IconChoice extends StatelessWidget {
-  const _IconChoice({
-    required this.iconKey,
-    required this.selected,
-    required this.color,
-    required this.onPressed,
-  });
-
-  final String iconKey;
-  final bool selected;
-  final Color color;
-  final VoidCallback onPressed;
-
-  @override
-  Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
-    final foreground = selected ? scheme.onPrimary : scheme.onSurfaceVariant;
-    return IconButton(
-      tooltip: iconKey,
-      isSelected: selected,
-      style: IconButton.styleFrom(
-        backgroundColor: selected ? color : Colors.transparent,
-        foregroundColor: foreground,
-      ),
-      onPressed: onPressed,
-      icon: Icon(LedgerPalette.icon(iconKey), color: foreground),
-    );
   }
 }
 

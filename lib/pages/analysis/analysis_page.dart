@@ -8,6 +8,8 @@ import 'package:money_manager/models/category_model.dart';
 import 'package:money_manager/models/ledger_kinds.dart';
 import 'package:money_manager/models/transaction_model.dart';
 import 'package:money_manager/pages/accounts/bloc/accounts_bloc.dart';
+import 'package:money_manager/pages/analysis/widgets/analysis_month_bars.dart';
+import 'package:money_manager/pages/analysis/widgets/analysis_total_row.dart';
 import 'package:money_manager/pages/categories/bloc/categories_bloc.dart';
 import 'package:money_manager/pages/transactions/bloc/transactions_bloc.dart';
 import 'package:money_manager/themes/app_themes.dart';
@@ -109,42 +111,15 @@ class _AnalysisPageState extends State<AnalysisPage> {
             style: Theme.of(context).textTheme.titleMedium,
           ),
           const SizedBox(height: AppSpacing.m),
-          SizedBox(
-            height: 120,
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.end,
-              children: [
-                for (var index = 0; index < months.length; index++)
-                  Expanded(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: [
-                        Expanded(
-                          child: Align(
-                            alignment: Alignment.bottomCenter,
-                            child: FractionallySizedBox(
-                              heightFactor: monthValues[index] / maxValue,
-                              child: DecoratedBox(
-                                decoration: BoxDecoration(
-                                  color: index == months.length - 1
-                                      ? Theme.of(context).colorScheme.primary
-                                      : Theme.of(context).colorScheme.outline,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                        Text('${months[index].month}'),
-                      ],
-                    ),
-                  ),
-              ],
-            ),
+          AnalysisMonthBars(
+            months: months,
+            values: monthValues,
+            maxValue: maxValue,
           ),
           const SizedBox(height: AppSpacing.xl),
           Text(l10n.categories, style: Theme.of(context).textTheme.titleMedium),
           for (final entry in byCategory.entries)
-            _TotalRow(
+            AnalysisTotalRow(
               color: LedgerPalette.color(_colorKey(categories, entry.key)),
               title: _categoryName(
                 categories,
@@ -159,7 +134,7 @@ class _AnalysisPageState extends State<AnalysisPage> {
           const SizedBox(height: AppSpacing.xl),
           Text(l10n.accounts, style: Theme.of(context).textTheme.titleMedium),
           for (final entry in byAccount.entries)
-            _TotalRow(
+            AnalysisTotalRow(
               color: Theme.of(context).colorScheme.primary,
               title: _accountName(
                 accounts,
@@ -237,28 +212,4 @@ String _accountName(
     }
   }
   return '';
-}
-
-class _TotalRow extends StatelessWidget {
-  const _TotalRow({
-    required this.color,
-    required this.title,
-    required this.amount,
-    this.share = '',
-  });
-
-  final Color color;
-  final String title;
-  final String amount;
-  final String share;
-
-  @override
-  Widget build(BuildContext context) {
-    return ListTile(
-      contentPadding: EdgeInsets.zero,
-      leading: Icon(Icons.circle, color: color, size: 12),
-      title: Text(title),
-      trailing: Text(share.isEmpty ? amount : '$share  $amount'),
-    );
-  }
 }

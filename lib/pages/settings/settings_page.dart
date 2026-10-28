@@ -7,9 +7,10 @@ import 'package:money_manager/blocs/app_setting_bloc/app_setting_state.dart';
 import 'package:money_manager/core/extensions/context_extension.dart';
 import 'package:money_manager/models/enums/app_appearance.dart';
 import 'package:money_manager/models/enums/week_start.dart';
+import 'package:money_manager/pages/settings/widgets/settings_choice_sheet.dart';
+import 'package:money_manager/pages/settings/widgets/settings_row.dart';
+import 'package:money_manager/pages/settings/widgets/settings_section.dart';
 import 'package:money_manager/routes/app_routes.dart';
-import 'package:money_manager/themes/app_themes.dart';
-import 'package:money_manager/widgets/ledger_sheet.dart';
 
 class SettingsPage extends StatelessWidget {
   const SettingsPage({super.key});
@@ -24,8 +25,8 @@ class SettingsPage extends StatelessWidget {
           final setting = state.appSetting;
           return ListView(
             children: [
-              _Section(l10n.general),
-              _Row(
+              SettingsSection(l10n.general),
+              SettingsRow(
                 title: l10n.language,
                 value: switch (setting.languageCode) {
                   'zh' => l10n.traditionalChinese,
@@ -33,7 +34,7 @@ class SettingsPage extends StatelessWidget {
                   'en' => l10n.english,
                   _ => l10n.followSystem,
                 },
-                onTap: () => _choose<String?>(
+                onTap: () => showSettingsChoice<String?>(
                   context,
                   title: l10n.language,
                   options: [
@@ -55,14 +56,14 @@ class SettingsPage extends StatelessWidget {
                   },
                 ),
               ),
-              _Row(
+              SettingsRow(
                 title: l10n.appearance,
                 value: switch (setting.appearance) {
                   AppAppearance.light => l10n.light,
                   AppAppearance.dark => l10n.dark,
                   AppAppearance.system => l10n.followSystem,
                 },
-                onTap: () => _choose<AppAppearance>(
+                onTap: () => showSettingsChoice<AppAppearance>(
                   context,
                   title: l10n.appearance,
                   options: [
@@ -78,12 +79,12 @@ class SettingsPage extends StatelessWidget {
                   },
                 ),
               ),
-              _Row(
+              SettingsRow(
                 title: l10n.weekStart,
                 value: setting.weekStart == WeekStart.monday
                     ? l10n.monday
                     : l10n.sunday,
-                onTap: () => _choose<WeekStart>(
+                onTap: () => showSettingsChoice<WeekStart>(
                   context,
                   title: l10n.weekStart,
                   options: [
@@ -98,7 +99,7 @@ class SettingsPage extends StatelessWidget {
                   },
                 ),
               ),
-              _Section(l10n.ledger),
+              SettingsSection(l10n.ledger),
               ListTile(
                 title: Text(l10n.categories),
                 subtitle: Text(l10n.expenseAndIncome),
@@ -111,97 +112,4 @@ class SettingsPage extends StatelessWidget {
       ),
     );
   }
-}
-
-class _Section extends StatelessWidget {
-  const _Section(this.text);
-
-  final String text;
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(
-        AppSpacing.l,
-        AppSpacing.xl,
-        AppSpacing.l,
-        AppSpacing.s,
-      ),
-      child: Text(
-        text,
-        style: Theme.of(context).textTheme.labelLarge
-            ?.copyWith(color: Theme.of(context).colorScheme.onSurfaceVariant),
-      ),
-    );
-  }
-}
-
-class _Row extends StatelessWidget {
-  const _Row({required this.title, required this.value, required this.onTap});
-
-  final String title;
-  final String value;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    return ListTile(
-      title: Text(title),
-      trailing: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Text(
-            value,
-            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-              color: Theme.of(context).colorScheme.onSurfaceVariant,
-            ),
-          ),
-          const Icon(Icons.chevron_right),
-        ],
-      ),
-      onTap: onTap,
-    );
-  }
-}
-
-Future<void> _choose<T>(
-  BuildContext context, {
-  required String title,
-  required List<(T, String)> options,
-  required T selected,
-  required ValueChanged<T> onSelected,
-}) async {
-  await showLedgerSheet<void>(
-    context: context,
-    builder: (context) {
-      return SafeArea(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Padding(
-              padding: const EdgeInsets.all(AppSpacing.l),
-              child: Text(
-                title,
-                style: Theme.of(context).textTheme.titleMedium,
-              ),
-            ),
-            for (final option in options)
-              ListTile(
-                title: Text(option.$2),
-                trailing: option.$1 == selected
-                    ? Icon(
-                        Icons.check,
-                        color: Theme.of(context).colorScheme.primary,
-                      )
-                    : null,
-                onTap: () {
-                  onSelected(option.$1);
-                  Navigator.pop(context);
-                },
-              ),
-          ],
-        ),
-      );
-    },
-  );
 }
