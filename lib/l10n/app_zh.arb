@@ -28,6 +28,7 @@
   "emptyAccounts": "還沒有帳戶",
   "archiveBlocked": "先把餘額轉走，才能封存",
   "nameRequired": "請輸入名稱",
+  "iconRequired": "請選擇圖示",
   "amountInvalid": "請輸入有效金額",
   "categories": "分類",
   "expenseAndIncome": "支出與收入",

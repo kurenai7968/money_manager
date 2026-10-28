@@ -267,6 +267,12 @@ abstract class AppLocalizations {
   /// **'Enter a name'**
   String get nameRequired;
 
+  /// No description provided for @iconRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose an icon'**
+  String get iconRequired;
+
   /// No description provided for @amountInvalid.
   ///
   /// In en, this message translates to:

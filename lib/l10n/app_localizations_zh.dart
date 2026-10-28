@@ -94,6 +94,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get nameRequired => '請輸入名稱';
 
   @override
+  String get iconRequired => '請選擇圖示';
+
+  @override
   String get amountInvalid => '請輸入有效金額';
 
   @override
@@ -331,6 +334,9 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
 
   @override
   String get nameRequired => '请输入名称';
+
+  @override
+  String get iconRequired => '请选择图标';
 
   @override
   String get amountInvalid => '请输入有效金额';

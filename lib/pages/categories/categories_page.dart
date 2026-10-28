@@ -11,8 +11,28 @@ import 'package:money_manager/routes/app_routes.dart';
 import 'package:money_manager/themes/app_themes.dart';
 import 'package:money_manager/themes/ledger_palette.dart';
 
-class CategoriesPage extends StatelessWidget {
+class CategoriesPage extends StatefulWidget {
   const CategoriesPage({super.key});
+
+  @override
+  State<CategoriesPage> createState() => _CategoriesPageState();
+}
+
+class _CategoriesPageState extends State<CategoriesPage>
+    with SingleTickerProviderStateMixin {
+  late final TabController _tabs;
+
+  @override
+  void initState() {
+    super.initState();
+    _tabs = TabController(length: CategoryKind.values.length, vsync: this);
+  }
+
+  @override
+  void dispose() {
+    _tabs.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -22,39 +42,36 @@ class CategoriesPage extends StatelessWidget {
         title: Text(l10n.categories),
         actions: [
           TextButton(
-            onPressed: () => context.push(AppRoutes.categoryNew.path),
+            onPressed: () => context.push(
+              AppRoutes.categoryNew.path,
+              extra: CategoryKind.values[_tabs.index],
+            ),
             child: Text(l10n.add),
           ),
         ],
+        bottom: TabBar(
+          controller: _tabs,
+          tabs: [
+            for (final kind in CategoryKind.values)
+              Tab(
+                text: kind == CategoryKind.expense ? l10n.expense : l10n.income,
+              ),
+          ],
+        ),
       ),
       body: BlocBuilder<CategoriesBloc, CategoriesState>(
         builder: (context, state) {
-          final active = state.active;
-          return CustomScrollView(
-            slivers: [
-              for (final kind in CategoryKind.values) ...[
-                SliverToBoxAdapter(
-                  child: Padding(
-                    padding: const EdgeInsets.fromLTRB(
-                      AppSpacing.l,
-                      AppSpacing.xl,
-                      AppSpacing.l,
-                      AppSpacing.s,
-                    ),
-                    child: Text(
-                      kind == CategoryKind.expense ? l10n.expense : l10n.income,
-                      style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                        color: Theme.of(context).colorScheme.onSurfaceVariant,
-                      ),
-                    ),
-                  ),
+          return TabBarView(
+            controller: _tabs,
+            children: [
+              for (final kind in CategoryKind.values)
+                _CategoryList(
+                  key: ValueKey(kind),
+                  categories: [
+                    for (final category in state.active)
+                      if (category.kind == kind) category,
+                  ],
                 ),
-                _CategorySliver(
-                  categories: active
-                      .where((category) => category.kind == kind)
-                      .toList(),
-                ),
-              ],
             ],
           );
         },
@@ -63,26 +80,19 @@ class CategoriesPage extends StatelessWidget {
   }
 }
 
-class _CategorySliver extends StatelessWidget {
-  const _CategorySliver({required this.categories});
+class _CategoryList extends StatelessWidget {
+  const _CategoryList({required this.categories, super.key});
 
   final List<CategoryModel> categories;
 
   @override
   Widget build(BuildContext context) {
-    return SliverReorderableList(
+    return ReorderableListView.builder(
+      buildDefaultDragHandles: false,
+      padding: const EdgeInsets.symmetric(vertical: AppSpacing.s),
       itemCount: categories.length,
-      onReorderItem: (oldIndex, newIndex) {
-        final updated = [...categories];
-        final moved = updated.removeAt(oldIndex);
-        updated.insert(newIndex, moved);
-        context.read<CategoriesBloc>().add(
-          CategoriesReorderPressed(
-            updated.first.kind,
-            updated.map((category) => category.id).toList(),
-          ),
-        );
-      },
+      onReorderItem: (oldIndex, newIndex) =>
+          _reorder(context, oldIndex, newIndex),
       itemBuilder: (context, index) {
         final category = categories[index];
         return ListTile(
@@ -105,6 +115,26 @@ class _CategorySliver extends StatelessWidget {
           ),
         );
       },
+    );
+  }
+
+  void _reorder(BuildContext context, int oldIndex, int newIndex) {
+    if (oldIndex < 0 || oldIndex >= categories.length || oldIndex == newIndex) {
+      return;
+    }
+    final updated = [...categories];
+    final moved = updated.removeAt(oldIndex);
+    var target = newIndex;
+    if (target < 0) {
+      target = 0;
+    } else if (target > updated.length) {
+      target = updated.length;
+    }
+    updated.insert(target, moved);
+    context.read<CategoriesBloc>().add(
+      CategoriesReorderPressed(moved.kind, [
+        for (final category in updated) category.id,
+      ]),
     );
   }
 }

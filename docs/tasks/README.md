@@ -22,3 +22,4 @@ Ids are five digits, starting at `00001`. The next id is one greater than the hi
 - 00012 Migrate to material_ui
 - 00013 Match startup and provider style
 - 00014 Transaction page keypad and category
+- 00015 Category list and default names

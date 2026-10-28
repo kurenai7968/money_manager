@@ -98,7 +98,12 @@ class AppRouter {
         GoRoute(
           path: AppRoutes.categoryNew.path,
           parentNavigatorKey: _rootKey,
-          builder: (context, state) => const CategoryFormPage(),
+          builder: (context, state) {
+            final extra = state.extra;
+            return CategoryFormPage(
+              initialKind: extra is CategoryKind ? extra : CategoryKind.expense,
+            );
+          },
         ),
         GoRoute(
           path: AppRoutes.categoryEdit.path,

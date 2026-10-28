@@ -12,9 +12,14 @@ import 'package:money_manager/themes/app_themes.dart';
 import 'package:money_manager/themes/ledger_palette.dart';
 
 class CategoryFormPage extends StatefulWidget {
-  const CategoryFormPage({this.categoryId, super.key});
+  const CategoryFormPage({
+    this.categoryId,
+    this.initialKind = CategoryKind.expense,
+    super.key,
+  });
 
   final String? categoryId;
+  final CategoryKind initialKind;
 
   @override
   State<CategoryFormPage> createState() => _CategoryFormPageState();
@@ -22,18 +27,20 @@ class CategoryFormPage extends StatefulWidget {
 
 class _CategoryFormPageState extends State<CategoryFormPage> {
   final _name = TextEditingController();
-  var _icon = 'other';
+  String? _icon;
   var _color = 'coral';
-  var _kind = CategoryKind.expense;
+  late CategoryKind _kind;
   var _sortOrder = 0;
   var _archived = false;
-  String? _languageEn;
-  String? _languageZh;
-  String? _languageZhCn;
-  var _localized = false;
   var _ready = false;
   var _waiting = false;
   String? _error;
+
+  @override
+  void initState() {
+    super.initState();
+    _kind = widget.initialKind;
+  }
 
   @override
   void didChangeDependencies() {
@@ -54,20 +61,9 @@ class _CategoryFormPageState extends State<CategoryFormPage> {
       _kind = category.kind;
       _sortOrder = category.sortOrder;
       _archived = category.archived;
-      _languageEn = category.languageEn;
-      _languageZh = category.languageZh;
-      _languageZhCn = category.languageZhCn;
-      _localized =
-          category.languageEn != null ||
-          category.languageZh != null ||
-          category.languageZhCn != null;
-    } else {
-      final sameKind = categories.where((category) => category.kind == _kind);
-      final orders = sameKind.map((category) => category.sortOrder);
-      _sortOrder = orders.isEmpty
-          ? 0
-          : orders.reduce((a, b) => a > b ? a : b) + 1;
+      return;
     }
+    _sortOrder = _nextSortOrder(categories, _kind);
   }
 
   @override
@@ -117,8 +113,17 @@ class _CategoryFormPageState extends State<CategoryFormPage> {
                   ),
                 ],
                 selected: {_kind},
-                onSelectionChanged: (value) =>
-                    setState(() => _kind = value.first),
+                onSelectionChanged: (value) {
+                  final kind = value.first;
+                  final categories = context
+                      .read<CategoriesBloc>()
+                      .state
+                      .categories;
+                  setState(() {
+                    _kind = kind;
+                    _sortOrder = _nextSortOrder(categories, kind);
+                  });
+                },
               ),
             const SizedBox(height: AppSpacing.xl),
             Text(l10n.icon, style: Theme.of(context).textTheme.labelLarge),
@@ -172,24 +177,24 @@ class _CategoryFormPageState extends State<CategoryFormPage> {
   }
 
   void _save() {
-    if (_name.text.trim().isEmpty) {
-      setState(() => _error = context.l10n.nameRequired);
+    final l10n = context.l10n;
+    final text = _name.text.trim();
+    if (text.isEmpty) {
+      setState(() => _error = l10n.nameRequired);
+      return;
+    }
+    final icon = _icon;
+    if (icon == null) {
+      setState(() => _error = l10n.iconRequired);
       return;
     }
     _waiting = true;
-    final text = _name.text.trim();
-    final code = context.categoryLanguageCode;
     context.read<CategoriesBloc>().add(
       CategorySavePressed(
         CategoryModel(
           id: widget.categoryId ?? createId(),
-          name: _localized ? null : text,
-          languageEn: _localized ? (code == 'en' ? text : _languageEn) : null,
-          languageZh: _localized ? (code == 'zh' ? text : _languageZh) : null,
-          languageZhCn: _localized
-              ? (code == 'zh_CN' ? text : _languageZhCn)
-              : null,
-          icon: _icon,
+          name: text,
+          icon: icon,
           color: _color,
           kind: _kind,
           sortOrder: _sortOrder,
@@ -207,4 +212,15 @@ class _CategoryFormPageState extends State<CategoryFormPage> {
     _waiting = true;
     context.read<CategoriesBloc>().add(CategoryDeletePressed(id));
   }
+}
+
+int _nextSortOrder(List<CategoryModel> categories, CategoryKind kind) {
+  final orders = [
+    for (final category in categories)
+      if (category.kind == kind) category.sortOrder,
+  ];
+  if (orders.isEmpty) {
+    return 0;
+  }
+  return orders.reduce((left, right) => left > right ? left : right) + 1;
 }

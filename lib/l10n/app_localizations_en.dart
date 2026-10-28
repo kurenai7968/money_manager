@@ -94,6 +94,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get nameRequired => 'Enter a name';
 
   @override
+  String get iconRequired => 'Choose an icon';
+
+  @override
   String get amountInvalid => 'Enter a valid amount';
 
   @override
