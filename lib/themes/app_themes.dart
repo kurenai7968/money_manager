@@ -65,6 +65,11 @@ abstract final class AppThemes {
       ),
       dividerTheme: DividerThemeData(color: scheme.outline, thickness: 1),
       iconTheme: IconThemeData(color: scheme.onSurface),
+      bottomSheetTheme: BottomSheetThemeData(
+        backgroundColor: scheme.surface,
+        modalBackgroundColor: scheme.surface,
+        surfaceTintColor: Colors.transparent,
+      ),
     );
   }
 

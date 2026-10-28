@@ -9,6 +9,7 @@ import 'package:money_manager/models/enums/app_appearance.dart';
 import 'package:money_manager/models/enums/week_start.dart';
 import 'package:money_manager/routes/app_routes.dart';
 import 'package:money_manager/themes/app_themes.dart';
+import 'package:money_manager/widgets/ledger_sheet.dart';
 
 class SettingsPage extends StatelessWidget {
   const SettingsPage({super.key});
@@ -169,8 +170,8 @@ Future<void> _choose<T>(
   required List<(T, String)> options,
   required T selected,
   required ValueChanged<T> onSelected,
-}) {
-  return showModalBottomSheet<void>(
+}) async {
+  await showLedgerSheet<void>(
     context: context,
     builder: (context) {
       return SafeArea(

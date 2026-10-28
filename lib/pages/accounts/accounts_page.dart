@@ -14,6 +14,7 @@ import 'package:money_manager/pages/transactions/bloc/transactions_bloc.dart';
 import 'package:money_manager/routes/app_routes.dart';
 import 'package:money_manager/themes/app_themes.dart';
 import 'package:money_manager/themes/ledger_palette.dart';
+import 'package:money_manager/widgets/ledger_reorder.dart';
 
 class AccountsPage extends StatelessWidget {
   const AccountsPage({super.key});
@@ -86,6 +87,7 @@ class AccountsPage extends StatelessWidget {
               if (assets.isNotEmpty) ...[
                 SliverToBoxAdapter(child: _SectionLabel(l10n.assets)),
                 _AccountSliver(
+                  key: const ValueKey('assets'),
                   accounts: assets,
                   transactions: transactions,
                   onReorder: (ids) => context.read<AccountsBloc>().add(
@@ -96,6 +98,7 @@ class AccountsPage extends StatelessWidget {
               if (liabilities.isNotEmpty) ...[
                 SliverToBoxAdapter(child: _SectionLabel(l10n.liabilities)),
                 _AccountSliver(
+                  key: const ValueKey('liabilities'),
                   accounts: liabilities,
                   transactions: transactions,
                   onReorder: (ids) => context.read<AccountsBloc>().add(
@@ -134,11 +137,12 @@ class _SectionLabel extends StatelessWidget {
   }
 }
 
-class _AccountSliver extends StatelessWidget {
+class _AccountSliver extends StatefulWidget {
   const _AccountSliver({
     required this.accounts,
     required this.transactions,
     required this.onReorder,
+    super.key,
   });
 
   final List<AccountModel> accounts;
@@ -146,25 +150,55 @@ class _AccountSliver extends StatelessWidget {
   final ValueChanged<List<String>> onReorder;
 
   @override
+  State<_AccountSliver> createState() => _AccountSliverState();
+}
+
+class _AccountSliverState extends State<_AccountSliver> {
+  late List<AccountModel> _accounts = widget.accounts;
+
+  @override
+  void didUpdateWidget(_AccountSliver oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    _accounts = syncReorder(
+      _accounts,
+      widget.accounts,
+      (account) => account.id,
+    );
+  }
+
+  @override
   Widget build(BuildContext context) {
     return SliverReorderableList(
-      itemCount: accounts.length,
-      onReorderItem: (oldIndex, newIndex) {
-        final updated = [...accounts];
-        final moved = updated.removeAt(oldIndex);
-        updated.insert(newIndex, moved);
-        onReorder(updated.map((account) => account.id).toList());
-      },
+      itemCount: _accounts.length,
+      proxyDecorator: ledgerReorderProxy,
+      onReorderItem: _reorder,
       itemBuilder: (context, index) {
-        final account = accounts[index];
+        final account = _accounts[index];
         return _AccountRow(
           key: ValueKey(account.id),
           account: account,
-          transactions: transactions,
+          transactions: widget.transactions,
           index: index,
         );
       },
     );
+  }
+
+  void _reorder(int oldIndex, int newIndex) {
+    if (oldIndex < 0 || oldIndex >= _accounts.length || oldIndex == newIndex) {
+      return;
+    }
+    final updated = [..._accounts];
+    final moved = updated.removeAt(oldIndex);
+    var target = newIndex;
+    if (target < 0) {
+      target = 0;
+    } else if (target > updated.length) {
+      target = updated.length;
+    }
+    updated.insert(target, moved);
+    setState(() => _accounts = updated);
+    widget.onReorder([for (final account in updated) account.id]);
   }
 }
 

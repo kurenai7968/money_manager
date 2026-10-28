@@ -17,6 +17,7 @@ import 'package:money_manager/pages/transactions/bloc/transactions_event.dart';
 import 'package:money_manager/pages/transactions/bloc/transactions_state.dart';
 import 'package:money_manager/themes/app_themes.dart';
 import 'package:money_manager/themes/ledger_palette.dart';
+import 'package:money_manager/widgets/ledger_sheet.dart';
 
 class RecordPage extends StatefulWidget {
   const RecordPage({
@@ -338,7 +339,7 @@ class _RecordPageState extends State<RecordPage> {
 
   Future<void> _pickAccount() async {
     final accounts = context.read<AccountsBloc>().state.active;
-    final selected = await showModalBottomSheet<String>(
+    final selected = await showLedgerSheet<String>(
       context: context,
       builder: (context) {
         return _AccountSheet(accounts: accounts, selectedId: _accountId);
@@ -671,7 +672,7 @@ class _TransferFields extends StatelessWidget {
     ValueChanged<String> onSelected,
     String? selectedId,
   ) async {
-    final selected = await showModalBottomSheet<String>(
+    final selected = await showLedgerSheet<String>(
       context: context,
       builder: (context) =>
           _AccountSheet(accounts: accounts, selectedId: selectedId),

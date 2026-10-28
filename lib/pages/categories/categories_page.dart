@@ -10,6 +10,7 @@ import 'package:money_manager/pages/categories/bloc/categories_state.dart';
 import 'package:money_manager/routes/app_routes.dart';
 import 'package:money_manager/themes/app_themes.dart';
 import 'package:money_manager/themes/ledger_palette.dart';
+import 'package:money_manager/widgets/ledger_reorder.dart';
 
 class CategoriesPage extends StatefulWidget {
   const CategoriesPage({super.key});
@@ -80,21 +81,38 @@ class _CategoriesPageState extends State<CategoriesPage>
   }
 }
 
-class _CategoryList extends StatelessWidget {
+class _CategoryList extends StatefulWidget {
   const _CategoryList({required this.categories, super.key});
 
   final List<CategoryModel> categories;
 
   @override
+  State<_CategoryList> createState() => _CategoryListState();
+}
+
+class _CategoryListState extends State<_CategoryList> {
+  late List<CategoryModel> _categories = widget.categories;
+
+  @override
+  void didUpdateWidget(_CategoryList oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    _categories = syncReorder(
+      _categories,
+      widget.categories,
+      (category) => category.id,
+    );
+  }
+
+  @override
   Widget build(BuildContext context) {
     return ReorderableListView.builder(
       buildDefaultDragHandles: false,
+      proxyDecorator: ledgerReorderProxy,
       padding: const EdgeInsets.symmetric(vertical: AppSpacing.s),
-      itemCount: categories.length,
-      onReorderItem: (oldIndex, newIndex) =>
-          _reorder(context, oldIndex, newIndex),
+      itemCount: _categories.length,
+      onReorderItem: _reorder,
       itemBuilder: (context, index) {
-        final category = categories[index];
+        final category = _categories[index];
         return ListTile(
           key: ValueKey(category.id),
           onTap: () => context.push(AppRoutes.editCategory(category.id)),
@@ -118,11 +136,13 @@ class _CategoryList extends StatelessWidget {
     );
   }
 
-  void _reorder(BuildContext context, int oldIndex, int newIndex) {
-    if (oldIndex < 0 || oldIndex >= categories.length || oldIndex == newIndex) {
+  void _reorder(int oldIndex, int newIndex) {
+    if (oldIndex < 0 ||
+        oldIndex >= _categories.length ||
+        oldIndex == newIndex) {
       return;
     }
-    final updated = [...categories];
+    final updated = [..._categories];
     final moved = updated.removeAt(oldIndex);
     var target = newIndex;
     if (target < 0) {
@@ -131,6 +151,7 @@ class _CategoryList extends StatelessWidget {
       target = updated.length;
     }
     updated.insert(target, moved);
+    setState(() => _categories = updated);
     context.read<CategoriesBloc>().add(
       CategoriesReorderPressed(moved.kind, [
         for (final category in updated) category.id,

@@ -12,6 +12,7 @@ import 'package:money_manager/pages/categories/bloc/categories_state.dart';
 import 'package:money_manager/pages/categories/categories_page.dart';
 import 'package:money_manager/pages/categories/category_form_page.dart';
 import 'package:money_manager/routes/app_routes.dart';
+import 'package:money_manager/themes/ledger_palette.dart';
 
 import '../support/memory_category_repository.dart';
 
@@ -148,6 +149,7 @@ void main() {
 
     for (final key in ['food', 'other', 'salary']) {
       expect(_iconSelected(tester, key), isFalse);
+      expect(_iconFill(tester, key), Colors.transparent);
     }
 
     await tester.enterText(find.byType(TextField), 'Rent');
@@ -158,7 +160,8 @@ void main() {
     await tester.tap(find.byTooltip('shopping'));
     await tester.pump();
     expect(_iconSelected(tester, 'shopping'), isTrue);
-    expect(_iconSelected(tester, 'other'), isFalse);
+    expect(_iconFill(tester, 'shopping'), LedgerPalette.coral);
+    expect(_iconFill(tester, 'other'), Colors.transparent);
 
     await tester.tap(find.text('Save'));
     await tester.pumpAndSettle();
@@ -256,9 +259,18 @@ Future<void> _pumpForm(
 }
 
 bool _iconSelected(WidgetTester tester, String key) {
+  return _iconButton(tester, key).isSelected == true;
+}
+
+Color? _iconFill(WidgetTester tester, String key) {
+  return _iconButton(
+    tester,
+    key,
+  ).style?.backgroundColor?.resolve(const <WidgetState>{});
+}
+
+IconButton _iconButton(WidgetTester tester, String key) {
   return tester
-          .widgetList<IconButton>(find.byType(IconButton))
-          .firstWhere((button) => button.tooltip == key)
-          .isSelected ==
-      true;
+      .widgetList<IconButton>(find.byType(IconButton))
+      .firstWhere((button) => button.tooltip == key);
 }
