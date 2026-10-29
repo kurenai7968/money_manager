@@ -3,9 +3,6 @@ import 'package:material_ui/material_ui.dart';
 import 'package:money_manager/blocs/app_setting_bloc/app_setting_bloc.dart';
 import 'package:money_manager/database/shared_preferences/shared_preference_store.dart';
 import 'package:money_manager/database/sqlite/app_database.dart';
-import 'package:money_manager/pages/accounts/bloc/accounts_bloc.dart';
-import 'package:money_manager/pages/categories/bloc/categories_bloc.dart';
-import 'package:money_manager/pages/transactions/bloc/transactions_bloc.dart';
 import 'package:money_manager/repositories/account_repository.dart';
 import 'package:money_manager/repositories/app_setting_repository.dart';
 import 'package:money_manager/repositories/category_repository.dart';
@@ -51,20 +48,10 @@ class AppProviders extends StatelessWidget {
               transactions ?? SqliteTransactionRepository(AppDatabase.instance),
         ),
       ],
-      child: MultiBlocProvider(
-        providers: [
-          BlocProvider(
-            create: (context) => AppSettingBloc(
-              appSettingRepository: context.read<AppSettingRepository>(),
-            ),
-          ),
-          BlocProvider(create: (context) => AccountsBloc(context.read())),
-          BlocProvider(create: (context) => TransactionsBloc(context.read())),
-          BlocProvider(
-            create: (context) =>
-                CategoriesBloc(context.read(), transactions: context.read()),
-          ),
-        ],
+      child: BlocProvider(
+        create: (context) => AppSettingBloc(
+          appSettingRepository: context.read<AppSettingRepository>(),
+        ),
         child: child,
       ),
     );

@@ -25,3 +25,4 @@ Ids are five digits, starting at `00001`. The next id is one greater than the hi
 - 00015 Category list and default names
 - 00016 Category icon, reorder, and sheets
 - 00017 Split page widgets
+- 00018 Thin page with its bloc

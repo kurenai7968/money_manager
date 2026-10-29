@@ -31,7 +31,7 @@ lib/
 ├── main.dart                      # Entry point
 ├── app.dart                       # AppProviders, then BlocSelector applies the setting to MaterialApp.router
 ├── app_config.dart                # Banner ids, app setting keys, and similar constants
-├── app_providers.dart             # BlocProviders and RepositoryProviders
+├── app_providers.dart             # RepositoryProviders and AppSettingBloc
 ├── l10n/                     # Localization (.arb files)
 ├── core/
 │   ├── utils/                # Shared helpers, including JsonConverter
@@ -48,8 +48,8 @@ lib/
 ├── pages/
 │   ├── [feature_name]/
 │   │   ├── bloc/             # Feature-specific bloc
-│   │   ├── widgets/          # Widgets used only by this feature
-│   │   └── [feature]_page.dart
+│   │   ├── widgets/          # App bar, body, and other widgets for this feature
+│   │   └── [feature]_page.dart  # BlocProvider and Scaffold only
 │   └── pages.dart            # Exports every [feature]_page.dart under pages/
 ├── routes/                   # GoRouter configuration
 ├── themes/                   # Light and dark ThemeData, exposed as AppThemes.light and AppThemes.dark
@@ -57,6 +57,8 @@ lib/
 ```
 
 ## Data flow
+
+`AppProviders` provides the repositories and `AppSettingBloc`. `MaterialApp` reads language and appearance from `AppSettingBloc`, so that bloc stays above the router. A page creates the other blocs it uses and dispatches their start events. When an ancestor already provides one of those blocs, the page uses that instance. A page that stays mounted reloads those blocs when the route changes, so a save on another route shows up after returning.
 
 A page dispatches a bloc event. The bloc calls a repository. The repository reads and writes SQLite through `database/sqlite`, and key-value settings through `database/shared_preferences`. It throws exceptions from `core/errors/`. The bloc catches those exceptions and emits an error status. The repository persists entities with `fromJson` and `toJson`, then converts them with the mapping extensions in `core/mapping/`. Callers receive models. UI models contain no JSON serialization. Other layers do not import `sqflite` or `shared_preferences`.
 
@@ -142,9 +144,22 @@ The tab bar is Home, Analysis, Accounts, and Settings, with the record button in
 
 ## Widgets
 
-Split a page into small widgets by responsibility, section, or interaction. Keep widgets used by one feature in `pages/[feature_name]/widgets/`. Move a widget to `lib/widgets/` only when more than one feature uses it and it has no feature-specific presentation logic.
+`[feature]_page.dart` only creates the page blocs and a scaffold. The app bar and the body are widgets in `pages/[feature_name]/widgets/`:
+
+```dart
+BlocProvider(
+  create: (context) => XxxBloc(context.read())..add(const XxxStarted()),
+  child: const Scaffold(appBar: XxxAppBar(), body: XxxBody()),
+)
+```
+
+A page that needs more than one bloc nests those providers the same way. `SettingsPage` does not create `AppSettingBloc`. When the app bar and the body share view state, a frame widget between the provider and the scaffold holds that state. The page does not hold screen logic.
+
+Split the rest of a screen into small widgets by responsibility, section, or interaction. Keep widgets used by one feature in `pages/[feature_name]/widgets/`. Move a widget to `lib/widgets/` only when more than one feature uses it and it has no feature-specific presentation logic.
 
 ## BLoC
+
+The page widget provides each feature bloc it uses, as in Widgets. `AppSettingBloc` is the exception and is created in `AppProviders`.
 
 Follow the [bloc library naming conventions](https://bloclibrary.dev/naming-conventions/).
 

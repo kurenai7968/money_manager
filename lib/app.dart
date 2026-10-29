@@ -6,14 +6,7 @@ import 'package:money_manager/blocs/app_setting_bloc/app_setting_state.dart';
 import 'package:money_manager/core/extensions/context_extension.dart';
 import 'package:money_manager/l10n/app_localizations.dart';
 import 'package:money_manager/l10n/locale_resolution.dart';
-import 'package:money_manager/models/category_defaults.dart';
 import 'package:money_manager/models/enums/app_appearance.dart';
-import 'package:money_manager/pages/accounts/bloc/accounts_bloc.dart';
-import 'package:money_manager/pages/accounts/bloc/accounts_event.dart';
-import 'package:money_manager/pages/categories/bloc/categories_bloc.dart';
-import 'package:money_manager/pages/categories/bloc/categories_event.dart';
-import 'package:money_manager/pages/transactions/bloc/transactions_bloc.dart';
-import 'package:money_manager/pages/transactions/bloc/transactions_event.dart';
 import 'package:money_manager/repositories/account_repository.dart';
 import 'package:money_manager/repositories/app_setting_repository.dart';
 import 'package:money_manager/repositories/category_repository.dart';
@@ -73,43 +66,9 @@ class _AppState extends State<App> {
                   ...GlobalMaterialLocalizations.delegates,
                 ],
                 supportedLocales: AppLocalizations.supportedLocales,
-                builder: (context, child) {
-                  return _LedgerBootstrap(
-                    child: child ?? const SizedBox.shrink(),
-                  );
-                },
               );
             },
           ),
     );
   }
-}
-
-class _LedgerBootstrap extends StatefulWidget {
-  const _LedgerBootstrap({required this.child});
-
-  final Widget child;
-
-  @override
-  State<_LedgerBootstrap> createState() => _LedgerBootstrapState();
-}
-
-class _LedgerBootstrapState extends State<_LedgerBootstrap> {
-  @override
-  void initState() {
-    super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (!mounted) {
-        return;
-      }
-      context.read<AccountsBloc>().add(const AccountsStarted());
-      context.read<TransactionsBloc>().add(const TransactionsStarted());
-      context.read<CategoriesBloc>().add(
-        CategoriesStarted(defaultCategories()),
-      );
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) => widget.child;
 }
