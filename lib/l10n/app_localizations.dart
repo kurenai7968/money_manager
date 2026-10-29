@@ -453,6 +453,12 @@ abstract class AppLocalizations {
   /// **'Cancel'**
   String get cancel;
 
+  /// Confirms the date chosen in the record date picker.
+  ///
+  /// In en, this message translates to:
+  /// **'Done'**
+  String get done;
+
   /// No description provided for @balance.
   ///
   /// In en, this message translates to:

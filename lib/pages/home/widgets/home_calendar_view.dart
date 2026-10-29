@@ -1,7 +1,6 @@
 import 'package:material_ui/material_ui.dart';
 import 'package:money_manager/core/utils/ledger_balance.dart';
 import 'package:money_manager/core/utils/money_format.dart';
-import 'package:money_manager/models/app_setting_model.dart';
 import 'package:money_manager/models/category_model.dart';
 import 'package:money_manager/models/enums/week_start.dart';
 import 'package:money_manager/models/ledger_kinds.dart';
@@ -9,6 +8,7 @@ import 'package:money_manager/models/transaction_model.dart';
 import 'package:money_manager/pages/home/widgets/home_transaction_tile.dart';
 import 'package:money_manager/themes/app_themes.dart';
 import 'package:money_manager/themes/ledger_palette.dart';
+import 'package:money_manager/widgets/ledger_calendar.dart';
 
 class HomeCalendarView extends StatelessWidget {
   const HomeCalendarView({
@@ -33,72 +33,48 @@ class HomeCalendarView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
-    final first = DateTime(month.year, month.month);
-    final days = DateTime(month.year, month.month + 1, 0).day;
-    final leading = leadingCalendarBlanks(first, weekStart);
     final selected = selectedDay;
+    final focused =
+        selected != null &&
+            selected.year == month.year &&
+            selected.month == month.month
+        ? selected
+        : DateTime(month.year, month.month);
     final dayItems = selected == null
         ? const <TransactionModel>[]
         : transactions.where((item) => sameDay(item.date, selected)).toList();
     return Column(
       children: [
         Expanded(
-          child: GridView.builder(
-            padding: const EdgeInsets.all(AppSpacing.l),
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 7,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: AppSpacing.l),
+            child: LedgerCalendar(
+              focusedDay: focused,
+              selectedDay: selected,
+              weekStart: weekStart,
+              enableSwipe: false,
+              onDaySelected: (day, _) =>
+                  onSelect(DateTime(day.year, day.month, day.day)),
+              dayDetail: (context, day) {
+                final net = _dayNet(day);
+                if (net == 0) {
+                  return null;
+                }
+                return Text(
+                  formatMinor(net, locale: locale, signed: true),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: Theme.of(context).textTheme.labelMedium?.copyWith(
+                    color: net > 0 ? LedgerPalette.green : scheme.primary,
+                  ),
+                );
+              },
             ),
-            itemCount: leading + days,
-            itemBuilder: (context, index) {
-              if (index < leading) {
-                return const SizedBox.shrink();
-              }
-              final day = index - leading + 1;
-              final date = DateTime(month.year, month.month, day);
-              final net = _dayNet(date);
-              final isSelected = selected != null && sameDay(selected, date);
-              return InkWell(
-                onTap: () => onSelect(date),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    CircleAvatar(
-                      radius: 14,
-                      backgroundColor: isSelected
-                          ? scheme.primary
-                          : scheme.surface,
-                      child: Text(
-                        '$day',
-                        style: Theme.of(context).textTheme.labelMedium
-                            ?.copyWith(
-                              color: isSelected
-                                  ? scheme.onPrimary
-                                  : scheme.onSurface,
-                            ),
-                      ),
-                    ),
-                    if (net != 0)
-                      Text(
-                        formatMinor(net, locale: locale, signed: true),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: Theme.of(context).textTheme.labelMedium
-                            ?.copyWith(
-                              color: net > 0
-                                  ? LedgerPalette.green
-                                  : scheme.primary,
-                              height: 1.2,
-                            ),
-                      ),
-                  ],
-                ),
-              );
-            },
           ),
         ),
         if (selected != null)
           SizedBox(
-            height: 160,
+            height: AppSpacing.xl * 6 + AppSpacing.l,
             child: dayItems.isEmpty
                 ? const SizedBox.shrink()
                 : ListView.separated(

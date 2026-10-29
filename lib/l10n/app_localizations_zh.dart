@@ -187,6 +187,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get cancel => '取消';
 
   @override
+  String get done => '完成';
+
+  @override
   String get balance => '餘額';
 
   @override
@@ -427,6 +430,9 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
 
   @override
   String get cancel => '取消';
+
+  @override
+  String get done => '完成';
 
   @override
   String get balance => '余额';

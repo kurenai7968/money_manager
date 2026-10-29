@@ -65,6 +65,10 @@
   "invalidTransaction": "Enter an amount greater than zero",
   "needDifferentAccounts": "Choose two different accounts",
   "cancel": "Cancel",
+  "done": "Done",
+  "@done": {
+    "description": "Confirms the date chosen in the record date picker."
+  },
   "balance": "Balance",
   "monthBalance": "Balance",
   "recent": "Recent",

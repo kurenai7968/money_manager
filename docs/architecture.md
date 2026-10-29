@@ -12,6 +12,7 @@ The navigation shell, ledger, home, analysis, and settings are implemented. New 
 
 - Framework: Flutter (stable). Language: Dart.
 - UI: `material_ui`, imported as `package:material_ui/material_ui.dart`.
+- Calendar: `table_calendar`. The home month grid and the record date picker both use `TableCalendar`. Do not build a day grid and do not call `showDatePicker`.
 - State management: `flutter_bloc`
 - Navigation: `go_router`
 - Localization: ARB files generate `AppLocalizations`. `MaterialApp` registers `AppLocalizations.delegate` and `GlobalMaterialLocalizations.delegates` from `material_ui`.

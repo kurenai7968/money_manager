@@ -1,7 +1,9 @@
 import 'package:material_ui/material_ui.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:intl/intl.dart';
 import 'package:money_manager/app.dart';
 import 'package:money_manager/widgets/app_tab_bar.dart';
+import 'package:table_calendar/table_calendar.dart';
 
 import '../support/memory_account_repository.dart';
 import '../support/memory_app_setting_repository.dart';
@@ -276,6 +278,40 @@ void main() {
     await openRecord(tester);
     expect(selectedCategory('Food'), findsOneWidget);
     expect(find.byTooltip('Save'), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('Record date picker uses TableCalendar', (tester) async {
+    await pumpLedger(tester);
+    await openRecord(tester);
+    final now = DateTime.now();
+    await tester.tap(find.text(DateFormat.MMMd('en').format(now)));
+    await tester.pumpAndSettle();
+
+    expect(
+      find.byWidgetPredicate((widget) => widget is TableCalendar),
+      findsOneWidget,
+    );
+    expect(find.text('Done'), findsOneWidget);
+    expect(find.text('Cancel'), findsOneWidget);
+
+    final other = now.day == 10 ? 11 : 10;
+    await tester.tap(
+      find.descendant(
+        of: find.byWidgetPredicate((widget) => widget is TableCalendar),
+        matching: find.text('$other'),
+      ),
+    );
+    await tester.pump();
+    await tester.tap(find.text('Done'));
+    await tester.pumpAndSettle();
+
+    expect(
+      find.text(
+        DateFormat.MMMd('en').format(DateTime(now.year, now.month, other)),
+      ),
+      findsOneWidget,
+    );
     expect(tester.takeException(), isNull);
   });
 }

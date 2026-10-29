@@ -59,6 +59,7 @@
   "invalidTransaction": "請輸入大於 0 的金額",
   "needDifferentAccounts": "請選擇兩個不同的帳戶",
   "cancel": "取消",
+  "done": "完成",
   "balance": "餘額",
   "monthBalance": "結餘",
   "recent": "最近",

@@ -2,6 +2,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:material_ui/material_ui.dart';
+import 'package:money_manager/blocs/app_setting_bloc/app_setting_bloc.dart';
 import 'package:money_manager/core/extensions/context_extension.dart';
 import 'package:money_manager/core/utils/amount_expression.dart';
 import 'package:money_manager/core/utils/id.dart';
@@ -13,6 +14,7 @@ import 'package:money_manager/models/transaction_model.dart';
 import 'package:money_manager/pages/accounts/bloc/accounts_bloc.dart';
 import 'package:money_manager/pages/categories/bloc/categories_bloc.dart';
 import 'package:money_manager/pages/record/widgets/record_account_sheet.dart';
+import 'package:money_manager/pages/record/widgets/record_date_dialog.dart';
 import 'package:money_manager/pages/record/widgets/record_note_dialog.dart';
 import 'package:money_manager/pages/transactions/bloc/transactions_bloc.dart';
 import 'package:money_manager/pages/transactions/bloc/transactions_event.dart';
@@ -158,11 +160,12 @@ class RecordFrameState extends State<RecordFrame> {
   }
 
   Future<void> pickDate() async {
-    final picked = await showDatePicker(
+    final weekStart = context.read<AppSettingBloc>().state.appSetting.weekStart;
+    final picked = await showDialog<DateTime>(
       context: context,
-      initialDate: date,
-      firstDate: DateTime(2000),
-      lastDate: DateTime(2100),
+      builder: (context) {
+        return RecordDateDialog(initial: date, weekStart: weekStart);
+      },
     );
     if (picked != null) {
       change(() => date = picked);
