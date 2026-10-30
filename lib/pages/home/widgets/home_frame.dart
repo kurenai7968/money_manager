@@ -33,7 +33,10 @@ class HomeFrameState extends State<HomeFrame> {
   void shiftMonth(int delta) {
     setState(() {
       month = DateTime(month.year, month.month + delta);
-      selectedDay = null;
+      final now = DateTime.now();
+      selectedDay = now.year == month.year && now.month == month.month
+          ? DateTime(now.year, now.month, now.day)
+          : null;
     });
   }
 

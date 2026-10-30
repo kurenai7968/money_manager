@@ -45,9 +45,10 @@ class HomeCalendarView extends StatelessWidget {
         : transactions.where((item) => sameDay(item.date, selected)).toList();
     return Column(
       children: [
-        Expanded(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: AppSpacing.l),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: AppSpacing.l),
+          child: SizedBox(
+            height: LedgerCalendar.extent(context, header: false),
             child: LedgerCalendar(
               focusedDay: focused,
               selectedDay: selected,
@@ -72,24 +73,22 @@ class HomeCalendarView extends StatelessWidget {
             ),
           ),
         ),
-        if (selected != null)
-          SizedBox(
-            height: AppSpacing.xl * 6 + AppSpacing.l,
-            child: dayItems.isEmpty
-                ? const SizedBox.shrink()
-                : ListView.separated(
-                    itemCount: dayItems.length,
-                    separatorBuilder: (_, _) =>
-                        Divider(height: 1, color: scheme.outline),
-                    itemBuilder: (context, index) {
-                      return HomeTransactionTile(
-                        transaction: dayItems[index],
-                        categories: categories,
-                        locale: locale,
-                      );
-                    },
-                  ),
-          ),
+        Expanded(
+          child: dayItems.isEmpty
+              ? const SizedBox.shrink()
+              : ListView.separated(
+                  itemCount: dayItems.length,
+                  separatorBuilder: (_, _) =>
+                      Divider(height: 1, color: scheme.outline),
+                  itemBuilder: (context, index) {
+                    return HomeTransactionTile(
+                      transaction: dayItems[index],
+                      categories: categories,
+                      locale: locale,
+                    );
+                  },
+                ),
+        ),
       ],
     );
   }
