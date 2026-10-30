@@ -90,13 +90,17 @@ class _AccountDetailBodyState extends State<AccountDetailBody>
                           TransactionType.expense => l10n.expense,
                           TransactionType.income => l10n.income,
                           TransactionType.transfer => l10n.transfer,
+                          TransactionType.opening => l10n.openingBalance,
                         }
                       : item.note,
                 ),
                 subtitle: Text(item.date.toString().split(' ').first),
                 trailing: Text(formatMinor(item.amountMinor, locale: locale)),
-                onTap: () =>
-                    context.push('${AppRoutes.record.path}?id=${item.id}'),
+                onTap: item.type == TransactionType.opening
+                    ? null
+                    : () => context.push(
+                        '${AppRoutes.record.path}?id=${item.id}',
+                      ),
               );
             },
           ),

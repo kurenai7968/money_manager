@@ -71,4 +71,40 @@ void main() {
     expect(figures.expenseMinor, 1200);
     expect(figures.balanceMinor, 3800);
   });
+
+  test('opening transaction is counted once and stays out of the month', () {
+    final opening = TransactionModel(
+      id: 'opening-cash',
+      type: TransactionType.opening,
+      amountMinor: 10000,
+      date: DateTime(2026, 10, 1),
+      accountId: 'cash',
+    );
+    final expense = TransactionModel(
+      id: 'meal',
+      type: TransactionType.expense,
+      amountMinor: 2000,
+      date: DateTime(2026, 10, 2),
+      accountId: 'cash',
+      categoryId: 'food',
+    );
+
+    expect(balanceOf(cash, [opening, expense]), 8000);
+    expect(
+      balanceOf(card.copyWith(openingBalanceMinor: 1200), [
+        TransactionModel(
+          id: 'opening-card',
+          type: TransactionType.opening,
+          amountMinor: 1200,
+          date: DateTime(2026, 10, 1),
+          accountId: 'card',
+        ),
+      ]),
+      1200,
+    );
+    final figures = monthFigures([opening, expense], DateTime(2026, 10));
+    expect(figures.incomeMinor, 0);
+    expect(figures.expenseMinor, 2000);
+    expect(figures.balanceMinor, -2000);
+  });
 }

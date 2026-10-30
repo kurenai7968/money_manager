@@ -35,14 +35,18 @@ class HomeTransactionTile extends StatelessWidget {
                   TransactionType.expense => l10n.expense,
                   TransactionType.income => l10n.income,
                   TransactionType.transfer => l10n.transfer,
+                  TransactionType.opening => l10n.openingBalance,
                 }
               : category.first.labelFor(context.categoryLanguageCode));
     final color = switch (transaction.type) {
       TransactionType.income => LedgerPalette.green,
       TransactionType.expense => scheme.primary,
       TransactionType.transfer => scheme.onSurface,
+      TransactionType.opening => scheme.onSurface,
     };
-    final signed = transaction.type == TransactionType.transfer
+    final signed =
+        transaction.type == TransactionType.transfer ||
+            transaction.type == TransactionType.opening
         ? formatMinor(transaction.amountMinor, locale: locale)
         : formatMinor(
             transaction.type == TransactionType.expense
@@ -52,8 +56,9 @@ class HomeTransactionTile extends StatelessWidget {
             signed: true,
           );
     return ListTile(
-      onTap: () =>
-          context.push('${AppRoutes.record.path}?id=${transaction.id}'),
+      onTap: transaction.type == TransactionType.opening
+          ? null
+          : () => context.push('${AppRoutes.record.path}?id=${transaction.id}'),
       title: Text(title),
       subtitle: Text(DateFormat.MMMd(locale).format(transaction.date)),
       trailing: Text(

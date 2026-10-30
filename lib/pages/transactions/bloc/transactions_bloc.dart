@@ -46,15 +46,17 @@ class TransactionsBloc extends Bloc<TransactionsEvent, TransactionsState> {
   ) async {
     final transaction = event.transaction;
     final invalidAmount = transaction.amountMinor <= 0;
+    final invalidOpening = transaction.type == TransactionType.opening;
     final invalidExpense =
         transaction.type != TransactionType.transfer &&
+        transaction.type != TransactionType.opening &&
         (transaction.accountId == null || transaction.categoryId == null);
     final invalidTransfer =
         transaction.type == TransactionType.transfer &&
         (transaction.fromAccountId == null ||
             transaction.toAccountId == null ||
             transaction.fromAccountId == transaction.toAccountId);
-    if (invalidAmount || invalidExpense || invalidTransfer) {
+    if (invalidAmount || invalidOpening || invalidExpense || invalidTransfer) {
       emit(
         state.copyWith(
           status: TransactionsStatus.failure,

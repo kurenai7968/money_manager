@@ -14,6 +14,7 @@ int balanceOf(AccountModel account, Iterable<TransactionModel> transactions) {
         transaction.amountMinor,
       TransactionType.transfer when transaction.fromAccountId == account.id =>
         -transaction.amountMinor,
+      TransactionType.opening => 0,
       _ => 0,
     };
     balance += account.type == AccountType.credit ? -delta : delta;

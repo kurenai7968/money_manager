@@ -70,6 +70,28 @@ void main() {
   );
 
   blocTest<TransactionsBloc, TransactionsState>(
+    'rejects an opening transaction',
+    build: () => TransactionsBloc(repository),
+    act: (bloc) => bloc.add(
+      TransactionSavePressed(
+        TransactionModel(
+          id: 'opening-cash',
+          type: TransactionType.opening,
+          amountMinor: 1500,
+          date: DateTime(2026, 10, 23),
+          accountId: 'cash',
+        ),
+      ),
+    ),
+    expect: () => const [
+      TransactionsState(
+        status: TransactionsStatus.failure,
+        error: TransactionsError.invalid,
+      ),
+    ],
+  );
+
+  blocTest<TransactionsBloc, TransactionsState>(
     'deletes a transaction',
     build: () => TransactionsBloc(repository),
     setUp: () {

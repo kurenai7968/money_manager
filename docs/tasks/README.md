@@ -28,3 +28,4 @@ Ids are five digits, starting at `00001`. The next id is one greater than the hi
 - 00018 Thin page with its bloc
 - 00019 Calendar package
 - 00020 Compact home calendar
+- 00021 Opening balance transaction

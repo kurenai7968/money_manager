@@ -63,6 +63,8 @@ lib/
 
 A page dispatches a bloc event. The bloc calls a repository. The repository reads and writes SQLite through `database/sqlite`, and key-value settings through `database/shared_preferences`. It throws exceptions from `core/errors/`. The bloc catches those exceptions and emits an error status. The repository persists entities with `fromJson` and `toJson`, then converts them with the mapping extensions in `core/mapping/`. Callers receive models. UI models contain no JSON serialization. Other layers do not import `sqflite` or `shared_preferences`.
 
+Saving an account keeps one opening transaction aligned with its opening balance. A balance greater than zero creates or updates that transaction. A zero balance deletes it. An account that already has an opening balance and no opening transaction gets one when accounts load.
+
 ## Models
 
 The class name ends in `Model`. Mapping lives in `core/mapping/[name]_mapping.dart`. That file imports both types. The model file and the entity file do not import each other. Only a repository imports the mapping file.
@@ -111,7 +113,7 @@ Expense and income keep separate lists. A transfer has no category. A category t
 ### TransactionModel
 
 - `id`
-- `type`: `expense`, `income`, or `transfer`
+- `type`: `expense`, `income`, `transfer`, or `opening`
 - `amount`, greater than zero
 - `date`
 - `note`, optional
@@ -122,6 +124,8 @@ Expense and income keep separate lists. A transfer has no category. A category t
 `amount` is the left-to-right result of the keypad expression. The expression itself is not stored. The two accounts on a transfer must be different.
 
 An expense decreases its account. An income increases its account. A transfer moves the same amount between its two accounts, so net worth stays the same. Paying a credit card is a transfer from the funding account to the card. Changing type clears a category that belongs to the other kind.
+
+An opening transaction records one account's opening balance. It uses `accountId`, has no category, and has no transfer accounts. Its amount equals that account's `openingBalance`. Balance still starts from `openingBalance`, and does not apply this transaction again. For a credit account, that amount is the amount owed.
 
 ### Settings
 
@@ -158,6 +162,8 @@ A page that needs more than one bloc nests those providers the same way. `Settin
 
 Split the rest of a screen into small widgets by responsibility, section, or interaction. Keep widgets used by one feature in `pages/[feature_name]/widgets/`. Move a widget to `lib/widgets/` only when more than one feature uses it and it has no feature-specific presentation logic.
 
+An opening transaction appears in the account history and the home list, labeled with the opening balance. It is not a record-page type.
+
 ## BLoC
 
 The page widget provides each feature bloc it uses, as in Widgets. `AppSettingBloc` is the exception and is created in `AppProviders`.
@@ -176,6 +182,7 @@ Follow the [bloc library naming conventions](https://bloclibrary.dev/naming-conv
 - Define `GoRouter` routes with an enum such as `AppRoutes`. Do not hardcode path strings.
 - Repositories throw custom exceptions from `core/errors/`. Blocs catch them and emit an error state.
 - A stored transaction amount is greater than zero.
+- An opening transaction matches its account's opening balance and stays out of the monthly balance. The record page does not create or edit an opening transaction.
 - Monthly balance is income minus expense. Transfers stay out of it.
 - A transfer keeps net worth unchanged and uses two different accounts.
 - An account is archived only at a zero balance. A category with transactions is archived, not deleted.

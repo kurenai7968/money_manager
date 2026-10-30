@@ -38,7 +38,8 @@ class AnalysisPage extends StatelessWidget {
     if (!hasBloc<AccountsBloc>(context)) {
       child = BlocProvider(
         create: (context) =>
-            AccountsBloc(context.read())..add(const AccountsStarted()),
+            AccountsBloc(context.read(), context.read())
+              ..add(const AccountsStarted()),
         child: child,
       );
     }

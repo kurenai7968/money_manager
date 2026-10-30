@@ -62,7 +62,7 @@ class AppRouter {
             final typeName = state.uri.queryParameters['type'];
             TransactionType? type;
             for (final item in TransactionType.values) {
-              if (item.name == typeName) {
+              if (item != TransactionType.opening && item.name == typeName) {
                 type = item;
               }
             }
