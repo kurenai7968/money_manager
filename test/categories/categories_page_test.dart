@@ -6,15 +6,15 @@ import 'package:material_ui/material_ui.dart';
 import 'package:money_manager/l10n/app_localizations.dart';
 import 'package:money_manager/models/category_model.dart';
 import 'package:money_manager/models/ledger_kinds.dart';
-import 'package:money_manager/pages/categories/bloc/categories_bloc.dart';
-import 'package:money_manager/pages/categories/bloc/categories_event.dart';
-import 'package:money_manager/pages/categories/bloc/categories_state.dart';
 import 'package:money_manager/pages/categories/categories_page.dart';
 import 'package:money_manager/pages/categories/category_form_page.dart';
+import 'package:money_manager/repositories/category_repository.dart';
+import 'package:money_manager/repositories/transaction_repository.dart';
 import 'package:money_manager/routes/app_routes.dart';
 import 'package:money_manager/themes/ledger_palette.dart';
 
 import '../support/memory_category_repository.dart';
+import '../support/memory_transaction_repository.dart';
 
 const _food = CategoryModel(
   id: 'food',
@@ -56,8 +56,8 @@ const _localizedFood = CategoryModel(
 
 void main() {
   testWidgets('expense and income use separate tabs', (tester) async {
-    final bloc = await _loadedBloc([_food, _transit, _salary]);
-    await _pumpPage(tester, bloc);
+    final categories = _repository([_food, _transit, _salary]);
+    await _pumpPage(tester, categories);
 
     expect(find.text('Food'), findsOneWidget);
     expect(find.text('Transit'), findsOneWidget);
@@ -71,8 +71,8 @@ void main() {
   });
 
   testWidgets('reordering a category does not throw', (tester) async {
-    final bloc = await _loadedBloc([_food, _transit, _salary]);
-    await _pumpPage(tester, bloc);
+    final categories = _repository([_food, _transit, _salary]);
+    await _pumpPage(tester, categories);
 
     final gesture = await tester.startGesture(
       tester.getCenter(find.byIcon(Icons.drag_handle).first),
@@ -86,8 +86,9 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(tester.takeException(), isNull);
+    final saved = await categories.getAll();
     expect(
-      bloc.state.categories
+      saved
           .where((category) => category.kind == CategoryKind.expense)
           .map((category) => category.id),
       ['transit', 'food'],
@@ -95,7 +96,7 @@ void main() {
   });
 
   testWidgets('add uses the selected tab kind', (tester) async {
-    final bloc = await _loadedBloc([_food, _salary]);
+    final categories = _repository([_food, _salary]);
     final router = GoRouter(
       initialLocation: AppRoutes.categories.path,
       routes: [
@@ -116,9 +117,9 @@ void main() {
     );
     addTearDown(router.dispose);
     await tester.pumpWidget(
-      BlocProvider.value(
-        value: bloc,
-        child: MaterialApp.router(
+      _provided(
+        categories,
+        MaterialApp.router(
           routerConfig: router,
           locale: const Locale('en'),
           localizationsDelegates: _delegates,
@@ -144,8 +145,8 @@ void main() {
   });
 
   testWidgets('a new category starts with no icon selected', (tester) async {
-    final bloc = await _loadedBloc(const []);
-    await _pumpForm(tester, bloc);
+    final categories = _repository(const []);
+    await _pumpForm(tester, categories);
 
     for (final key in ['food', 'other', 'salary']) {
       expect(_iconSelected(tester, key), isFalse);
@@ -166,7 +167,9 @@ void main() {
     await tester.tap(find.text('Save'));
     await tester.pumpAndSettle();
 
-    final saved = bloc.state.categories.single;
+    final saved = (await categories.getAll()).singleWhere(
+      (category) => category.name == 'Rent',
+    );
     expect(saved.name, 'Rent');
     expect(saved.icon, 'shopping');
     expect(saved.languageEn, isNull);
@@ -175,8 +178,8 @@ void main() {
   });
 
   testWidgets('editing a default category keeps one name', (tester) async {
-    final bloc = await _loadedBloc([_localizedFood]);
-    await _pumpForm(tester, bloc, categoryId: 'food');
+    final categories = _repository([_localizedFood]);
+    await _pumpForm(tester, categories, categoryId: 'food');
 
     expect(_iconSelected(tester, 'food'), isTrue);
     expect(find.text('Food'), findsOneWidget);
@@ -185,7 +188,7 @@ void main() {
     await tester.tap(find.text('Save'));
     await tester.pumpAndSettle();
 
-    final saved = bloc.state.categories.single;
+    final saved = (await categories.getAll()).single;
     expect(saved.name, 'Groceries');
     expect(saved.languageEn, isNull);
     expect(saved.languageZh, isNull);
@@ -201,20 +204,30 @@ const _delegates = [
   ...GlobalMaterialLocalizations.delegates,
 ];
 
-Future<CategoriesBloc> _loadedBloc(List<CategoryModel> categories) async {
-  final repository = MemoryCategoryRepository()..categories.addAll(categories);
-  final bloc = CategoriesBloc(repository)..add(const CategoriesStarted([]));
-  await bloc.stream.firstWhere(
-    (state) => state.status == CategoriesStatus.success,
-  );
-  return bloc;
+MemoryCategoryRepository _repository(List<CategoryModel> categories) {
+  return MemoryCategoryRepository()..categories.addAll(categories);
 }
 
-Future<void> _pumpPage(WidgetTester tester, CategoriesBloc bloc) async {
+Widget _provided(MemoryCategoryRepository categories, Widget child) {
+  return MultiRepositoryProvider(
+    providers: [
+      RepositoryProvider<CategoryRepository>.value(value: categories),
+      RepositoryProvider<TransactionRepository>.value(
+        value: MemoryTransactionRepository(),
+      ),
+    ],
+    child: child,
+  );
+}
+
+Future<void> _pumpPage(
+  WidgetTester tester,
+  MemoryCategoryRepository categories,
+) async {
   await tester.pumpWidget(
-    BlocProvider.value(
-      value: bloc,
-      child: const MaterialApp(
+    _provided(
+      categories,
+      const MaterialApp(
         locale: Locale('en'),
         localizationsDelegates: _delegates,
         supportedLocales: AppLocalizations.supportedLocales,
@@ -227,7 +240,7 @@ Future<void> _pumpPage(WidgetTester tester, CategoriesBloc bloc) async {
 
 Future<void> _pumpForm(
   WidgetTester tester,
-  CategoriesBloc bloc, {
+  MemoryCategoryRepository categories, {
   String? categoryId,
 }) async {
   final router = GoRouter(
@@ -244,9 +257,9 @@ Future<void> _pumpForm(
   );
   addTearDown(router.dispose);
   await tester.pumpWidget(
-    BlocProvider.value(
-      value: bloc,
-      child: MaterialApp.router(
+    _provided(
+      categories,
+      MaterialApp.router(
         routerConfig: router,
         locale: const Locale('en'),
         localizationsDelegates: _delegates,

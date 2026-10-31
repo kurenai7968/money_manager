@@ -6,7 +6,6 @@ import 'package:money_manager/pages/accounts/bloc/accounts_bloc.dart';
 import 'package:money_manager/pages/accounts/bloc/accounts_event.dart';
 import 'package:money_manager/pages/categories/bloc/categories_bloc.dart';
 import 'package:money_manager/pages/categories/bloc/categories_event.dart';
-import 'package:money_manager/pages/page_blocs.dart';
 import 'package:money_manager/pages/record/widgets/record_app_bar.dart';
 import 'package:money_manager/pages/record/widgets/record_body.dart';
 import 'package:money_manager/pages/record/widgets/record_frame.dart';
@@ -27,35 +26,25 @@ class RecordPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Widget child = RecordFrame(
-      transactionId: transactionId,
-      initialType: initialType,
-      initialAccountId: initialAccountId,
-      child: const Scaffold(appBar: RecordAppBar(), body: RecordBody()),
-    );
-    if (!hasBloc<CategoriesBloc>(context)) {
-      child = BlocProvider(
-        create: (context) =>
-            CategoriesBloc(context.read(), transactions: context.read())
-              ..add(CategoriesStarted(defaultCategories())),
-        child: child,
-      );
-    }
-    if (!hasBloc<TransactionsBloc>(context)) {
-      child = BlocProvider(
+    return BlocProvider(
+      create: (context) =>
+          AccountsBloc(context.read(), context.read())
+            ..add(const AccountsStarted()),
+      child: BlocProvider(
         create: (context) =>
             TransactionsBloc(context.read())..add(const TransactionsStarted()),
-        child: child,
-      );
-    }
-    if (!hasBloc<AccountsBloc>(context)) {
-      child = BlocProvider(
-        create: (context) =>
-            AccountsBloc(context.read(), context.read())
-              ..add(const AccountsStarted()),
-        child: child,
-      );
-    }
-    return child;
+        child: BlocProvider(
+          create: (context) =>
+              CategoriesBloc(context.read(), transactions: context.read())
+                ..add(CategoriesStarted(defaultCategories())),
+          child: RecordFrame(
+            transactionId: transactionId,
+            initialType: initialType,
+            initialAccountId: initialAccountId,
+            child: const Scaffold(appBar: RecordAppBar(), body: RecordBody()),
+          ),
+        ),
+      ),
+    );
   }
 }

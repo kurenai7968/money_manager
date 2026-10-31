@@ -6,7 +6,6 @@ import 'package:money_manager/pages/categories/bloc/categories_bloc.dart';
 import 'package:money_manager/pages/categories/bloc/categories_event.dart';
 import 'package:money_manager/pages/categories/widgets/category_form_app_bar.dart';
 import 'package:money_manager/pages/categories/widgets/category_form_body.dart';
-import 'package:money_manager/pages/page_blocs.dart';
 
 class CategoryFormPage extends StatelessWidget {
   const CategoryFormPage({
@@ -20,18 +19,17 @@ class CategoryFormPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Widget child = Scaffold(
-      appBar: CategoryFormAppBar(editing: categoryId != null),
-      body: CategoryFormBody(categoryId: categoryId, initialKind: initialKind),
+    return BlocProvider(
+      create: (context) =>
+          CategoriesBloc(context.read(), transactions: context.read())
+            ..add(CategoriesStarted(defaultCategories())),
+      child: Scaffold(
+        appBar: CategoryFormAppBar(editing: categoryId != null),
+        body: CategoryFormBody(
+          categoryId: categoryId,
+          initialKind: initialKind,
+        ),
+      ),
     );
-    if (!hasBloc<CategoriesBloc>(context)) {
-      child = BlocProvider(
-        create: (context) =>
-            CategoriesBloc(context.read(), transactions: context.read())
-              ..add(CategoriesStarted(defaultCategories())),
-        child: child,
-      );
-    }
-    return child;
   }
 }
