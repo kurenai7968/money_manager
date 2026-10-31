@@ -1,20 +1,22 @@
 import 'package:material_ui/material_ui.dart';
 import 'package:money_manager/core/utils/ledger_balance.dart';
 import 'package:money_manager/core/utils/money_format.dart';
+import 'package:money_manager/models/account_model.dart';
 import 'package:money_manager/models/category_model.dart';
 import 'package:money_manager/models/enums/week_start.dart';
 import 'package:money_manager/models/ledger_kinds.dart';
 import 'package:money_manager/models/transaction_model.dart';
-import 'package:money_manager/pages/home/widgets/home_transaction_tile.dart';
 import 'package:money_manager/themes/app_themes.dart';
 import 'package:money_manager/themes/ledger_palette.dart';
 import 'package:money_manager/widgets/ledger_calendar.dart';
+import 'package:money_manager/widgets/transaction_item.dart';
 
 class HomeCalendarView extends StatelessWidget {
   const HomeCalendarView({
     required this.month,
     required this.transactions,
     required this.categories,
+    required this.accounts,
     required this.selectedDay,
     required this.weekStart,
     required this.locale,
@@ -25,6 +27,7 @@ class HomeCalendarView extends StatelessWidget {
   final DateTime month;
   final List<TransactionModel> transactions;
   final List<CategoryModel> categories;
+  final List<AccountModel> accounts;
   final DateTime? selectedDay;
   final WeekStart weekStart;
   final String locale;
@@ -76,17 +79,12 @@ class HomeCalendarView extends StatelessWidget {
         Expanded(
           child: dayItems.isEmpty
               ? const SizedBox.shrink()
-              : ListView.separated(
-                  itemCount: dayItems.length,
-                  separatorBuilder: (_, _) =>
-                      Divider(height: 1, color: scheme.outline),
-                  itemBuilder: (context, index) {
-                    return HomeTransactionTile(
-                      transaction: dayItems[index],
-                      categories: categories,
-                      locale: locale,
-                    );
-                  },
+              : TransactionList(
+                  transactions: dayItems,
+                  categories: categories,
+                  accounts: accounts,
+                  locale: locale,
+                  showDayHeaders: false,
                 ),
         ),
       ],

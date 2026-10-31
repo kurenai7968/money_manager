@@ -29,3 +29,4 @@ Ids are five digits, starting at `00001`. The next id is one greater than the hi
 - 00019 Calendar package
 - 00020 Compact home calendar
 - 00021 Opening balance transaction
+- 00022 Shared transaction item

@@ -3,6 +3,8 @@ import 'package:material_ui/material_ui.dart';
 import 'package:money_manager/blocs/app_setting_bloc/app_setting_bloc.dart';
 import 'package:money_manager/core/utils/ledger_balance.dart';
 import 'package:money_manager/models/category_defaults.dart';
+import 'package:money_manager/pages/accounts/bloc/accounts_bloc.dart';
+import 'package:money_manager/pages/accounts/bloc/accounts_event.dart';
 import 'package:money_manager/pages/categories/bloc/categories_bloc.dart';
 import 'package:money_manager/pages/categories/bloc/categories_event.dart';
 import 'package:money_manager/pages/home/widgets/home_calendar_view.dart';
@@ -24,6 +26,7 @@ class _HomeBodyState extends State<HomeBody> with RouteReload {
   void reloadForRoute() {
     context.read<TransactionsBloc>().add(const TransactionsStarted());
     context.read<CategoriesBloc>().add(CategoriesStarted(defaultCategories()));
+    context.read<AccountsBloc>().add(const AccountsStarted());
   }
 
   @override
@@ -32,6 +35,7 @@ class _HomeBodyState extends State<HomeBody> with RouteReload {
     final locale = Localizations.localeOf(context).toString();
     final transactions = context.watch<TransactionsBloc>().state.transactions;
     final categories = context.watch<CategoriesBloc>().state.categories;
+    final accounts = context.watch<AccountsBloc>().state.accounts;
     final inMonth = transactions
         .where(
           (item) =>
@@ -50,6 +54,7 @@ class _HomeBodyState extends State<HomeBody> with RouteReload {
         figures: figures,
         transactions: inMonth,
         categories: categories,
+        accounts: accounts,
         locale: locale,
       );
     }
@@ -57,6 +62,7 @@ class _HomeBodyState extends State<HomeBody> with RouteReload {
       month: frame.month,
       transactions: inMonth,
       categories: categories,
+      accounts: accounts,
       selectedDay: frame.selectedDay,
       weekStart: weekStart,
       locale: locale,

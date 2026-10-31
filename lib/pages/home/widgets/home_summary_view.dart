@@ -2,18 +2,20 @@ import 'package:material_ui/material_ui.dart';
 import 'package:money_manager/core/extensions/context_extension.dart';
 import 'package:money_manager/core/utils/ledger_balance.dart';
 import 'package:money_manager/core/utils/money_format.dart';
+import 'package:money_manager/models/account_model.dart';
 import 'package:money_manager/models/category_model.dart';
 import 'package:money_manager/models/transaction_model.dart';
 import 'package:money_manager/pages/home/widgets/home_month_donut.dart';
-import 'package:money_manager/pages/home/widgets/home_transaction_tile.dart';
 import 'package:money_manager/themes/app_themes.dart';
 import 'package:money_manager/themes/ledger_palette.dart';
+import 'package:money_manager/widgets/transaction_item.dart';
 
 class HomeSummaryView extends StatelessWidget {
   const HomeSummaryView({
     required this.figures,
     required this.transactions,
     required this.categories,
+    required this.accounts,
     required this.locale,
     super.key,
   });
@@ -21,6 +23,7 @@ class HomeSummaryView extends StatelessWidget {
   final MonthFigures figures;
   final List<TransactionModel> transactions;
   final List<CategoryModel> categories;
+  final List<AccountModel> accounts;
   final String locale;
 
   @override
@@ -101,17 +104,11 @@ class HomeSummaryView extends StatelessWidget {
         Expanded(
           child: transactions.isEmpty
               ? Center(child: Text(l10n.emptyMonth))
-              : ListView.separated(
-                  itemCount: transactions.length,
-                  separatorBuilder: (_, _) =>
-                      Divider(height: 1, color: scheme.outline),
-                  itemBuilder: (context, index) {
-                    return HomeTransactionTile(
-                      transaction: transactions[index],
-                      categories: categories,
-                      locale: locale,
-                    );
-                  },
+              : TransactionList(
+                  transactions: transactions,
+                  categories: categories,
+                  accounts: accounts,
+                  locale: locale,
                 ),
         ),
       ],

@@ -36,3 +36,4 @@ Personal ledger for one person. Phone first. Utility register.
 - 2026-10-23: Summary shows a small income and expense pair, then a lower donut. 結餘 sits in the donut. The pair has no side labels on the chart. The list under that is transactions. Every screen uses the same off-white background, centered app bar title, and the same tab bar.
 - 2026-10-23: Accounts is a tab. An account opens its own page: balance, this month's movement, history, and 轉帳.
 - 2026-10-23: Analysis is a tab. It shows this month against the previous month, the last six months, then totals by category and by account.
+- 2026-10-30: A transaction row shows the category icon, category name, note, amount, and account. The amount uses the category color. Transfer and opening amounts stay near-black. A `#tag` in the note uses the income green. Home summary and account history share that row and group it by day. The day header shows the date and that day's expense.

@@ -1,6 +1,8 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:money_manager/models/category_defaults.dart';
+import 'package:money_manager/pages/accounts/bloc/accounts_bloc.dart';
+import 'package:money_manager/pages/accounts/bloc/accounts_event.dart';
 import 'package:money_manager/pages/categories/bloc/categories_bloc.dart';
 import 'package:money_manager/pages/categories/bloc/categories_event.dart';
 import 'package:money_manager/pages/home/widgets/home_app_bar.dart';
@@ -30,6 +32,14 @@ class HomePage extends StatelessWidget {
       child = BlocProvider(
         create: (context) =>
             TransactionsBloc(context.read())..add(const TransactionsStarted()),
+        child: child,
+      );
+    }
+    if (!hasBloc<AccountsBloc>(context)) {
+      child = BlocProvider(
+        create: (context) =>
+            AccountsBloc(context.read(), context.read())
+              ..add(const AccountsStarted()),
         child: child,
       );
     }
