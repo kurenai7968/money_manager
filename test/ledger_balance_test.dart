@@ -41,6 +41,10 @@ void main() {
     expect(balanceOf(card, [expense]), 2000);
     expect(balanceOf(cash, [payment]), 8000);
     expect(balanceOf(card, [expense, payment]), 0);
+    expect(balancesOf([cash, card], [expense, payment]), {
+      'cash': 8000,
+      'card': 0,
+    });
     expect(netWorthOf([cash, card], [expense, payment]), 8000);
   });
 

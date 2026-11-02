@@ -31,3 +31,4 @@ Ids are five digits, starting at `00001`. The next id is one greater than the hi
 - 00021 Opening balance transaction
 - 00022 Shared transaction item
 - 00023 Remove hasBloc
+- 00024 Speed up ledger screens

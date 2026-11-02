@@ -19,29 +19,31 @@ class HomeMonthDonut extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
     return SizedBox(
       width: 180,
       height: 180,
-      child: CustomPaint(
-        painter: _DonutPainter(
-          income: income,
-          expense: expense,
-          incomeColor: LedgerPalette.green,
-          expenseColor: Theme.of(context).colorScheme.primary,
-          trackColor: Theme.of(context).colorScheme.outline,
-        ),
-        child: Center(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(
-                label,
-                style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                  color: Theme.of(context).colorScheme.onSurfaceVariant,
+      child: RepaintBoundary(
+        child: CustomPaint(
+          painter: _DonutPainter(
+            income: income,
+            expense: expense,
+            incomeColor: LedgerPalette.green,
+            expenseColor: scheme.primary,
+            trackColor: scheme.outline,
+          ),
+          child: Center(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  label,
+                  style: Theme.of(context).textTheme.labelMedium
+                      ?.copyWith(color: scheme.onSurfaceVariant),
                 ),
-              ),
-              Text(amount, style: Theme.of(context).textTheme.titleLarge),
-            ],
+                Text(amount, style: Theme.of(context).textTheme.titleLarge),
+              ],
+            ),
           ),
         ),
       ),
@@ -95,6 +97,10 @@ class _DonutPainter extends CustomPainter {
 
   @override
   bool shouldRepaint(covariant _DonutPainter oldDelegate) {
-    return oldDelegate.income != income || oldDelegate.expense != expense;
+    return oldDelegate.income != income ||
+        oldDelegate.expense != expense ||
+        oldDelegate.incomeColor != incomeColor ||
+        oldDelegate.expenseColor != expenseColor ||
+        oldDelegate.trackColor != trackColor;
   }
 }

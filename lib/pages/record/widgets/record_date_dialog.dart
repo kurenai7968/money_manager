@@ -1,6 +1,6 @@
-import 'package:intl/intl.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:money_manager/core/extensions/context_extension.dart';
+import 'package:money_manager/core/utils/cached_date_format.dart';
 import 'package:money_manager/models/enums/week_start.dart';
 import 'package:money_manager/themes/app_themes.dart';
 import 'package:money_manager/widgets/ledger_calendar.dart';
@@ -59,7 +59,7 @@ class _RecordDateDialogState extends State<RecordDateDialog> {
             padding: const EdgeInsets.all(AppSpacing.l),
             children: [
               Text(
-                DateFormat.yMMMEd(locale).format(_day),
+                cachedYearMonthDay(locale).format(_day),
                 style: textTheme.titleMedium,
                 textAlign: TextAlign.center,
               ),
@@ -72,7 +72,7 @@ class _RecordDateDialogState extends State<RecordDateDialog> {
                   ),
                   Expanded(
                     child: Text(
-                      DateFormat.yMMMM(locale).format(_focused),
+                      cachedYearMonth(locale).format(_focused),
                       style: textTheme.titleMedium,
                       textAlign: TextAlign.center,
                     ),

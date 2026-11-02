@@ -2,6 +2,7 @@ import 'package:material_ui/material_ui.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:intl/intl.dart';
 import 'package:money_manager/app.dart';
+import 'package:money_manager/pages/record/widgets/record_category_grid.dart';
 import 'package:money_manager/widgets/app_tab_bar.dart';
 import 'package:table_calendar/table_calendar.dart';
 
@@ -256,6 +257,18 @@ void main() {
     expect(gaps[1], closeTo(gaps[2], 0.5));
     expect(gaps[0], lessThan(84));
     expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('Keypad presses leave the category grid in place', (
+    tester,
+  ) async {
+    await pumpLedger(tester);
+    await openRecord(tester);
+    final builds = RecordCategoryGrid.debugBuildCount;
+    await tapKey(tester, '1');
+    await tapKey(tester, '8');
+    expect(find.text('18'), findsOneWidget);
+    expect(RecordCategoryGrid.debugBuildCount, builds);
   });
 
   testWidgets('Record page lays out at a larger text scale', (tester) async {

@@ -48,7 +48,7 @@ class _HomeBodyState extends State<HomeBody> with RouteReload {
         .state
         .appSetting
         .weekStart;
-    final figures = monthFigures(transactions, frame.month);
+    final figures = monthFigures(inMonth, frame.month);
     if (frame.view == HomeView.summary) {
       return HomeSummaryView(
         figures: figures,

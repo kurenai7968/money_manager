@@ -1,4 +1,5 @@
 import 'package:material_ui/material_ui.dart';
+import 'package:money_manager/core/utils/ledger_balance.dart';
 import 'package:money_manager/models/account_model.dart';
 import 'package:money_manager/models/transaction_model.dart';
 import 'package:money_manager/pages/accounts/widgets/account_row.dart';
@@ -35,6 +36,7 @@ class _AccountSliverState extends State<AccountSliver> {
 
   @override
   Widget build(BuildContext context) {
+    final balances = balancesOf(_accounts, widget.transactions);
     return SliverReorderableList(
       itemCount: _accounts.length,
       proxyDecorator: ledgerReorderProxy,
@@ -44,7 +46,7 @@ class _AccountSliverState extends State<AccountSliver> {
         return AccountRow(
           key: ValueKey(account.id),
           account: account,
-          transactions: widget.transactions,
+          balance: balances[account.id] ?? account.openingBalanceMinor,
           index: index,
         );
       },

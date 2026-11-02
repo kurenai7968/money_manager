@@ -1,5 +1,4 @@
 import 'package:material_ui/material_ui.dart';
-import 'package:money_manager/core/utils/ledger_balance.dart';
 import 'package:money_manager/core/utils/money_format.dart';
 import 'package:money_manager/models/account_model.dart';
 import 'package:money_manager/models/category_model.dart';
@@ -43,9 +42,11 @@ class HomeCalendarView extends StatelessWidget {
             selected.month == month.month
         ? selected
         : DateTime(month.year, month.month);
+    final days = _indexDays(transactions);
     final dayItems = selected == null
         ? const <TransactionModel>[]
-        : transactions.where((item) => sameDay(item.date, selected)).toList();
+        : days.items[DateTime(selected.year, selected.month, selected.day)] ??
+              const <TransactionModel>[];
     return Column(
       children: [
         Padding(
@@ -60,7 +61,8 @@ class HomeCalendarView extends StatelessWidget {
               onDaySelected: (day, _) =>
                   onSelect(DateTime(day.year, day.month, day.day)),
               dayDetail: (context, day) {
-                final net = _dayNet(day);
+                final net =
+                    days.nets[DateTime(day.year, day.month, day.day)] ?? 0;
                 if (net == 0) {
                   return null;
                 }
@@ -90,18 +92,31 @@ class HomeCalendarView extends StatelessWidget {
       ],
     );
   }
+}
 
-  int _dayNet(DateTime date) {
-    var net = 0;
-    for (final transaction in transactions.where(
-      (item) => sameDay(item.date, date),
-    )) {
-      if (transaction.type == TransactionType.income) {
-        net += transaction.amountMinor;
-      } else if (transaction.type == TransactionType.expense) {
-        net -= transaction.amountMinor;
-      }
+class _MonthDays {
+  final nets = <DateTime, int>{};
+  final items = <DateTime, List<TransactionModel>>{};
+}
+
+_MonthDays _indexDays(List<TransactionModel> transactions) {
+  final days = _MonthDays();
+  for (final transaction in transactions) {
+    final day = DateTime(
+      transaction.date.year,
+      transaction.date.month,
+      transaction.date.day,
+    );
+    (days.items[day] ??= []).add(transaction);
+    final delta = switch (transaction.type) {
+      TransactionType.income => transaction.amountMinor,
+      TransactionType.expense => -transaction.amountMinor,
+      _ => 0,
+    };
+    if (delta == 0) {
+      continue;
     }
-    return net;
+    days.nets[day] = (days.nets[day] ?? 0) + delta;
   }
+  return days;
 }

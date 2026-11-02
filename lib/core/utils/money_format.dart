@@ -1,9 +1,12 @@
 import 'package:intl/intl.dart';
 
+final _amountPattern = RegExp(r'^(\d+)(?:\.(\d{1,2}))?$');
+final _decimalPatterns = <String, NumberFormat>{};
+
 int? parseAmountMinor(String text) {
   final normalized = text.trim().replaceAll(',', '');
   if (normalized.isEmpty) return 0;
-  final match = RegExp(r'^(\d+)(?:\.(\d{1,2}))?$').firstMatch(normalized);
+  final match = _amountPattern.firstMatch(normalized);
   if (match == null) return null;
   final whole = int.parse(match.group(1)!);
   final fraction = match.group(2);
@@ -14,7 +17,11 @@ int? parseAmountMinor(String text) {
 String formatMinor(int minor, {required String locale, bool signed = false}) {
   final negative = minor < 0;
   final absolute = minor.abs();
-  final whole = NumberFormat.decimalPattern(locale).format(absolute ~/ 100);
+  final pattern = _decimalPatterns.putIfAbsent(
+    locale,
+    () => NumberFormat.decimalPattern(locale),
+  );
+  final whole = pattern.format(absolute ~/ 100);
   final fraction = absolute % 100;
   final text = fraction == 0
       ? whole

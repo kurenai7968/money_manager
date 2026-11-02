@@ -1,9 +1,9 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-import 'package:intl/intl.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:money_manager/blocs/app_setting_bloc/app_setting_bloc.dart';
 import 'package:money_manager/core/extensions/context_extension.dart';
+import 'package:money_manager/core/utils/cached_date_format.dart';
 import 'package:money_manager/core/utils/amount_expression.dart';
 import 'package:money_manager/core/utils/id.dart';
 import 'package:money_manager/l10n/app_localizations.dart';
@@ -41,12 +41,19 @@ class RecordFrame extends StatefulWidget {
     return scope!.state;
   }
 
+  static RecordFrameState read(BuildContext context) {
+    final element = context
+        .getElementForInheritedWidgetOfExactType<_RecordScope>();
+    assert(element != null, 'RecordFrame not found');
+    return (element!.widget as _RecordScope).state;
+  }
+
   @override
   State<RecordFrame> createState() => RecordFrameState();
 }
 
 class RecordFrameState extends State<RecordFrame> {
-  var expression = const AmountExpression();
+  final _amounts = RecordExpression(const AmountExpression());
   var type = TransactionType.expense;
   DateTime date = DateTime.now();
   String note = '';
@@ -61,7 +68,17 @@ class RecordFrameState extends State<RecordFrame> {
   List<AccountModel> accounts = const [];
   List<CategoryModel> visibleCategories = const [];
 
+  AmountExpression get expression => _amounts.value;
+
+  Listenable get expressionListenable => _amounts;
+
   int? get result => expression.resultMinor;
+
+  @override
+  void dispose() {
+    _amounts.dispose();
+    super.dispose();
+  }
 
   String? get transactionId => widget.transactionId;
 
@@ -92,7 +109,7 @@ class RecordFrameState extends State<RecordFrame> {
         categoryId = transaction.categoryId;
         fromId = transaction.fromAccountId;
         toId = transaction.toAccountId;
-        expression = AmountExpression.fromMinor(transaction.amountMinor);
+        _amounts.sync(AmountExpression.fromMinor(transaction.amountMinor));
         _existingReady = true;
       }
     }
@@ -137,13 +154,26 @@ class RecordFrameState extends State<RecordFrame> {
         : match.first.labelFor(context.categoryLanguageCode);
   }
 
+  void editExpression(AmountExpression next) {
+    if (identical(next, expression)) {
+      if (error != null) {
+        setState(() => error = null);
+      }
+      return;
+    }
+    _amounts.update(next);
+    if (error != null) {
+      setState(() => error = null);
+    }
+  }
+
   void equals() {
     final next = expression.evaluate();
     if (next == null) {
       setState(() => error = context.l10n.invalidTransaction);
       return;
     }
-    change(() => expression = next);
+    editExpression(next);
   }
 
   void setType(TransactionType next) {
@@ -271,8 +301,8 @@ class RecordFrameState extends State<RecordFrame> {
 
   String titleFor(String locale) {
     return locale.startsWith('zh')
-        ? DateFormat('M月d日', locale).format(date)
-        : DateFormat.MMMd(locale).format(date);
+        ? cachedDateFormat(locale, 'M月d日').format(date)
+        : cachedMonthDay(locale).format(date);
   }
 
   @override
@@ -307,6 +337,24 @@ class RecordFrameState extends State<RecordFrame> {
       },
       child: _RecordScope(state: this, child: widget.child),
     );
+  }
+}
+
+class RecordExpression extends ChangeNotifier {
+  RecordExpression(this.value);
+
+  AmountExpression value;
+
+  void update(AmountExpression next) {
+    if (identical(value, next)) {
+      return;
+    }
+    value = next;
+    notifyListeners();
+  }
+
+  void sync(AmountExpression next) {
+    value = next;
   }
 }
 

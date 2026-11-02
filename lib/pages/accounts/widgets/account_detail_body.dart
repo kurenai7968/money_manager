@@ -49,13 +49,15 @@ class _AccountDetailBodyState extends State<AccountDetailBody>
     final transactions = context.watch<TransactionsBloc>().state.transactions;
     final categories = context.watch<CategoriesBloc>().state.categories;
     final accounts = context.watch<AccountsBloc>().state.accounts;
-    final balance = balanceOf(account, transactions);
+    final history = [
+      for (final item in transactions)
+        if (item.accountId == account.id ||
+            item.fromAccountId == account.id ||
+            item.toAccountId == account.id)
+          item,
+    ];
+    final balance = balanceOf(account, history);
     final isCredit = account.type == AccountType.credit;
-    final history = transactions.where((item) {
-      return item.accountId == account.id ||
-          item.fromAccountId == account.id ||
-          item.toAccountId == account.id;
-    }).toList();
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [

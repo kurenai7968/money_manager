@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:money_manager/core/extensions/context_extension.dart';
 import 'package:money_manager/models/category_model.dart';
@@ -16,8 +17,12 @@ class RecordCategoryGrid extends StatelessWidget {
   final String? selectedId;
   final ValueChanged<String> onSelected;
 
+  @visibleForTesting
+  static int debugBuildCount = 0;
+
   @override
   Widget build(BuildContext context) {
+    debugBuildCount++;
     return LayoutBuilder(
       builder: (context, constraints) {
         const columns = 4;

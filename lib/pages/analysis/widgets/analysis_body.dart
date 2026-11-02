@@ -1,11 +1,8 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:money_manager/core/extensions/context_extension.dart';
-import 'package:money_manager/core/utils/ledger_balance.dart';
 import 'package:money_manager/core/utils/money_format.dart';
-import 'package:money_manager/models/account_model.dart';
 import 'package:money_manager/models/category_defaults.dart';
-import 'package:money_manager/models/category_model.dart';
 import 'package:money_manager/models/ledger_kinds.dart';
 import 'package:money_manager/models/transaction_model.dart';
 import 'package:money_manager/pages/accounts/bloc/accounts_bloc.dart';
@@ -46,36 +43,20 @@ class _AnalysisBodyState extends State<AnalysisBody> with RouteReload {
     final transactions = context.watch<TransactionsBloc>().state.transactions;
     final categories = context.watch<CategoriesBloc>().state.categories;
     final accounts = context.watch<AccountsBloc>().state.active;
-    final current = _total(transactions, month, kind);
-    final previous = _total(
-      transactions,
-      DateTime(month.year, month.month - 1),
-      kind,
-    );
+    final rollup = _rollup(transactions, month, kind);
+    final current = rollup.current;
+    final previous = rollup.previous;
     final delta = current - previous;
-    final months = [
-      for (var offset = 5; offset >= 0; offset--)
-        DateTime(month.year, month.month - offset),
-    ];
-    final monthValues = [
-      for (final item in months) _total(transactions, item, kind),
-    ];
+    final months = rollup.months;
+    final monthValues = rollup.monthValues;
     final maxValue = monthValues.fold<int>(
       1,
       (max, value) => value > max ? value : max,
     );
-    final byCategory = _grouped(
-      transactions,
-      month,
-      kind,
-      (item) => item.categoryId,
-    );
-    final byAccount = _grouped(
-      transactions,
-      month,
-      kind,
-      (item) => item.accountId,
-    );
+    final byCategory = rollup.byCategory;
+    final byAccount = rollup.byAccount;
+    final categoriesById = _firstById(categories, (category) => category.id);
+    final accountsById = _firstById(accounts, (account) => account.id);
     return ListView(
       padding: const EdgeInsets.all(AppSpacing.l),
       children: [
@@ -108,12 +89,14 @@ class _AnalysisBodyState extends State<AnalysisBody> with RouteReload {
         Text(l10n.categories, style: Theme.of(context).textTheme.titleMedium),
         for (final entry in byCategory.entries)
           AnalysisTotalRow(
-            color: LedgerPalette.color(_colorKey(categories, entry.key)),
-            title: _categoryName(
-              categories,
-              entry.key,
-              context.categoryLanguageCode,
+            color: LedgerPalette.color(
+              categoriesById[entry.key]?.color ?? 'slate',
             ),
+            title:
+                categoriesById[entry.key]?.labelFor(
+                  context.categoryLanguageCode,
+                ) ??
+                '',
             amount: formatMinor(entry.value, locale: locale),
             share: current == 0
                 ? ''
@@ -124,11 +107,11 @@ class _AnalysisBodyState extends State<AnalysisBody> with RouteReload {
         for (final entry in byAccount.entries)
           AnalysisTotalRow(
             color: Theme.of(context).colorScheme.primary,
-            title: _accountName(
-              accounts,
-              entry.key,
-              context.categoryLanguageCode,
-            ),
+            title:
+                accountsById[entry.key]?.labelFor(
+                  context.categoryLanguageCode,
+                ) ??
+                '',
             amount: formatMinor(entry.value, locale: locale),
           ),
       ],
@@ -136,72 +119,84 @@ class _AnalysisBodyState extends State<AnalysisBody> with RouteReload {
   }
 }
 
-int _total(
-  List<TransactionModel> transactions,
-  DateTime month,
-  CategoryKind kind,
-) {
-  final figures = monthFigures(transactions, month);
-  return kind == CategoryKind.expense
-      ? figures.expenseMinor
-      : figures.incomeMinor;
+class _Rollup {
+  _Rollup(this.months, this.monthValues, this.byCategory, this.byAccount);
+
+  final List<DateTime> months;
+  final List<int> monthValues;
+  final Map<String?, int> byCategory;
+  final Map<String?, int> byAccount;
+
+  int get current => monthValues.last;
+
+  int get previous => monthValues[monthValues.length - 2];
 }
 
-Map<String?, int> _grouped(
+_Rollup _rollup(
   List<TransactionModel> transactions,
   DateTime month,
   CategoryKind kind,
-  String? Function(TransactionModel transaction) keyOf,
 ) {
-  final totals = <String?, int>{};
+  final months = [
+    for (var offset = 5; offset >= 0; offset--)
+      DateTime(month.year, month.month - offset),
+  ];
+  final income = List<int>.filled(months.length, 0);
+  final expense = List<int>.filled(months.length, 0);
+  final indexByMonth = <int, int>{
+    for (var index = 0; index < months.length; index++)
+      months[index].year * 12 + months[index].month: index,
+  };
+  final currentKey = month.year * 12 + month.month;
+  final byCategory = <String?, int>{};
+  final byAccount = <String?, int>{};
+  final wantExpense = kind == CategoryKind.expense;
   for (final transaction in transactions) {
-    final matchesKind = kind == CategoryKind.expense
-        ? transaction.type == TransactionType.expense
-        : transaction.type == TransactionType.income;
-    if (!matchesKind ||
-        transaction.date.year != month.year ||
-        transaction.date.month != month.month) {
+    final index =
+        indexByMonth[transaction.date.year * 12 + transaction.date.month];
+    if (index == null) {
       continue;
     }
-    final key = keyOf(transaction);
-    totals[key] = (totals[key] ?? 0) + transaction.amountMinor;
+    if (transaction.type == TransactionType.income) {
+      income[index] += transaction.amountMinor;
+    } else if (transaction.type == TransactionType.expense) {
+      expense[index] += transaction.amountMinor;
+    } else {
+      continue;
+    }
+    final matches = wantExpense
+        ? transaction.type == TransactionType.expense
+        : transaction.type == TransactionType.income;
+    if (!matches ||
+        transaction.date.year * 12 + transaction.date.month != currentKey) {
+      continue;
+    }
+    final categoryId = transaction.categoryId;
+    final accountId = transaction.accountId;
+    byCategory[categoryId] =
+        (byCategory[categoryId] ?? 0) + transaction.amountMinor;
+    byAccount[accountId] =
+        (byAccount[accountId] ?? 0) + transaction.amountMinor;
   }
+  final totals = wantExpense ? expense : income;
+  return _Rollup(
+    months,
+    totals,
+    _sortedTotals(byCategory),
+    _sortedTotals(byAccount),
+  );
+}
+
+Map<String?, int> _sortedTotals(Map<String?, int> totals) {
   final entries = totals.entries.toList()
     ..sort((a, b) => b.value.compareTo(a.value));
   return {for (final entry in entries) entry.key: entry.value};
 }
 
-String _colorKey(List<CategoryModel> categories, String? id) {
-  for (final category in categories) {
-    if (category.id == id) {
-      return category.color;
-    }
+Map<String, T> _firstById<T>(List<T> items, String Function(T item) idOf) {
+  final index = <String, T>{};
+  for (final item in items) {
+    index.putIfAbsent(idOf(item), () => item);
   }
-  return 'slate';
-}
-
-String _categoryName(
-  List<CategoryModel> categories,
-  String? id,
-  String languageCode,
-) {
-  for (final category in categories) {
-    if (category.id == id) {
-      return category.labelFor(languageCode);
-    }
-  }
-  return '';
-}
-
-String _accountName(
-  List<AccountModel> accounts,
-  String? id,
-  String languageCode,
-) {
-  for (final account in accounts) {
-    if (account.id == id) {
-      return account.labelFor(languageCode);
-    }
-  }
-  return '';
+  return index;
 }

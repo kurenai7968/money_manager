@@ -1,6 +1,6 @@
 import 'package:go_router/go_router.dart';
-import 'package:intl/intl.dart';
 import 'package:material_ui/material_ui.dart';
+import 'package:money_manager/core/utils/cached_date_format.dart';
 import 'package:money_manager/core/extensions/context_extension.dart';
 import 'package:money_manager/core/utils/money_format.dart';
 import 'package:money_manager/models/account_model.dart';
@@ -29,6 +29,8 @@ class TransactionList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final categoriesById = _firstById(categories, (category) => category.id);
+    final accountsById = _firstById(accounts, (account) => account.id);
     if (!showDayHeaders) {
       return ListView.separated(
         itemCount: transactions.length,
@@ -39,6 +41,8 @@ class TransactionList extends StatelessWidget {
             transaction: transactions[index],
             categories: categories,
             accounts: accounts,
+            categoriesById: categoriesById,
+            accountsById: accountsById,
             locale: locale,
           );
         },
@@ -90,6 +94,8 @@ class TransactionList extends StatelessWidget {
                 transaction: transaction,
                 categories: categories,
                 accounts: accounts,
+                categoriesById: categoriesById,
+                accountsById: accountsById,
                 locale: locale,
               ),
             ],
@@ -106,6 +112,8 @@ class TransactionItem extends StatelessWidget {
     required this.categories,
     required this.accounts,
     required this.locale,
+    this.categoriesById,
+    this.accountsById,
     super.key,
   });
 
@@ -113,6 +121,8 @@ class TransactionItem extends StatelessWidget {
   final List<CategoryModel> categories;
   final List<AccountModel> accounts;
   final String locale;
+  final Map<String, CategoryModel>? categoriesById;
+  final Map<String, AccountModel>? accountsById;
 
   @override
   Widget build(BuildContext context) {
@@ -211,8 +221,13 @@ class TransactionItem extends StatelessWidget {
   }
 
   CategoryModel? _category() {
+    final indexed = categoriesById;
+    final categoryId = transaction.categoryId;
+    if (indexed != null) {
+      return categoryId == null ? null : indexed[categoryId];
+    }
     for (final item in categories) {
-      if (item.id == transaction.categoryId) {
+      if (item.id == categoryId) {
         return item;
       }
     }
@@ -233,6 +248,10 @@ class TransactionItem extends StatelessWidget {
     String nameOf(String? id) {
       if (id == null) {
         return '';
+      }
+      final indexed = accountsById;
+      if (indexed != null) {
+        return indexed[id]?.labelFor(languageCode) ?? '';
       }
       for (final account in accounts) {
         if (account.id == id) {
@@ -326,7 +345,7 @@ class _NoteText extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final base = style;
-    final matches = RegExp(r'#[^\s#]+').allMatches(note);
+    final matches = _noteTag.allMatches(note);
     if (base == null || matches.isEmpty) {
       return Text(
         note,
@@ -389,7 +408,7 @@ class _TransactionDayHeader extends StatelessWidget {
         children: [
           Expanded(
             child: Text(
-              DateFormat('M/d (E)', locale).format(day),
+              cachedDateFormat(locale, 'M/d (E)').format(day),
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
               style: style,
@@ -448,6 +467,16 @@ class _TransactionEntry extends _Entry {
 
   final TransactionModel transaction;
   final bool divider;
+}
+
+final _noteTag = RegExp(r'#[^\s#]+');
+
+Map<String, T> _firstById<T>(List<T> items, String Function(T item) idOf) {
+  final index = <String, T>{};
+  for (final item in items) {
+    index.putIfAbsent(idOf(item), () => item);
+  }
+  return index;
 }
 
 List<_DayGroup> _groupByDay(List<TransactionModel> transactions) {

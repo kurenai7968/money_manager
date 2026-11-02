@@ -1,11 +1,9 @@
 import 'package:material_ui/material_ui.dart';
 import 'package:go_router/go_router.dart';
 import 'package:money_manager/core/extensions/context_extension.dart';
-import 'package:money_manager/core/utils/ledger_balance.dart';
 import 'package:money_manager/core/utils/money_format.dart';
 import 'package:money_manager/models/account_model.dart';
 import 'package:money_manager/models/ledger_kinds.dart';
-import 'package:money_manager/models/transaction_model.dart';
 import 'package:money_manager/routes/app_routes.dart';
 import 'package:money_manager/themes/app_themes.dart';
 import 'package:money_manager/themes/ledger_palette.dart';
@@ -13,13 +11,13 @@ import 'package:money_manager/themes/ledger_palette.dart';
 class AccountRow extends StatelessWidget {
   const AccountRow({
     required this.account,
-    required this.transactions,
+    required this.balance,
     required this.index,
     super.key,
   });
 
   final AccountModel account;
-  final List<TransactionModel> transactions;
+  final int balance;
   final int index;
 
   @override
@@ -43,7 +41,7 @@ class AccountRow extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           Text(
-            formatMinor(balanceOf(account, transactions), locale: locale),
+            formatMinor(balance, locale: locale),
             style: Theme.of(context).textTheme.titleMedium
                 ?.copyWith(color: isCredit ? scheme.primary : scheme.onSurface),
           ),
