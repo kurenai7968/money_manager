@@ -1,19 +1,19 @@
 import 'package:material_ui/material_ui.dart';
 import 'package:money_manager/core/extensions/context_extension.dart';
 import 'package:money_manager/core/utils/cached_date_format.dart';
-import 'package:money_manager/models/enums/week_start.dart';
+import 'package:money_manager/models/enums/first_day_of_week.dart';
 import 'package:money_manager/themes/app_themes.dart';
 import 'package:money_manager/widgets/ledger_calendar.dart';
 
 class RecordDateDialog extends StatefulWidget {
   const RecordDateDialog({
     required this.initial,
-    required this.weekStart,
+    required this.firstDayOfWeek,
     super.key,
   });
 
   final DateTime initial;
-  final WeekStart weekStart;
+  final FirstDayOfWeek firstDayOfWeek;
 
   @override
   State<RecordDateDialog> createState() => _RecordDateDialogState();
@@ -89,7 +89,7 @@ class _RecordDateDialogState extends State<RecordDateDialog> {
                 child: LedgerCalendar(
                   focusedDay: _focused,
                   selectedDay: _day,
-                  weekStart: widget.weekStart,
+                  firstDayOfWeek: widget.firstDayOfWeek,
                   onDaySelected: (selected, focused) {
                     setState(() {
                       _day = DateTime(

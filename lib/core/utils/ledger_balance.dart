@@ -1,3 +1,4 @@
+import 'package:equatable/equatable.dart';
 import 'package:money_manager/core/utils/opening_transaction.dart';
 import 'package:money_manager/models/account_model.dart';
 import 'package:money_manager/models/ledger_kinds.dart';
@@ -81,13 +82,16 @@ void _apply(
   balances[accountId] = balances[accountId]! + delta;
 }
 
-class MonthFigures {
+class MonthFigures extends Equatable {
   const MonthFigures({required this.incomeMinor, required this.expenseMinor});
 
   final int incomeMinor;
   final int expenseMinor;
 
   int get balanceMinor => incomeMinor - expenseMinor;
+
+  @override
+  List<Object?> get props => [incomeMinor, expenseMinor];
 }
 
 MonthFigures monthFigures(
@@ -112,4 +116,72 @@ MonthFigures monthFigures(
 
 bool sameDay(DateTime a, DateTime b) {
   return a.year == b.year && a.month == b.month && a.day == b.day;
+}
+
+class DayLedger extends Equatable {
+  const DayLedger({
+    required this.day,
+    required this.netMinor,
+    required this.transactions,
+  });
+
+  final DateTime day;
+  final int netMinor;
+  final List<TransactionModel> transactions;
+
+  @override
+  List<Object?> get props => [day, netMinor, transactions];
+}
+
+List<DayLedger> daysOf(Iterable<TransactionModel> transactions) {
+  final items = <DateTime, List<TransactionModel>>{};
+  final nets = <DateTime, int>{};
+  for (final transaction in transactions) {
+    final day = DateTime(
+      transaction.date.year,
+      transaction.date.month,
+      transaction.date.day,
+    );
+    (items[day] ??= []).add(transaction);
+    final delta = switch (transaction.type) {
+      TransactionType.income => transaction.amountMinor,
+      TransactionType.expense => -transaction.amountMinor,
+      TransactionType.transfer => 0,
+    };
+    if (delta == 0) {
+      continue;
+    }
+    nets[day] = (nets[day] ?? 0) + delta;
+  }
+  return [
+    for (final entry in items.entries)
+      DayLedger(
+        day: entry.key,
+        netMinor: nets[entry.key] ?? 0,
+        transactions: entry.value,
+      ),
+  ];
+}
+
+int netOn(List<DayLedger> days, DateTime day) {
+  final key = DateTime(day.year, day.month, day.day);
+  for (final item in days) {
+    if (item.day == key) {
+      return item.netMinor;
+    }
+  }
+  return 0;
+}
+
+List<TransactionModel> transactionsOn(List<DayLedger> days, DateTime? day) {
+  if (day == null) {
+    return const [];
+  }
+  final key = DateTime(day.year, day.month, day.day);
+  for (final item in days) {
+    if (item.day == key) {
+      return item.transactions;
+    }
+  }
+  return const [];
 }

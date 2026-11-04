@@ -33,3 +33,5 @@ Ids are five digits, starting at `00001`. The next id is one greater than the hi
 - 00023 Remove hasBloc
 - 00024 Speed up ledger screens
 - 00025 Edit opening balance
+- 00026 Screen blocs and weekdays
+- 00027 First day to calendar weekday

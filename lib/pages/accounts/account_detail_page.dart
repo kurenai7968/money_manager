@@ -1,6 +1,8 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:money_manager/models/category_defaults.dart';
+import 'package:money_manager/pages/accounts/bloc/account_detail_bloc.dart';
+import 'package:money_manager/pages/accounts/bloc/account_detail_event.dart';
 import 'package:money_manager/pages/accounts/bloc/accounts_bloc.dart';
 import 'package:money_manager/pages/accounts/bloc/accounts_event.dart';
 import 'package:money_manager/pages/accounts/widgets/account_detail_app_bar.dart';
@@ -29,9 +31,17 @@ class AccountDetailPage extends StatelessWidget {
           create: (context) =>
               CategoriesBloc(context.read(), transactions: context.read())
                 ..add(CategoriesStarted(defaultCategories())),
-          child: Scaffold(
-            appBar: AccountDetailAppBar(accountId: accountId),
-            body: AccountDetailBody(accountId: accountId),
+          child: BlocProvider(
+            create: (context) => AccountDetailBloc(
+              accountId: accountId,
+              accounts: context.read(),
+              transactions: context.read(),
+              categories: context.read(),
+            )..add(const AccountDetailStarted()),
+            child: Scaffold(
+              appBar: AccountDetailAppBar(accountId: accountId),
+              body: AccountDetailBody(accountId: accountId),
+            ),
           ),
         ),
       ),

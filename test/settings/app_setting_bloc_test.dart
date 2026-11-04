@@ -6,7 +6,8 @@ import 'package:money_manager/blocs/app_setting_bloc/app_setting_state.dart';
 import 'package:money_manager/core/errors/app_exception.dart';
 import 'package:money_manager/models/app_setting_model.dart';
 import 'package:money_manager/models/enums/app_appearance.dart';
-import 'package:money_manager/models/enums/week_start.dart';
+import 'package:money_manager/models/enums/first_day_of_week.dart';
+import 'package:table_calendar/table_calendar.dart';
 import 'package:money_manager/repositories/app_setting_repository.dart';
 
 class _MemoryAppSettingRepository implements AppSettingRepository {
@@ -95,8 +96,28 @@ void main() {
     ],
   );
 
-  test('Sunday is the first column when the week starts on Sunday', () {
-    expect(leadingCalendarBlanks(DateTime(2026, 10, 1), WeekStart.monday), 3);
-    expect(leadingCalendarBlanks(DateTime(2026, 10, 1), WeekStart.sunday), 4);
+  test('each first day maps to the same calendar weekday', () {
+    for (final day in FirstDayOfWeek.values) {
+      expect(day.toStartingDayOfWeek().name, day.name);
+    }
+  });
+
+  test('blanks follow the first day of the week', () {
+    expect(
+      leadingCalendarBlanks(DateTime(2026, 10, 1), FirstDayOfWeek.monday),
+      3,
+    );
+    expect(
+      leadingCalendarBlanks(DateTime(2026, 10, 1), FirstDayOfWeek.sunday),
+      4,
+    );
+    expect(
+      leadingCalendarBlanks(DateTime(2026, 10, 1), FirstDayOfWeek.thursday),
+      0,
+    );
+    expect(
+      leadingCalendarBlanks(DateTime(2026, 10, 1), FirstDayOfWeek.friday),
+      6,
+    );
   });
 }

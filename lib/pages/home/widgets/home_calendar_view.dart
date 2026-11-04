@@ -1,9 +1,9 @@
 import 'package:material_ui/material_ui.dart';
+import 'package:money_manager/core/utils/ledger_balance.dart';
 import 'package:money_manager/core/utils/money_format.dart';
 import 'package:money_manager/models/account_model.dart';
 import 'package:money_manager/models/category_model.dart';
-import 'package:money_manager/models/enums/week_start.dart';
-import 'package:money_manager/models/ledger_kinds.dart';
+import 'package:money_manager/models/enums/first_day_of_week.dart';
 import 'package:money_manager/models/transaction_model.dart';
 import 'package:money_manager/themes/app_themes.dart';
 import 'package:money_manager/themes/ledger_palette.dart';
@@ -13,22 +13,24 @@ import 'package:money_manager/widgets/transaction_item.dart';
 class HomeCalendarView extends StatelessWidget {
   const HomeCalendarView({
     required this.month,
-    required this.transactions,
+    required this.days,
+    required this.dayItems,
     required this.categories,
     required this.accounts,
     required this.selectedDay,
-    required this.weekStart,
+    required this.firstDayOfWeek,
     required this.locale,
     required this.onSelect,
     super.key,
   });
 
   final DateTime month;
-  final List<TransactionModel> transactions;
+  final List<DayLedger> days;
+  final List<TransactionModel> dayItems;
   final List<CategoryModel> categories;
   final List<AccountModel> accounts;
   final DateTime? selectedDay;
-  final WeekStart weekStart;
+  final FirstDayOfWeek firstDayOfWeek;
   final String locale;
   final ValueChanged<DateTime> onSelect;
 
@@ -42,11 +44,6 @@ class HomeCalendarView extends StatelessWidget {
             selected.month == month.month
         ? selected
         : DateTime(month.year, month.month);
-    final days = _indexDays(transactions);
-    final dayItems = selected == null
-        ? const <TransactionModel>[]
-        : days.items[DateTime(selected.year, selected.month, selected.day)] ??
-              const <TransactionModel>[];
     return Column(
       children: [
         Padding(
@@ -56,13 +53,12 @@ class HomeCalendarView extends StatelessWidget {
             child: LedgerCalendar(
               focusedDay: focused,
               selectedDay: selected,
-              weekStart: weekStart,
+              firstDayOfWeek: firstDayOfWeek,
               enableSwipe: false,
               onDaySelected: (day, _) =>
                   onSelect(DateTime(day.year, day.month, day.day)),
               dayDetail: (context, day) {
-                final net =
-                    days.nets[DateTime(day.year, day.month, day.day)] ?? 0;
+                final net = netOn(days, day);
                 if (net == 0) {
                   return null;
                 }
@@ -92,31 +88,4 @@ class HomeCalendarView extends StatelessWidget {
       ],
     );
   }
-}
-
-class _MonthDays {
-  final nets = <DateTime, int>{};
-  final items = <DateTime, List<TransactionModel>>{};
-}
-
-_MonthDays _indexDays(List<TransactionModel> transactions) {
-  final days = _MonthDays();
-  for (final transaction in transactions) {
-    final day = DateTime(
-      transaction.date.year,
-      transaction.date.month,
-      transaction.date.day,
-    );
-    (days.items[day] ??= []).add(transaction);
-    final delta = switch (transaction.type) {
-      TransactionType.income => transaction.amountMinor,
-      TransactionType.expense => -transaction.amountMinor,
-      _ => 0,
-    };
-    if (delta == 0) {
-      continue;
-    }
-    days.nets[day] = (days.nets[day] ?? 0) + delta;
-  }
-  return days;
 }

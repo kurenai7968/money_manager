@@ -2,6 +2,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:money_manager/pages/accounts/bloc/accounts_bloc.dart';
 import 'package:money_manager/pages/accounts/bloc/accounts_event.dart';
+import 'package:money_manager/pages/accounts/bloc/accounts_list_bloc.dart';
+import 'package:money_manager/pages/accounts/bloc/accounts_list_event.dart';
 import 'package:money_manager/pages/accounts/widgets/accounts_app_bar.dart';
 import 'package:money_manager/pages/accounts/widgets/accounts_body.dart';
 import 'package:money_manager/pages/transactions/bloc/transactions_bloc.dart';
@@ -20,7 +22,13 @@ class AccountsPage extends StatelessWidget {
         create: (context) =>
             TransactionsBloc(context.read(), context.read())
               ..add(const TransactionsStarted()),
-        child: const Scaffold(appBar: AccountsAppBar(), body: AccountsBody()),
+        child: BlocProvider(
+          create: (context) => AccountsListBloc(
+            accounts: context.read(),
+            transactions: context.read(),
+          )..add(const AccountsListStarted()),
+          child: const Scaffold(appBar: AccountsAppBar(), body: AccountsBody()),
+        ),
       ),
     );
   }

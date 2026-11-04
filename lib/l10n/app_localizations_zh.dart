@@ -238,6 +238,21 @@ class AppLocalizationsZh extends AppLocalizations {
   String get monday => '星期一';
 
   @override
+  String get tuesday => '星期二';
+
+  @override
+  String get wednesday => '星期三';
+
+  @override
+  String get thursday => '星期四';
+
+  @override
+  String get friday => '星期五';
+
+  @override
+  String get saturday => '星期六';
+
+  @override
   String get sunday => '星期日';
 
   @override
@@ -481,6 +496,21 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
 
   @override
   String get monday => '星期一';
+
+  @override
+  String get tuesday => '星期二';
+
+  @override
+  String get wednesday => '星期三';
+
+  @override
+  String get thursday => '星期四';
+
+  @override
+  String get friday => '星期五';
+
+  @override
+  String get saturday => '星期六';
 
   @override
   String get sunday => '星期日';

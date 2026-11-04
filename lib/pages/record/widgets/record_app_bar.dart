@@ -1,7 +1,13 @@
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:material_ui/material_ui.dart';
+import 'package:money_manager/blocs/app_setting_bloc/app_setting_bloc.dart';
 import 'package:money_manager/core/extensions/context_extension.dart';
+import 'package:money_manager/core/utils/cached_date_format.dart';
+import 'package:money_manager/l10n/app_localizations.dart';
 import 'package:money_manager/models/ledger_kinds.dart';
-import 'package:money_manager/pages/record/widgets/record_frame.dart';
+import 'package:money_manager/pages/record/bloc/record_bloc.dart';
+import 'package:money_manager/pages/record/bloc/record_event.dart';
+import 'package:money_manager/pages/record/widgets/record_date_dialog.dart';
 
 class RecordAppBar extends StatelessWidget implements PreferredSizeWidget {
   const RecordAppBar({super.key});
@@ -11,20 +17,24 @@ class RecordAppBar extends StatelessWidget implements PreferredSizeWidget {
 
   @override
   Widget build(BuildContext context) {
-    final frame = RecordFrame.of(context);
+    final state = context.watch<RecordBloc>().state;
     final l10n = context.l10n;
     final locale = Localizations.localeOf(context).toString();
     return AppBar(
       title: TextButton(
-        onPressed: frame.pickDate,
+        onPressed: () => _pickDate(context),
         child: Text(
-          frame.titleFor(locale),
+          _title(locale, state.date),
           style: Theme.of(context).textTheme.titleLarge,
         ),
       ),
       actions: [
-        if (frame.transactionId != null)
-          TextButton(onPressed: frame.delete, child: Text(l10n.delete)),
+        if (state.transactionId != null)
+          TextButton(
+            onPressed: () =>
+                context.read<RecordBloc>().add(const RecordDeletePressed()),
+            child: Text(l10n.delete),
+          ),
       ],
       bottom: PreferredSize(
         preferredSize: const Size.fromHeight(48),
@@ -33,16 +43,17 @@ class RecordAppBar extends StatelessWidget implements PreferredSizeWidget {
             for (final type in TransactionType.values)
               Expanded(
                 child: TextButton(
-                  onPressed: () => frame.change(() => frame.setType(type)),
+                  onPressed: () =>
+                      context.read<RecordBloc>().add(RecordTypeSelected(type)),
                   child: Text(
-                    frame.typeLabel(l10n, type),
+                    _typeLabel(l10n, type),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: TextStyle(
-                      color: frame.type == type
+                      color: state.type == type
                           ? Theme.of(context).colorScheme.primary
                           : Theme.of(context).colorScheme.onSurfaceVariant,
-                      fontWeight: frame.type == type
+                      fontWeight: state.type == type
                           ? FontWeight.w600
                           : FontWeight.w400,
                     ),
@@ -54,4 +65,39 @@ class RecordAppBar extends StatelessWidget implements PreferredSizeWidget {
       ),
     );
   }
+
+  Future<void> _pickDate(BuildContext context) async {
+    final bloc = context.read<RecordBloc>();
+    final firstDay = context
+        .read<AppSettingBloc>()
+        .state
+        .appSetting
+        .firstDayOfWeek;
+    final picked = await showDialog<DateTime>(
+      context: context,
+      builder: (context) {
+        return RecordDateDialog(
+          initial: bloc.state.date,
+          firstDayOfWeek: firstDay,
+        );
+      },
+    );
+    if (picked != null) {
+      bloc.add(RecordDateSelected(picked));
+    }
+  }
+}
+
+String _title(String locale, DateTime date) {
+  return locale.startsWith('zh')
+      ? cachedDateFormat(locale, 'M月d日').format(date)
+      : cachedMonthDay(locale).format(date);
+}
+
+String _typeLabel(AppLocalizations l10n, TransactionType value) {
+  return switch (value) {
+    TransactionType.expense => l10n.expense,
+    TransactionType.income => l10n.income,
+    TransactionType.transfer => l10n.transfer,
+  };
 }

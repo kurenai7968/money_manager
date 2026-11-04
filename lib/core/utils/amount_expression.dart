@@ -125,6 +125,19 @@ class AmountExpression {
     );
   }
 
+  @override
+  bool operator ==(Object other) {
+    return other is AmountExpression &&
+        other.current == current &&
+        other.accumulatorMinor == accumulatorMinor &&
+        other.operator == operator &&
+        other.replaceOnNextDigit == replaceOnNextDigit;
+  }
+
+  @override
+  int get hashCode =>
+      Object.hash(current, accumulatorMinor, operator, replaceOnNextDigit);
+
   AmountExpression copyWith({
     String? current,
     int? accumulatorMinor,

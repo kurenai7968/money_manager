@@ -2,12 +2,12 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:money_manager/core/extensions/context_extension.dart';
 import 'package:money_manager/core/utils/money_format.dart';
+import 'package:money_manager/models/account_model.dart';
 import 'package:money_manager/models/category_defaults.dart';
-import 'package:money_manager/models/ledger_kinds.dart';
-import 'package:money_manager/models/transaction_model.dart';
+import 'package:money_manager/models/category_model.dart';
 import 'package:money_manager/pages/accounts/bloc/accounts_bloc.dart';
 import 'package:money_manager/pages/accounts/bloc/accounts_event.dart';
-import 'package:money_manager/pages/analysis/widgets/analysis_frame.dart';
+import 'package:money_manager/pages/analysis/bloc/analysis_bloc.dart';
 import 'package:money_manager/pages/analysis/widgets/analysis_month_bars.dart';
 import 'package:money_manager/pages/analysis/widgets/analysis_total_row.dart';
 import 'package:money_manager/pages/categories/bloc/categories_bloc.dart';
@@ -37,26 +37,9 @@ class _AnalysisBodyState extends State<AnalysisBody> with RouteReload {
   Widget build(BuildContext context) {
     final l10n = context.l10n;
     final locale = Localizations.localeOf(context).toString();
-    final kind = AnalysisFrame.of(context).kind;
-    final now = DateTime.now();
-    final month = DateTime(now.year, now.month);
-    final transactions = context.watch<TransactionsBloc>().state.transactions;
-    final categories = context.watch<CategoriesBloc>().state.categories;
-    final accounts = context.watch<AccountsBloc>().state.active;
-    final rollup = _rollup(transactions, month, kind);
+    final state = context.watch<AnalysisBloc>().state;
+    final rollup = state.rollup;
     final current = rollup.current;
-    final previous = rollup.previous;
-    final delta = current - previous;
-    final months = rollup.months;
-    final monthValues = rollup.monthValues;
-    final maxValue = monthValues.fold<int>(
-      1,
-      (max, value) => value > max ? value : max,
-    );
-    final byCategory = rollup.byCategory;
-    final byAccount = rollup.byAccount;
-    final categoriesById = _firstById(categories, (category) => category.id);
-    final accountsById = _firstById(accounts, (account) => account.id);
     return ListView(
       padding: const EdgeInsets.all(AppSpacing.l),
       children: [
@@ -70,7 +53,7 @@ class _AnalysisBodyState extends State<AnalysisBody> with RouteReload {
           style: Theme.of(context).textTheme.headlineMedium,
         ),
         Text(
-          '${formatMinor(delta, locale: locale, signed: true)} · ${l10n.lastMonth} ${formatMinor(previous, locale: locale)}',
+          '${formatMinor(rollup.delta, locale: locale, signed: true)} · ${l10n.lastMonth} ${formatMinor(rollup.previous, locale: locale)}',
           style: Theme.of(context).textTheme.bodyMedium
               ?.copyWith(color: Theme.of(context).colorScheme.onSurfaceVariant),
         ),
@@ -81,122 +64,58 @@ class _AnalysisBodyState extends State<AnalysisBody> with RouteReload {
         ),
         const SizedBox(height: AppSpacing.m),
         AnalysisMonthBars(
-          months: months,
-          values: monthValues,
-          maxValue: maxValue,
+          months: rollup.months,
+          values: rollup.monthValues,
+          maxValue: rollup.maxValue,
         ),
         const SizedBox(height: AppSpacing.xl),
         Text(l10n.categories, style: Theme.of(context).textTheme.titleMedium),
-        for (final entry in byCategory.entries)
+        for (final entry in rollup.byCategory)
           AnalysisTotalRow(
             color: LedgerPalette.color(
-              categoriesById[entry.key]?.color ?? 'slate',
+              _category(state.categories, entry.id)?.color ?? 'slate',
             ),
             title:
-                categoriesById[entry.key]?.labelFor(
-                  context.categoryLanguageCode,
-                ) ??
+                _category(
+                  state.categories,
+                  entry.id,
+                )?.labelFor(context.categoryLanguageCode) ??
                 '',
-            amount: formatMinor(entry.value, locale: locale),
-            share: current == 0
-                ? ''
-                : '${(entry.value * 100 / current).round()}%',
+            amount: formatMinor(entry.amountMinor, locale: locale),
+            share: entry.sharePercent == null ? '' : '${entry.sharePercent}%',
           ),
         const SizedBox(height: AppSpacing.xl),
         Text(l10n.accounts, style: Theme.of(context).textTheme.titleMedium),
-        for (final entry in byAccount.entries)
+        for (final entry in rollup.byAccount)
           AnalysisTotalRow(
             color: Theme.of(context).colorScheme.primary,
             title:
-                accountsById[entry.key]?.labelFor(
-                  context.categoryLanguageCode,
-                ) ??
+                _account(
+                  state.accounts,
+                  entry.id,
+                )?.labelFor(context.categoryLanguageCode) ??
                 '',
-            amount: formatMinor(entry.value, locale: locale),
+            amount: formatMinor(entry.amountMinor, locale: locale),
           ),
       ],
     );
   }
 }
 
-class _Rollup {
-  _Rollup(this.months, this.monthValues, this.byCategory, this.byAccount);
-
-  final List<DateTime> months;
-  final List<int> monthValues;
-  final Map<String?, int> byCategory;
-  final Map<String?, int> byAccount;
-
-  int get current => monthValues.last;
-
-  int get previous => monthValues[monthValues.length - 2];
-}
-
-_Rollup _rollup(
-  List<TransactionModel> transactions,
-  DateTime month,
-  CategoryKind kind,
-) {
-  final months = [
-    for (var offset = 5; offset >= 0; offset--)
-      DateTime(month.year, month.month - offset),
-  ];
-  final income = List<int>.filled(months.length, 0);
-  final expense = List<int>.filled(months.length, 0);
-  final indexByMonth = <int, int>{
-    for (var index = 0; index < months.length; index++)
-      months[index].year * 12 + months[index].month: index,
-  };
-  final currentKey = month.year * 12 + month.month;
-  final byCategory = <String?, int>{};
-  final byAccount = <String?, int>{};
-  final wantExpense = kind == CategoryKind.expense;
-  for (final transaction in transactions) {
-    final index =
-        indexByMonth[transaction.date.year * 12 + transaction.date.month];
-    if (index == null) {
-      continue;
+CategoryModel? _category(List<CategoryModel> categories, String? id) {
+  for (final category in categories) {
+    if (category.id == id) {
+      return category;
     }
-    if (transaction.type == TransactionType.income) {
-      income[index] += transaction.amountMinor;
-    } else if (transaction.type == TransactionType.expense) {
-      expense[index] += transaction.amountMinor;
-    } else {
-      continue;
-    }
-    final matches = wantExpense
-        ? transaction.type == TransactionType.expense
-        : transaction.type == TransactionType.income;
-    if (!matches ||
-        transaction.date.year * 12 + transaction.date.month != currentKey) {
-      continue;
-    }
-    final categoryId = transaction.categoryId;
-    final accountId = transaction.accountId;
-    byCategory[categoryId] =
-        (byCategory[categoryId] ?? 0) + transaction.amountMinor;
-    byAccount[accountId] =
-        (byAccount[accountId] ?? 0) + transaction.amountMinor;
   }
-  final totals = wantExpense ? expense : income;
-  return _Rollup(
-    months,
-    totals,
-    _sortedTotals(byCategory),
-    _sortedTotals(byAccount),
-  );
+  return null;
 }
 
-Map<String?, int> _sortedTotals(Map<String?, int> totals) {
-  final entries = totals.entries.toList()
-    ..sort((a, b) => b.value.compareTo(a.value));
-  return {for (final entry in entries) entry.key: entry.value};
-}
-
-Map<String, T> _firstById<T>(List<T> items, String Function(T item) idOf) {
-  final index = <String, T>{};
-  for (final item in items) {
-    index.putIfAbsent(idOf(item), () => item);
+AccountModel? _account(List<AccountModel> accounts, String? id) {
+  for (final account in accounts) {
+    if (account.id == id) {
+      return account;
+    }
   }
-  return index;
+  return null;
 }

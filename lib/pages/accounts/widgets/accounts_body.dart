@@ -1,11 +1,10 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:money_manager/core/extensions/context_extension.dart';
-import 'package:money_manager/core/utils/ledger_balance.dart';
 import 'package:money_manager/core/utils/money_format.dart';
-import 'package:money_manager/models/ledger_kinds.dart';
 import 'package:money_manager/pages/accounts/bloc/accounts_bloc.dart';
 import 'package:money_manager/pages/accounts/bloc/accounts_event.dart';
+import 'package:money_manager/pages/accounts/bloc/accounts_list_bloc.dart';
 import 'package:money_manager/pages/accounts/bloc/accounts_state.dart';
 import 'package:money_manager/pages/accounts/widgets/account_section_label.dart';
 import 'package:money_manager/pages/accounts/widgets/account_sliver.dart';
@@ -39,23 +38,12 @@ class _AccountsBodyState extends State<AccountsBody> with RouteReload {
             ..showSnackBar(SnackBar(content: Text(l10n.archiveBlocked)));
         }
       },
-      builder: (context, state) {
-        final transactions = context
-            .watch<TransactionsBloc>()
-            .state
-            .transactions;
-        final accounts = state.active;
-        if (accounts.isEmpty) {
+      builder: (context, _) {
+        final overview = context.watch<AccountsListBloc>().state;
+        if (overview.assets.isEmpty && overview.liabilities.isEmpty) {
           return Center(child: Text(l10n.emptyAccounts));
         }
-        final assets = accounts
-            .where((account) => account.type != AccountType.credit)
-            .toList();
-        final liabilities = accounts
-            .where((account) => account.type == AccountType.credit)
-            .toList();
         final locale = Localizations.localeOf(context).toString();
-        final worth = netWorthOf(accounts, transactions);
         return CustomScrollView(
           slivers: [
             SliverToBoxAdapter(
@@ -76,30 +64,28 @@ class _AccountsBodyState extends State<AccountsBody> with RouteReload {
                       ),
                     ),
                     Text(
-                      formatMinor(worth, locale: locale),
+                      formatMinor(overview.netWorth, locale: locale),
                       style: Theme.of(context).textTheme.headlineMedium,
                     ),
                   ],
                 ),
               ),
             ),
-            if (assets.isNotEmpty) ...[
+            if (overview.assets.isNotEmpty) ...[
               SliverToBoxAdapter(child: AccountSectionLabel(l10n.assets)),
               AccountSliver(
                 key: const ValueKey('assets'),
-                accounts: assets,
-                transactions: transactions,
+                lines: overview.assets,
                 onReorder: (ids) => context.read<AccountsBloc>().add(
                   AccountsReorderPressed(ids),
                 ),
               ),
             ],
-            if (liabilities.isNotEmpty) ...[
+            if (overview.liabilities.isNotEmpty) ...[
               SliverToBoxAdapter(child: AccountSectionLabel(l10n.liabilities)),
               AccountSliver(
                 key: const ValueKey('liabilities'),
-                accounts: liabilities,
-                transactions: transactions,
+                lines: overview.liabilities,
                 onReorder: (ids) => context.read<AccountsBloc>().add(
                   AccountsReorderPressed(ids),
                 ),

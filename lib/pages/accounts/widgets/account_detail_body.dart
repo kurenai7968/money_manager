@@ -2,10 +2,10 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:money_manager/core/extensions/context_extension.dart';
-import 'package:money_manager/core/utils/ledger_balance.dart';
 import 'package:money_manager/core/utils/money_format.dart';
 import 'package:money_manager/models/category_defaults.dart';
 import 'package:money_manager/models/ledger_kinds.dart';
+import 'package:money_manager/pages/accounts/bloc/account_detail_bloc.dart';
 import 'package:money_manager/pages/accounts/bloc/accounts_bloc.dart';
 import 'package:money_manager/pages/accounts/bloc/accounts_event.dart';
 import 'package:money_manager/pages/categories/bloc/categories_bloc.dart';
@@ -38,25 +38,12 @@ class _AccountDetailBodyState extends State<AccountDetailBody>
   @override
   Widget build(BuildContext context) {
     final l10n = context.l10n;
-    final matches = context.watch<AccountsBloc>().state.accounts.where(
-      (account) => account.id == widget.accountId,
-    );
-    if (matches.isEmpty) {
+    final state = context.watch<AccountDetailBloc>().state;
+    final account = state.account;
+    if (account == null) {
       return const SizedBox.shrink();
     }
-    final account = matches.first;
     final locale = Localizations.localeOf(context).toString();
-    final transactions = context.watch<TransactionsBloc>().state.transactions;
-    final categories = context.watch<CategoriesBloc>().state.categories;
-    final accounts = context.watch<AccountsBloc>().state.accounts;
-    final history = [
-      for (final item in transactions)
-        if (item.accountId == account.id ||
-            item.fromAccountId == account.id ||
-            item.toAccountId == account.id)
-          item,
-    ];
-    final balance = balanceOf(account, history);
     final isCredit = account.type == AccountType.credit;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -73,7 +60,7 @@ class _AccountDetailBodyState extends State<AccountDetailBody>
                 ),
               ),
               Text(
-                formatMinor(balance, locale: locale),
+                formatMinor(state.balanceMinor, locale: locale),
                 style: Theme.of(context).textTheme.headlineMedium?.copyWith(
                   color: isCredit
                       ? Theme.of(context).colorScheme.primary
@@ -85,9 +72,9 @@ class _AccountDetailBodyState extends State<AccountDetailBody>
         ),
         Expanded(
           child: TransactionList(
-            transactions: history,
-            categories: categories,
-            accounts: accounts,
+            transactions: state.history,
+            categories: state.categories,
+            accounts: state.accounts,
             locale: locale,
           ),
         ),

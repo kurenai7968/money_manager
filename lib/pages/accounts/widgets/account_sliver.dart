@@ -1,20 +1,16 @@
 import 'package:material_ui/material_ui.dart';
-import 'package:money_manager/core/utils/ledger_balance.dart';
-import 'package:money_manager/models/account_model.dart';
-import 'package:money_manager/models/transaction_model.dart';
+import 'package:money_manager/pages/accounts/bloc/accounts_list_state.dart';
 import 'package:money_manager/pages/accounts/widgets/account_row.dart';
 import 'package:money_manager/widgets/ledger_reorder.dart';
 
 class AccountSliver extends StatefulWidget {
   const AccountSliver({
-    required this.accounts,
-    required this.transactions,
+    required this.lines,
     required this.onReorder,
     super.key,
   });
 
-  final List<AccountModel> accounts;
-  final List<TransactionModel> transactions;
+  final List<AccountLine> lines;
   final ValueChanged<List<String>> onReorder;
 
   @override
@@ -22,31 +18,26 @@ class AccountSliver extends StatefulWidget {
 }
 
 class _AccountSliverState extends State<AccountSliver> {
-  late List<AccountModel> _accounts = widget.accounts;
+  late List<AccountLine> _lines = widget.lines;
 
   @override
   void didUpdateWidget(AccountSliver oldWidget) {
     super.didUpdateWidget(oldWidget);
-    _accounts = syncReorder(
-      _accounts,
-      widget.accounts,
-      (account) => account.id,
-    );
+    _lines = syncReorder(_lines, widget.lines, (line) => line.account.id);
   }
 
   @override
   Widget build(BuildContext context) {
-    final balances = balancesOf(_accounts, widget.transactions);
     return SliverReorderableList(
-      itemCount: _accounts.length,
+      itemCount: _lines.length,
       proxyDecorator: ledgerReorderProxy,
       onReorderItem: _reorder,
       itemBuilder: (context, index) {
-        final account = _accounts[index];
+        final line = _lines[index];
         return AccountRow(
-          key: ValueKey(account.id),
-          account: account,
-          balance: balances[account.id] ?? account.openingBalanceMinor,
+          key: ValueKey(line.account.id),
+          account: line.account,
+          balance: line.balanceMinor,
           index: index,
         );
       },
@@ -54,10 +45,10 @@ class _AccountSliverState extends State<AccountSliver> {
   }
 
   void _reorder(int oldIndex, int newIndex) {
-    if (oldIndex < 0 || oldIndex >= _accounts.length || oldIndex == newIndex) {
+    if (oldIndex < 0 || oldIndex >= _lines.length || oldIndex == newIndex) {
       return;
     }
-    final updated = [..._accounts];
+    final updated = [..._lines];
     final moved = updated.removeAt(oldIndex);
     var target = newIndex;
     if (target < 0) {
@@ -66,7 +57,7 @@ class _AccountSliverState extends State<AccountSliver> {
       target = updated.length;
     }
     updated.insert(target, moved);
-    setState(() => _accounts = updated);
-    widget.onReorder([for (final account in updated) account.id]);
+    setState(() => _lines = updated);
+    widget.onReorder([for (final line in updated) line.account.id]);
   }
 }

@@ -5,9 +5,10 @@ import 'package:money_manager/pages/accounts/bloc/accounts_bloc.dart';
 import 'package:money_manager/pages/accounts/bloc/accounts_event.dart';
 import 'package:money_manager/pages/categories/bloc/categories_bloc.dart';
 import 'package:money_manager/pages/categories/bloc/categories_event.dart';
+import 'package:money_manager/pages/home/bloc/home_bloc.dart';
+import 'package:money_manager/pages/home/bloc/home_event.dart';
 import 'package:money_manager/pages/home/widgets/home_app_bar.dart';
 import 'package:money_manager/pages/home/widgets/home_body.dart';
-import 'package:money_manager/pages/home/widgets/home_frame.dart';
 import 'package:money_manager/pages/transactions/bloc/transactions_bloc.dart';
 import 'package:money_manager/pages/transactions/bloc/transactions_event.dart';
 
@@ -28,8 +29,13 @@ class HomePage extends StatelessWidget {
           create: (context) =>
               CategoriesBloc(context.read(), transactions: context.read())
                 ..add(CategoriesStarted(defaultCategories())),
-          child: const HomeFrame(
-            child: Scaffold(appBar: HomeAppBar(), body: HomeBody()),
+          child: BlocProvider(
+            create: (context) => HomeBloc(
+              transactions: context.read(),
+              categories: context.read(),
+              accounts: context.read(),
+            )..add(const HomeStarted()),
+            child: const Scaffold(appBar: HomeAppBar(), body: HomeBody()),
           ),
         ),
       ),

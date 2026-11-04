@@ -1,14 +1,15 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:money_manager/blocs/app_setting_bloc/app_setting_bloc.dart';
-import 'package:money_manager/core/utils/ledger_balance.dart';
 import 'package:money_manager/models/category_defaults.dart';
 import 'package:money_manager/pages/accounts/bloc/accounts_bloc.dart';
 import 'package:money_manager/pages/accounts/bloc/accounts_event.dart';
 import 'package:money_manager/pages/categories/bloc/categories_bloc.dart';
 import 'package:money_manager/pages/categories/bloc/categories_event.dart';
+import 'package:money_manager/pages/home/bloc/home_bloc.dart';
+import 'package:money_manager/pages/home/bloc/home_event.dart';
+import 'package:money_manager/pages/home/bloc/home_state.dart';
 import 'package:money_manager/pages/home/widgets/home_calendar_view.dart';
-import 'package:money_manager/pages/home/widgets/home_frame.dart';
 import 'package:money_manager/pages/home/widgets/home_summary_view.dart';
 import 'package:money_manager/pages/route_reload.dart';
 import 'package:money_manager/pages/transactions/bloc/transactions_bloc.dart';
@@ -31,42 +32,32 @@ class _HomeBodyState extends State<HomeBody> with RouteReload {
 
   @override
   Widget build(BuildContext context) {
-    final frame = HomeFrame.of(context);
+    final state = context.watch<HomeBloc>().state;
     final locale = Localizations.localeOf(context).toString();
-    final transactions = context.watch<TransactionsBloc>().state.transactions;
-    final categories = context.watch<CategoriesBloc>().state.categories;
-    final accounts = context.watch<AccountsBloc>().state.accounts;
-    final inMonth = transactions
-        .where(
-          (item) =>
-              item.date.year == frame.month.year &&
-              item.date.month == frame.month.month,
-        )
-        .toList();
-    final weekStart = context
+    final firstDay = context
         .watch<AppSettingBloc>()
         .state
         .appSetting
-        .weekStart;
-    final figures = monthFigures(inMonth, frame.month);
-    if (frame.view == HomeView.summary) {
+        .firstDayOfWeek;
+    if (state.view == HomeView.summary) {
       return HomeSummaryView(
-        figures: figures,
-        transactions: inMonth,
-        categories: categories,
-        accounts: accounts,
+        figures: state.figures,
+        transactions: state.transactions,
+        categories: state.categories,
+        accounts: state.accounts,
         locale: locale,
       );
     }
     return HomeCalendarView(
-      month: frame.month,
-      transactions: inMonth,
-      categories: categories,
-      accounts: accounts,
-      selectedDay: frame.selectedDay,
-      weekStart: weekStart,
+      month: state.month,
+      days: state.days,
+      dayItems: state.selectedTransactions,
+      categories: state.categories,
+      accounts: state.accounts,
+      selectedDay: state.selectedDay,
+      firstDayOfWeek: firstDay,
       locale: locale,
-      onSelect: frame.selectDay,
+      onSelect: (day) => context.read<HomeBloc>().add(HomeDaySelected(day)),
     );
   }
 }

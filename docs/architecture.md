@@ -61,6 +61,8 @@ lib/
 
 `AppProviders` provides the repositories and `AppSettingBloc`. `MaterialApp` reads language and appearance from `AppSettingBloc`, so that bloc stays above the router. A page creates the other blocs it uses and dispatches their start events. When an ancestor already provides one of those blocs, the page uses that instance. A page that stays mounted reloads those blocs when the route changes, so a save on another route shows up after returning.
 
+A screen bloc may subscribe to another bloc and emit the figures and lists that screen shows. The widget does not derive those figures.
+
 A page dispatches a bloc event. The bloc calls a repository. The repository reads and writes SQLite through `database/sqlite`, and key-value settings through `database/shared_preferences`. It throws exceptions from `core/errors/`. The bloc catches those exceptions and emits an error status. The repository persists entities with `fromJson` and `toJson`, then converts them with the mapping extensions in `core/mapping/`. Callers receive models. UI models contain no JSON serialization. Other layers do not import `sqflite` or `shared_preferences`.
 
 Saving an account keeps one transaction aligned with its opening balance. A positive balance stores an income of that amount. A negative balance stores an expense of the absolute amount. A zero balance deletes that transaction. The user edits that transaction on the record page. Saving it writes the signed amount back to the account opening balance: income is positive, expense is negative. Deleting it, changing it into a transfer, or moving it to another account sets the original opening balance to zero. An account that already has a non-zero opening balance and no matching transaction gets one when accounts load. A stored opening row is read as income.
@@ -129,7 +131,7 @@ An account's opening balance is an income or an expense on that account. The sto
 
 ### Settings
 
-`AppSettingBloc` stores language, appearance (`light`, `dark`, or `system`), and the first weekday. Amounts are stored as numbers.
+`AppSettingBloc` stores language, appearance (`light`, `dark`, or `system`), and the first day of the week. The first day of the week is `FirstDayOfWeek`, Monday through Sunday. The default is Monday. The stored value is the weekday name. Amounts are stored as numbers.
 
 ### Month
 
@@ -158,7 +160,7 @@ BlocProvider(
 )
 ```
 
-A page that needs more than one bloc nests those providers the same way. `SettingsPage` does not create `AppSettingBloc`. When the app bar and the body share view state, a frame widget between the provider and the scaffold holds that state. The page does not hold screen logic.
+A page that needs more than one bloc nests those providers the same way. `SettingsPage` does not create `AppSettingBloc`. The bloc for that screen holds the decisions shared by the app bar and the body: selected month, selected day, summary or calendar, analysis kind, and the record draft. Widgets read the bloc state and send events. They format text, paint, and lay out children. A widget keeps a controller only for a text field or a tab bar.
 
 Split the rest of a screen into small widgets by responsibility, section, or interaction. Keep widgets used by one feature in `pages/[feature_name]/widgets/`. Move a widget to `lib/widgets/` only when more than one feature uses it and it has no feature-specific presentation logic.
 
@@ -167,6 +169,8 @@ An account's opening balance appears in the account history and the home list as
 ## BLoC
 
 The page widget provides each feature bloc it uses, as in Widgets. `AppSettingBloc` is the exception and is created in `AppProviders`.
+
+Screen rules live in the bloc. That includes which transactions fall in the month, month totals, day nets, analysis rollups, asset and liability groups, net worth, account history, and whether a record or form can be saved. The bloc calls the pure functions in `core/utils/`. Widgets display the emitted state.
 
 Follow the [bloc library naming conventions](https://bloclibrary.dev/naming-conventions/).
 

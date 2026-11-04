@@ -1,6 +1,6 @@
 import 'package:material_ui/material_ui.dart';
 import 'package:money_manager/core/extensions/context_extension.dart';
-import 'package:money_manager/models/enums/week_start.dart';
+import 'package:money_manager/models/enums/first_day_of_week.dart';
 import 'package:money_manager/themes/app_themes.dart';
 import 'package:table_calendar/table_calendar.dart';
 
@@ -8,7 +8,7 @@ class LedgerCalendar extends StatelessWidget {
   const LedgerCalendar({
     required this.focusedDay,
     required this.selectedDay,
-    required this.weekStart,
+    required this.firstDayOfWeek,
     required this.onDaySelected,
     this.onPageChanged,
     this.dayDetail,
@@ -22,7 +22,7 @@ class LedgerCalendar extends StatelessWidget {
 
   final DateTime focusedDay;
   final DateTime? selectedDay;
-  final WeekStart weekStart;
+  final FirstDayOfWeek firstDayOfWeek;
   final void Function(DateTime selectedDay, DateTime focusedDay) onDaySelected;
   final ValueChanged<DateTime>? onPageChanged;
   final Widget? Function(BuildContext context, DateTime day)? dayDetail;
@@ -76,9 +76,7 @@ class LedgerCalendar extends StatelessWidget {
           ? AvailableGestures.horizontalSwipe
           : AvailableGestures.none,
       rangeSelectionMode: RangeSelectionMode.disabled,
-      startingDayOfWeek: weekStart == WeekStart.monday
-          ? StartingDayOfWeek.monday
-          : StartingDayOfWeek.sunday,
+      startingDayOfWeek: firstDayOfWeek.toStartingDayOfWeek(),
       selectedDayPredicate: (day) =>
           selectedDay != null && isSameDay(selectedDay, day),
       onDaySelected: onDaySelected,

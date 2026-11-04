@@ -5,8 +5,9 @@ import 'package:money_manager/blocs/app_setting_bloc/app_setting_bloc.dart';
 import 'package:money_manager/blocs/app_setting_bloc/app_setting_event.dart';
 import 'package:money_manager/blocs/app_setting_bloc/app_setting_state.dart';
 import 'package:money_manager/core/extensions/context_extension.dart';
+import 'package:money_manager/l10n/app_localizations.dart';
 import 'package:money_manager/models/enums/app_appearance.dart';
-import 'package:money_manager/models/enums/week_start.dart';
+import 'package:money_manager/models/enums/first_day_of_week.dart';
 import 'package:money_manager/pages/settings/widgets/settings_choice_sheet.dart';
 import 'package:money_manager/pages/settings/widgets/settings_row.dart';
 import 'package:money_manager/pages/settings/widgets/settings_section.dart';
@@ -79,20 +80,18 @@ class SettingsBody extends StatelessWidget {
             ),
             SettingsRow(
               title: l10n.weekStart,
-              value: setting.weekStart == WeekStart.monday
-                  ? l10n.monday
-                  : l10n.sunday,
-              onTap: () => showSettingsChoice<WeekStart>(
+              value: _weekdayLabel(l10n, setting.firstDayOfWeek),
+              onTap: () => showSettingsChoice<FirstDayOfWeek>(
                 context,
                 title: l10n.weekStart,
                 options: [
-                  (WeekStart.monday, l10n.monday),
-                  (WeekStart.sunday, l10n.sunday),
+                  for (final day in FirstDayOfWeek.values)
+                    (day, _weekdayLabel(l10n, day)),
                 ],
-                selected: setting.weekStart,
+                selected: setting.firstDayOfWeek,
                 onSelected: (value) {
                   context.read<AppSettingBloc>().add(
-                    AppSettingChanged(setting.copyWith(weekStart: value)),
+                    AppSettingChanged(setting.copyWith(firstDayOfWeek: value)),
                   );
                 },
               ),
@@ -109,4 +108,16 @@ class SettingsBody extends StatelessWidget {
       },
     );
   }
+}
+
+String _weekdayLabel(AppLocalizations l10n, FirstDayOfWeek day) {
+  return switch (day) {
+    FirstDayOfWeek.monday => l10n.monday,
+    FirstDayOfWeek.tuesday => l10n.tuesday,
+    FirstDayOfWeek.wednesday => l10n.wednesday,
+    FirstDayOfWeek.thursday => l10n.thursday,
+    FirstDayOfWeek.friday => l10n.friday,
+    FirstDayOfWeek.saturday => l10n.saturday,
+    FirstDayOfWeek.sunday => l10n.sunday,
+  };
 }
