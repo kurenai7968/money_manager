@@ -20,7 +20,8 @@ class AccountFormPage extends StatelessWidget {
             ..add(const AccountsStarted()),
       child: BlocProvider(
         create: (context) =>
-            TransactionsBloc(context.read())..add(const TransactionsStarted()),
+            TransactionsBloc(context.read(), context.read())
+              ..add(const TransactionsStarted()),
         child: Scaffold(
           appBar: AccountFormAppBar(editing: accountId != null),
           body: AccountFormBody(accountId: accountId),

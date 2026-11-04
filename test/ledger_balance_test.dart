@@ -76,10 +76,10 @@ void main() {
     expect(figures.balanceMinor, 3800);
   });
 
-  test('opening transaction is counted once and stays out of the month', () {
+  test('opening income is counted once and included in the month', () {
     final opening = TransactionModel(
       id: 'opening-cash',
-      type: TransactionType.opening,
+      type: TransactionType.income,
       amountMinor: 10000,
       date: DateTime(2026, 10, 1),
       accountId: 'cash',
@@ -98,7 +98,7 @@ void main() {
       balanceOf(card.copyWith(openingBalanceMinor: 1200), [
         TransactionModel(
           id: 'opening-card',
-          type: TransactionType.opening,
+          type: TransactionType.income,
           amountMinor: 1200,
           date: DateTime(2026, 10, 1),
           accountId: 'card',
@@ -107,8 +107,26 @@ void main() {
       1200,
     );
     final figures = monthFigures([opening, expense], DateTime(2026, 10));
-    expect(figures.incomeMinor, 0);
+    expect(figures.incomeMinor, 10000);
     expect(figures.expenseMinor, 2000);
-    expect(figures.balanceMinor, -2000);
+    expect(figures.balanceMinor, 8000);
+  });
+
+  test('negative opening expense is counted once', () {
+    final opening = TransactionModel(
+      id: 'opening-cash',
+      type: TransactionType.expense,
+      amountMinor: 500,
+      date: DateTime(2026, 10, 1),
+      accountId: 'cash',
+    );
+
+    expect(
+      balanceOf(cash.copyWith(openingBalanceMinor: -500), [opening]),
+      -500,
+    );
+    final figures = monthFigures([opening], DateTime(2026, 10));
+    expect(figures.incomeMinor, 0);
+    expect(figures.expenseMinor, 500);
   });
 }

@@ -75,7 +75,7 @@ void main() {
     verify: (bloc) {
       expect(bloc.state.netWorth, 1500);
       final opening = transactions.transactions.single;
-      expect(opening.type, TransactionType.opening);
+      expect(opening.type, TransactionType.income);
       expect(opening.accountId, cash.id);
       expect(opening.amountMinor, 1500);
       expect(opening.categoryId, isNull);
@@ -91,18 +91,23 @@ void main() {
       transactions.transactions.add(
         TransactionModel(
           id: 'opening-cash',
-          type: TransactionType.opening,
+          type: TransactionType.income,
           amountMinor: 100,
           date: DateTime(2026, 1, 1),
+          note: 'start',
           accountId: cash.id,
+          categoryId: 'salary',
         ),
       );
     },
     act: (bloc) => bloc.add(const AccountSavePressed(cash)),
     verify: (bloc) {
       final opening = transactions.transactions.single;
+      expect(opening.type, TransactionType.income);
       expect(opening.amountMinor, 1500);
       expect(opening.date, DateTime(2026, 1, 1));
+      expect(opening.note, 'start');
+      expect(opening.categoryId, 'salary');
       expect(bloc.state.accounts.single.openingBalanceMinor, 1500);
     },
   );
@@ -114,7 +119,7 @@ void main() {
       transactions.transactions.add(
         TransactionModel(
           id: 'opening-cash',
-          type: TransactionType.opening,
+          type: TransactionType.income,
           amountMinor: 1500,
           date: DateTime(2026, 1, 1),
           accountId: cash.id,
@@ -140,8 +145,38 @@ void main() {
       expect(bloc.state.accounts.single.openingBalanceMinor, 1500);
       final opening = transactions.transactions.single;
       expect(opening.id, 'opening-cash');
+      expect(opening.type, TransactionType.income);
       expect(opening.amountMinor, 1500);
       expect(opening.accountId, cash.id);
+    },
+  );
+
+  blocTest<AccountsBloc, AccountsState>(
+    'saves a negative opening balance as an expense',
+    build: () => AccountsBloc(repository, transactions),
+    setUp: () {
+      transactions.transactions.add(
+        TransactionModel(
+          id: 'opening-cash',
+          type: TransactionType.income,
+          amountMinor: 1500,
+          date: DateTime(2026, 1, 1),
+          note: 'start',
+          accountId: cash.id,
+          categoryId: 'salary',
+        ),
+      );
+    },
+    act: (bloc) =>
+        bloc.add(AccountSavePressed(cash.copyWith(openingBalanceMinor: -400))),
+    verify: (bloc) {
+      final opening = transactions.transactions.single;
+      expect(opening.type, TransactionType.expense);
+      expect(opening.amountMinor, 400);
+      expect(opening.categoryId, isNull);
+      expect(opening.note, 'start');
+      expect(opening.date, DateTime(2026, 1, 1));
+      expect(bloc.state.accounts.single.openingBalanceMinor, -400);
     },
   );
 

@@ -1,4 +1,5 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:money_manager/core/utils/opening_transaction.dart';
 import 'package:money_manager/models/account_defaults.dart';
 import 'package:money_manager/models/account_model.dart';
 import 'package:money_manager/models/ledger_kinds.dart';
@@ -53,15 +54,6 @@ class AccountsBloc extends Bloc<AccountsEvent, AccountsState> {
         state.copyWith(
           status: AccountsStatus.failure,
           error: AccountsError.nameRequired,
-        ),
-      );
-      return;
-    }
-    if (event.account.openingBalanceMinor < 0) {
-      emit(
-        state.copyWith(
-          status: AccountsStatus.failure,
-          error: AccountsError.saveFailed,
         ),
       );
       return;
@@ -141,34 +133,30 @@ class AccountsBloc extends Bloc<AccountsEvent, AccountsState> {
   Future<void> _syncOpeningTransactions(List<AccountModel> accounts) async {
     final existing = await _transactions.getAll();
     for (final account in accounts) {
-      final id = 'opening-${account.id}';
-      final prior = existing
-          .where(
-            (item) =>
-                item.id == id ||
-                (item.type == TransactionType.opening &&
-                    item.accountId == account.id),
-          )
-          .toList();
-      if (account.openingBalanceMinor <= 0) {
+      final id = openingTransactionId(account.id);
+      final prior = existing.where((item) => item.id == id).toList();
+      if (account.openingBalanceMinor == 0) {
         for (final item in prior) {
           await _transactions.delete(item.id);
         }
         continue;
       }
-      final kept = prior.where((item) => item.id == id);
+      final previous = prior.isEmpty ? null : prior.first;
+      final type = account.openingBalanceMinor > 0
+          ? TransactionType.income
+          : TransactionType.expense;
+      final sameType = previous != null && previous.type == type;
       await _transactions.save(
         TransactionModel(
           id: id,
-          type: TransactionType.opening,
-          amountMinor: account.openingBalanceMinor,
-          date: kept.isEmpty ? DateTime.now() : kept.first.date,
+          type: type,
+          amountMinor: account.openingBalanceMinor.abs(),
+          date: previous?.date ?? DateTime.now(),
+          note: previous?.note ?? '',
           accountId: account.id,
+          categoryId: sameType ? previous?.categoryId : null,
         ),
       );
-      for (final extra in prior.where((item) => item.id != id)) {
-        await _transactions.delete(extra.id);
-      }
     }
   }
 }

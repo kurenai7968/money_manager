@@ -6,7 +6,9 @@ extension TransactionEntityMapping on TransactionEntity {
   TransactionModel toModel() {
     return TransactionModel(
       id: id,
-      type: TransactionType.values.byName(type),
+      type: type == 'opening'
+          ? TransactionType.income
+          : TransactionType.values.byName(type),
       amountMinor: amountMinor,
       date: DateTime.parse(date),
       note: note ?? '',

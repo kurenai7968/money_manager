@@ -105,12 +105,14 @@ void main() {
     );
   });
 
-  testWidgets('opening balance is labeled and not editable', (tester) async {
+  testWidgets('opening balance opens the record page as income', (
+    tester,
+  ) async {
     await _pumpItem(
       tester,
       transaction: TransactionModel(
         id: 'opening-cash',
-        type: TransactionType.opening,
+        type: TransactionType.income,
         amountMinor: 5000,
         date: DateTime(2026, 10, 30),
         accountId: _cash.id,
@@ -119,10 +121,10 @@ void main() {
       accounts: const [_cash],
     );
 
-    expect(find.text('Opening balance'), findsOneWidget);
-    expect(find.text('50'), findsOneWidget);
+    expect(find.text('Income'), findsOneWidget);
+    expect(find.text('+50'), findsOneWidget);
     expect(find.text('Cash'), findsOneWidget);
-    expect(tester.widget<InkWell>(find.byType(InkWell)).onTap, isNull);
+    expect(tester.widget<InkWell>(find.byType(InkWell)).onTap, isNotNull);
   });
 
   testWidgets('day header shows the date and that day expense', (tester) async {

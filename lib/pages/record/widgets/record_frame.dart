@@ -259,7 +259,7 @@ class RecordFrameState extends State<RecordFrame> {
     if (loaded.isEmpty) {
       return l10n.needAccount;
     }
-    if (type == TransactionType.opening || amount == null || amount <= 0) {
+    if (amount == null || amount <= 0) {
       return l10n.invalidTransaction;
     }
     final known = loaded.map((account) => account.id).toSet();
@@ -295,7 +295,6 @@ class RecordFrameState extends State<RecordFrame> {
       TransactionType.expense => l10n.expense,
       TransactionType.income => l10n.income,
       TransactionType.transfer => l10n.transfer,
-      TransactionType.opening => l10n.openingBalance,
     };
   }
 

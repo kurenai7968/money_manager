@@ -139,10 +139,8 @@ class TransactionItem extends StatelessWidget {
     return Material(
       type: MaterialType.transparency,
       child: InkWell(
-        onTap: transaction.type == TransactionType.opening
-            ? null
-            : () =>
-                  context.push('${AppRoutes.record.path}?id=${transaction.id}'),
+        onTap: () =>
+            context.push('${AppRoutes.record.path}?id=${transaction.id}'),
         child: Padding(
           padding: const EdgeInsets.symmetric(
             horizontal: AppSpacing.l,
@@ -240,7 +238,6 @@ class TransactionItem extends StatelessWidget {
       TransactionType.expense => l10n.expense,
       TransactionType.income => l10n.income,
       TransactionType.transfer => l10n.transfer,
-      TransactionType.opening => l10n.openingBalance,
     };
   }
 
@@ -277,8 +274,7 @@ class TransactionItem extends StatelessWidget {
 
   String _amount() {
     final minor = transaction.amountMinor;
-    if (transaction.type == TransactionType.transfer ||
-        transaction.type == TransactionType.opening) {
+    if (transaction.type == TransactionType.transfer) {
       return formatMinor(minor, locale: locale);
     }
     return formatMinor(
@@ -290,8 +286,7 @@ class TransactionItem extends StatelessWidget {
 
   Color _amountColor(BuildContext context, CategoryModel? category) {
     final scheme = Theme.of(context).colorScheme;
-    if (transaction.type == TransactionType.transfer ||
-        transaction.type == TransactionType.opening) {
+    if (transaction.type == TransactionType.transfer) {
       return scheme.onSurface;
     }
     if (category != null) {
@@ -325,7 +320,6 @@ class _TransactionIcon extends StatelessWidget {
       foreground = scheme.onSurface;
       icon = switch (type) {
         TransactionType.transfer => Icons.swap_horiz,
-        TransactionType.opening => Icons.account_balance_wallet_outlined,
         _ => Icons.circle_outlined,
       };
     }

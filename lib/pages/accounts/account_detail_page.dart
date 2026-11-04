@@ -23,7 +23,8 @@ class AccountDetailPage extends StatelessWidget {
             ..add(const AccountsStarted()),
       child: BlocProvider(
         create: (context) =>
-            TransactionsBloc(context.read())..add(const TransactionsStarted()),
+            TransactionsBloc(context.read(), context.read())
+              ..add(const TransactionsStarted()),
         child: BlocProvider(
           create: (context) =>
               CategoriesBloc(context.read(), transactions: context.read())

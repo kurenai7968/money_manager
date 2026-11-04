@@ -117,7 +117,10 @@ class _AccountFormBodyState extends State<AccountFormBody> {
           const SizedBox(height: AppSpacing.s),
           TextField(
             controller: _balance,
-            keyboardType: const TextInputType.numberWithOptions(decimal: true),
+            keyboardType: const TextInputType.numberWithOptions(
+              decimal: true,
+              signed: true,
+            ),
           ),
           const SizedBox(height: AppSpacing.xl),
           Wrap(

@@ -1,3 +1,4 @@
+import 'package:money_manager/core/utils/opening_transaction.dart';
 import 'package:money_manager/models/account_model.dart';
 import 'package:money_manager/models/ledger_kinds.dart';
 import 'package:money_manager/models/transaction_model.dart';
@@ -15,8 +16,14 @@ Map<String, int> balancesOf(
   for (final transaction in transactions) {
     switch (transaction.type) {
       case TransactionType.expense:
+        if (isOpeningBalanceTransaction(transaction)) {
+          break;
+        }
         _apply(byId, balances, transaction.accountId, -transaction.amountMinor);
       case TransactionType.income:
+        if (isOpeningBalanceTransaction(transaction)) {
+          break;
+        }
         _apply(byId, balances, transaction.accountId, transaction.amountMinor);
       case TransactionType.transfer:
         _apply(
@@ -31,8 +38,6 @@ Map<String, int> balancesOf(
           transaction.fromAccountId,
           -transaction.amountMinor,
         );
-      case TransactionType.opening:
-        break;
     }
   }
   return balances;

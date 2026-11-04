@@ -8,7 +8,8 @@ void main() {
     expect(parseAmountMinor('12.5'), 1250);
     expect(parseAmountMinor('12.50'), 1250);
     expect(parseAmountMinor('1,280'), 128000);
-    expect(parseAmountMinor('-1'), isNull);
+    expect(parseAmountMinor('-1'), -100);
+    expect(parseAmountMinor('-12.5'), -1250);
     expect(parseAmountMinor('1.234'), isNull);
   });
 

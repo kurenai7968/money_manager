@@ -30,9 +30,7 @@ class RecordAppBar extends StatelessWidget implements PreferredSizeWidget {
         preferredSize: const Size.fromHeight(48),
         child: Row(
           children: [
-            for (final type in TransactionType.values.where(
-              (type) => type != TransactionType.opening,
-            ))
+            for (final type in TransactionType.values)
               Expanded(
                 child: TextButton(
                   onPressed: () => frame.change(() => frame.setType(type)),
