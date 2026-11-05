@@ -122,6 +122,7 @@ class LedgerCalendar extends StatelessWidget {
             day: day,
             selected: selectedDay != null && isSameDay(selectedDay, day),
             detail: dayDetail?.call(context, day),
+            reserveDetail: dayDetail != null,
           );
         },
       ),
@@ -144,39 +145,54 @@ class _DayCell extends StatelessWidget {
     required this.day,
     required this.selected,
     required this.detail,
+    required this.reserveDetail,
   });
 
   final DateTime day;
   final bool selected;
   final Widget? detail;
+  final bool reserveDetail;
 
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
-    return FittedBox(
-      fit: BoxFit.scaleDown,
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          DecoratedBox(
-            decoration: BoxDecoration(
-              color: selected ? scheme.primary : Colors.transparent,
-              shape: BoxShape.circle,
-            ),
-            child: Padding(
-              padding: const EdgeInsets.all(AppSpacing.s),
-              child: Text(
-                '${day.day}',
-                style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                  color: selected ? scheme.onPrimary : scheme.onSurface,
-                ),
-              ),
-            ),
-          ),
-          ?detail,
-        ],
+    final label = Padding(
+      padding: const EdgeInsets.all(AppSpacing.s),
+      child: Text(
+        '${day.day}',
+        style: Theme.of(context).textTheme.labelMedium
+            ?.copyWith(color: selected ? scheme.onPrimary : scheme.onSurface),
       ),
     );
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.end,
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Center(
+          child: selected
+              ? DecoratedBox(
+                  decoration: BoxDecoration(
+                    color: scheme.primary,
+                    shape: BoxShape.circle,
+                  ),
+                  child: label,
+                )
+              : label,
+        ),
+        if (reserveDetail)
+          SizedBox(
+            height: _detailExtent(context),
+            child: detail == null
+                ? null
+                : FittedBox(fit: BoxFit.scaleDown, child: detail),
+          ),
+      ],
+    );
   }
+}
+
+double _detailExtent(BuildContext context) {
+  final style = Theme.of(context).textTheme.labelMedium!;
+  return MediaQuery.textScalerOf(context)
+      .scale(style.fontSize! * style.height!);
 }
