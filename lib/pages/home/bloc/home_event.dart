@@ -12,9 +12,9 @@ class HomeStarted extends HomeEvent {
 }
 
 class HomeMonthShifted extends HomeEvent {
-  const HomeMonthShifted(this.delta);
-
   final int delta;
+
+  const HomeMonthShifted(this.delta);
 
   @override
   List<Object?> get props => [delta];
@@ -25,9 +25,9 @@ class HomeViewToggled extends HomeEvent {
 }
 
 class HomeDaySelected extends HomeEvent {
-  const HomeDaySelected(this.day);
-
   final DateTime day;
+
+  const HomeDaySelected(this.day);
 
   @override
   List<Object?> get props => [day];

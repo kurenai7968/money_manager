@@ -9,6 +9,12 @@ import 'package:money_manager/repositories/category_repository.dart';
 import 'package:money_manager/repositories/transaction_repository.dart';
 
 class AppProviders extends StatelessWidget {
+  final Widget child;
+  final AccountRepository? accounts;
+  final CategoryRepository? categories;
+  final TransactionRepository? transactions;
+  final AppSettingRepository? settings;
+
   const AppProviders({
     super.key,
     required this.child,
@@ -17,12 +23,6 @@ class AppProviders extends StatelessWidget {
     this.transactions,
     this.settings,
   });
-
-  final Widget child;
-  final AccountRepository? accounts;
-  final CategoryRepository? categories;
-  final TransactionRepository? transactions;
-  final AppSettingRepository? settings;
 
   @override
   Widget build(BuildContext context) {

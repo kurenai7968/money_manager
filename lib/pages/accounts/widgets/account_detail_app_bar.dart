@@ -7,9 +7,9 @@ import 'package:money_manager/routes/app_routes.dart';
 
 class AccountDetailAppBar extends StatelessWidget
     implements PreferredSizeWidget {
-  const AccountDetailAppBar({required this.accountId, super.key});
-
   final String accountId;
+
+  const AccountDetailAppBar({required this.accountId, super.key});
 
   @override
   Size get preferredSize => const Size.fromHeight(kToolbarHeight);

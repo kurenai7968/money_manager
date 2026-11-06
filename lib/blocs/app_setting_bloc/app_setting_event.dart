@@ -13,9 +13,9 @@ class AppSettingInitialized extends AppSettingEvent {
 }
 
 class AppSettingChanged extends AppSettingEvent {
-  const AppSettingChanged(this.appSetting);
-
   final AppSettingModel appSetting;
+
+  const AppSettingChanged(this.appSetting);
 
   @override
   List<Object?> get props => [appSetting];

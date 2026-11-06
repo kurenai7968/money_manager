@@ -10,37 +10,37 @@ sealed class CategoriesEvent extends Equatable {
 }
 
 class CategoriesStarted extends CategoriesEvent {
-  const CategoriesStarted(this.defaults);
-
   final List<CategoryModel> defaults;
+
+  const CategoriesStarted(this.defaults);
 
   @override
   List<Object?> get props => [defaults];
 }
 
 class CategorySavePressed extends CategoriesEvent {
-  const CategorySavePressed(this.category);
-
   final CategoryModel category;
+
+  const CategorySavePressed(this.category);
 
   @override
   List<Object?> get props => [category];
 }
 
 class CategoryDeletePressed extends CategoriesEvent {
-  const CategoryDeletePressed(this.id);
-
   final String id;
+
+  const CategoryDeletePressed(this.id);
 
   @override
   List<Object?> get props => [id];
 }
 
 class CategoriesReorderPressed extends CategoriesEvent {
-  const CategoriesReorderPressed(this.kind, this.ids);
-
   final CategoryKind kind;
   final List<String> ids;
+
+  const CategoriesReorderPressed(this.kind, this.ids);
 
   @override
   List<Object?> get props => [kind, ids];

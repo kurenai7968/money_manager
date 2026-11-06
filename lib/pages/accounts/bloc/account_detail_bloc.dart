@@ -13,6 +13,12 @@ import 'package:money_manager/pages/transactions/bloc/transactions_bloc.dart';
 import 'package:money_manager/pages/transactions/bloc/transactions_state.dart';
 
 class AccountDetailBloc extends Bloc<AccountDetailEvent, AccountDetailState> {
+  final String accountId;
+  final AccountsBloc _accounts;
+  final TransactionsBloc _transactions;
+  final CategoriesBloc _categories;
+  final _subscriptions = <StreamSubscription<dynamic>>[];
+
   AccountDetailBloc({
     required this.accountId,
     required AccountsBloc accounts,
@@ -25,12 +31,6 @@ class AccountDetailBloc extends Bloc<AccountDetailEvent, AccountDetailState> {
     on<AccountDetailStarted>(_onStarted);
     on<AccountDetailSourcesChanged>(_onSourcesChanged);
   }
-
-  final String accountId;
-  final AccountsBloc _accounts;
-  final TransactionsBloc _transactions;
-  final CategoriesBloc _categories;
-  final _subscriptions = <StreamSubscription<dynamic>>[];
 
   void _listen() {
     if (_subscriptions.isNotEmpty) {

@@ -13,14 +13,14 @@ import 'package:money_manager/themes/app_themes.dart';
 import 'package:money_manager/themes/ledger_palette.dart';
 
 class CategoryFormBody extends StatefulWidget {
+  final String? categoryId;
+  final CategoryKind initialKind;
+
   const CategoryFormBody({
     this.categoryId,
     this.initialKind = CategoryKind.expense,
     super.key,
   });
-
-  final String? categoryId;
-  final CategoryKind initialKind;
 
   @override
   State<CategoryFormBody> createState() => _CategoryFormBodyState();

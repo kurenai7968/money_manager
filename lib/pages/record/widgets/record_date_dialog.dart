@@ -6,14 +6,14 @@ import 'package:money_manager/themes/app_themes.dart';
 import 'package:money_manager/widgets/ledger_calendar.dart';
 
 class RecordDateDialog extends StatefulWidget {
+  final DateTime initial;
+  final FirstDayOfWeek firstDayOfWeek;
+
   const RecordDateDialog({
     required this.initial,
     required this.firstDayOfWeek,
     super.key,
   });
-
-  final DateTime initial;
-  final FirstDayOfWeek firstDayOfWeek;
 
   @override
   State<RecordDateDialog> createState() => _RecordDateDialogState();

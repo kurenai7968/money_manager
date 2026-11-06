@@ -6,15 +6,15 @@ enum TransactionsStatus { initial, loading, success, failure }
 enum TransactionsError { none, saveFailed, invalid }
 
 class TransactionsState extends Equatable {
+  final TransactionsStatus status;
+  final List<TransactionModel> transactions;
+  final TransactionsError error;
+
   const TransactionsState({
     this.status = TransactionsStatus.initial,
     this.transactions = const [],
     this.error = TransactionsError.none,
   });
-
-  final TransactionsStatus status;
-  final List<TransactionModel> transactions;
-  final TransactionsError error;
 
   TransactionsState copyWith({
     TransactionsStatus? status,

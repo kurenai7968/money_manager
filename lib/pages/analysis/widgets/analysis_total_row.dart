@@ -1,6 +1,11 @@
 import 'package:material_ui/material_ui.dart';
 
 class AnalysisTotalRow extends StatelessWidget {
+  final Color color;
+  final String title;
+  final String amount;
+  final String share;
+
   const AnalysisTotalRow({
     required this.color,
     required this.title,
@@ -8,11 +13,6 @@ class AnalysisTotalRow extends StatelessWidget {
     this.share = '',
     super.key,
   });
-
-  final Color color;
-  final String title;
-  final String amount;
-  final String share;
 
   @override
   Widget build(BuildContext context) {

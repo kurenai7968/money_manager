@@ -5,6 +5,11 @@ part 'app_setting_entity.g.dart';
 
 @JsonSerializable(fieldRename: FieldRename.snake)
 class AppSettingEntity extends Equatable {
+  final String languageCode;
+  final String countryCode;
+  final String appearance;
+  final String firstDayOfWeek;
+
   const AppSettingEntity({
     required this.languageCode,
     required this.countryCode,
@@ -14,11 +19,6 @@ class AppSettingEntity extends Equatable {
 
   factory AppSettingEntity.fromJson(Map<String, dynamic> json) =>
       _$AppSettingEntityFromJson(json);
-
-  final String languageCode;
-  final String countryCode;
-  final String appearance;
-  final String firstDayOfWeek;
 
   Map<String, dynamic> toJson() => _$AppSettingEntityToJson(this);
 

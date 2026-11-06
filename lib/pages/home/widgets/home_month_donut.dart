@@ -4,6 +4,11 @@ import 'package:material_ui/material_ui.dart';
 import 'package:money_manager/themes/ledger_palette.dart';
 
 class HomeMonthDonut extends StatelessWidget {
+  final int income;
+  final int expense;
+  final String label;
+  final String amount;
+
   const HomeMonthDonut({
     required this.income,
     required this.expense,
@@ -11,11 +16,6 @@ class HomeMonthDonut extends StatelessWidget {
     required this.amount,
     super.key,
   });
-
-  final int income;
-  final int expense;
-  final String label;
-  final String amount;
 
   @override
   Widget build(BuildContext context) {
@@ -52,6 +52,12 @@ class HomeMonthDonut extends StatelessWidget {
 }
 
 class _DonutPainter extends CustomPainter {
+  final int income;
+  final int expense;
+  final Color incomeColor;
+  final Color expenseColor;
+  final Color trackColor;
+
   _DonutPainter({
     required this.income,
     required this.expense,
@@ -59,12 +65,6 @@ class _DonutPainter extends CustomPainter {
     required this.expenseColor,
     required this.trackColor,
   });
-
-  final int income;
-  final int expense;
-  final Color incomeColor;
-  final Color expenseColor;
-  final Color trackColor;
 
   @override
   void paint(Canvas canvas, Size size) {

@@ -18,9 +18,9 @@ import 'package:money_manager/themes/app_themes.dart';
 import 'package:money_manager/widgets/transaction_item.dart';
 
 class AccountDetailBody extends StatefulWidget {
-  const AccountDetailBody({required this.accountId, super.key});
-
   final String accountId;
+
+  const AccountDetailBody({required this.accountId, super.key});
 
   @override
   State<AccountDetailBody> createState() => _AccountDetailBodyState();

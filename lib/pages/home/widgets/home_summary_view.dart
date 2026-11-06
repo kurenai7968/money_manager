@@ -11,6 +11,12 @@ import 'package:money_manager/themes/ledger_palette.dart';
 import 'package:money_manager/widgets/transaction_item.dart';
 
 class HomeSummaryView extends StatelessWidget {
+  final MonthFigures figures;
+  final List<TransactionModel> transactions;
+  final List<CategoryModel> categories;
+  final List<AccountModel> accounts;
+  final String locale;
+
   const HomeSummaryView({
     required this.figures,
     required this.transactions,
@@ -19,12 +25,6 @@ class HomeSummaryView extends StatelessWidget {
     required this.locale,
     super.key,
   });
-
-  final MonthFigures figures;
-  final List<TransactionModel> transactions;
-  final List<CategoryModel> categories;
-  final List<AccountModel> accounts;
-  final String locale;
 
   @override
   Widget build(BuildContext context) {

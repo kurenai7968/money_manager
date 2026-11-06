@@ -13,18 +13,18 @@ class TransactionsStarted extends TransactionsEvent {
 }
 
 class TransactionSavePressed extends TransactionsEvent {
-  const TransactionSavePressed(this.transaction);
-
   final TransactionModel transaction;
+
+  const TransactionSavePressed(this.transaction);
 
   @override
   List<Object?> get props => [transaction];
 }
 
 class TransactionDeletePressed extends TransactionsEvent {
-  const TransactionDeletePressed(this.id);
-
   final String id;
+
+  const TransactionDeletePressed(this.id);
 
   @override
   List<Object?> get props => [id];

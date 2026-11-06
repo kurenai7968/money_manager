@@ -16,6 +16,21 @@ enum RecordError {
 }
 
 class RecordState extends Equatable {
+  final RecordStatus status;
+  final RecordError error;
+  final bool closePage;
+  final TransactionType type;
+  final DateTime date;
+  final String note;
+  final String? accountId;
+  final String? categoryId;
+  final String? fromId;
+  final String? toId;
+  final String? transactionId;
+  final AmountExpression expression;
+  final List<AccountModel> accounts;
+  final List<CategoryModel> visibleCategories;
+
   const RecordState({
     this.status = RecordStatus.initial,
     this.error = RecordError.none,
@@ -32,21 +47,6 @@ class RecordState extends Equatable {
     this.accounts = const [],
     this.visibleCategories = const [],
   });
-
-  final RecordStatus status;
-  final RecordError error;
-  final bool closePage;
-  final TransactionType type;
-  final DateTime date;
-  final String note;
-  final String? accountId;
-  final String? categoryId;
-  final String? fromId;
-  final String? toId;
-  final String? transactionId;
-  final AmountExpression expression;
-  final List<AccountModel> accounts;
-  final List<CategoryModel> visibleCategories;
 
   int? get result => expression.resultMinor;
 

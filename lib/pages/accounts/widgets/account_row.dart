@@ -9,16 +9,16 @@ import 'package:money_manager/themes/app_themes.dart';
 import 'package:money_manager/themes/ledger_palette.dart';
 
 class AccountRow extends StatelessWidget {
+  final AccountModel account;
+  final int balance;
+  final int index;
+
   const AccountRow({
     required this.account,
     required this.balance,
     required this.index,
     super.key,
   });
-
-  final AccountModel account;
-  final int balance;
-  final int index;
 
   @override
   Widget build(BuildContext context) {

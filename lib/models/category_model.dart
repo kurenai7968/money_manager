@@ -2,6 +2,17 @@ import 'package:equatable/equatable.dart';
 import 'package:money_manager/models/ledger_kinds.dart';
 
 class CategoryModel extends Equatable {
+  final String id;
+  final String? name;
+  final String? languageEn;
+  final String? languageZh;
+  final String? languageZhCn;
+  final String icon;
+  final String color;
+  final CategoryKind kind;
+  final int sortOrder;
+  final bool archived;
+
   const CategoryModel({
     required this.id,
     this.name,
@@ -14,17 +25,6 @@ class CategoryModel extends Equatable {
     required this.sortOrder,
     this.archived = false,
   });
-
-  final String id;
-  final String? name;
-  final String? languageEn;
-  final String? languageZh;
-  final String? languageZhCn;
-  final String icon;
-  final String color;
-  final CategoryKind kind;
-  final int sortOrder;
-  final bool archived;
 
   String labelFor(String languageCode) {
     final localized = switch (languageCode) {

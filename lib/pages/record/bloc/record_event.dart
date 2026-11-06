@@ -10,87 +10,87 @@ sealed class RecordEvent extends Equatable {
 }
 
 class RecordStarted extends RecordEvent {
+  final String? transactionId;
+  final TransactionType? initialType;
+  final String? initialAccountId;
+
   const RecordStarted({
     this.transactionId,
     this.initialType,
     this.initialAccountId,
   });
 
-  final String? transactionId;
-  final TransactionType? initialType;
-  final String? initialAccountId;
-
   @override
   List<Object?> get props => [transactionId, initialType, initialAccountId];
 }
 
 class RecordTypeSelected extends RecordEvent {
-  const RecordTypeSelected(this.type);
-
   final TransactionType type;
+
+  const RecordTypeSelected(this.type);
 
   @override
   List<Object?> get props => [type];
 }
 
 class RecordDateSelected extends RecordEvent {
-  const RecordDateSelected(this.date);
-
   final DateTime date;
+
+  const RecordDateSelected(this.date);
 
   @override
   List<Object?> get props => [date];
 }
 
 class RecordNoteChanged extends RecordEvent {
-  const RecordNoteChanged(this.note);
-
   final String note;
+
+  const RecordNoteChanged(this.note);
 
   @override
   List<Object?> get props => [note];
 }
 
 class RecordAccountSelected extends RecordEvent {
-  const RecordAccountSelected(this.accountId);
-
   final String accountId;
+
+  const RecordAccountSelected(this.accountId);
 
   @override
   List<Object?> get props => [accountId];
 }
 
 class RecordCategorySelected extends RecordEvent {
-  const RecordCategorySelected(this.categoryId);
-
   final String categoryId;
+
+  const RecordCategorySelected(this.categoryId);
 
   @override
   List<Object?> get props => [categoryId];
 }
 
 class RecordTransferFromSelected extends RecordEvent {
-  const RecordTransferFromSelected(this.accountId);
-
   final String accountId;
+
+  const RecordTransferFromSelected(this.accountId);
 
   @override
   List<Object?> get props => [accountId];
 }
 
 class RecordTransferToSelected extends RecordEvent {
-  const RecordTransferToSelected(this.accountId);
-
   final String accountId;
+
+  const RecordTransferToSelected(this.accountId);
 
   @override
   List<Object?> get props => [accountId];
 }
 
 class RecordDigitPressed extends RecordEvent {
-  const RecordDigitPressed(this.digit);
-
   final String digit;
+
+  const RecordDigitPressed(this.digit);
 
   @override
   List<Object?> get props => [digit];
@@ -113,9 +113,9 @@ class RecordClearPressed extends RecordEvent {
 }
 
 class RecordOperatorPressed extends RecordEvent {
-  const RecordOperatorPressed(this.operator);
-
   final AmountOperator operator;
+
+  const RecordOperatorPressed(this.operator);
 
   @override
   List<Object?> get props => [operator];
@@ -134,9 +134,9 @@ class RecordDeletePressed extends RecordEvent {
 }
 
 class RecordSourcesChanged extends RecordEvent {
-  const RecordSourcesChanged({this.transactions = false});
-
   final bool transactions;
+
+  const RecordSourcesChanged({this.transactions = false});
 
   @override
   List<Object?> get props => [transactions];

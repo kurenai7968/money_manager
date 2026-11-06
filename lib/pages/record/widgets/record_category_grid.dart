@@ -6,19 +6,18 @@ import 'package:money_manager/themes/app_themes.dart';
 import 'package:money_manager/themes/ledger_palette.dart';
 
 class RecordCategoryGrid extends StatelessWidget {
+  final List<CategoryModel> categories;
+  final String? selectedId;
+  final ValueChanged<String> onSelected;
+  @visibleForTesting
+  static int debugBuildCount = 0;
+
   const RecordCategoryGrid({
     required this.categories,
     required this.selectedId,
     required this.onSelected,
     super.key,
   });
-
-  final List<CategoryModel> categories;
-  final String? selectedId;
-  final ValueChanged<String> onSelected;
-
-  @visibleForTesting
-  static int debugBuildCount = 0;
 
   @override
   Widget build(BuildContext context) {

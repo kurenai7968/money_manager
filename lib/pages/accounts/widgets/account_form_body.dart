@@ -10,9 +10,9 @@ import 'package:money_manager/pages/accounts/bloc/account_form_state.dart';
 import 'package:money_manager/themes/app_themes.dart';
 
 class AccountFormBody extends StatefulWidget {
-  const AccountFormBody({this.accountId, super.key});
-
   final String? accountId;
+
+  const AccountFormBody({this.accountId, super.key});
 
   @override
   State<AccountFormBody> createState() => _AccountFormBodyState();

@@ -2,9 +2,9 @@ import 'package:material_ui/material_ui.dart';
 import 'package:money_manager/core/extensions/context_extension.dart';
 
 class RecordNoteDialog extends StatefulWidget {
-  const RecordNoteDialog({required this.initial, super.key});
-
   final String initial;
+
+  const RecordNoteDialog({required this.initial, super.key});
 
   @override
   State<RecordNoteDialog> createState() => _RecordNoteDialogState();

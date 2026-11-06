@@ -6,6 +6,19 @@ enum AccountFormStatus { initial, success, failure }
 enum AccountFormError { none, nameRequired, amountInvalid, archiveBlocked }
 
 class AccountFormState extends Equatable {
+  final AccountFormStatus status;
+  final AccountFormError error;
+  final String accountId;
+  final bool prepared;
+  final bool editing;
+  final bool saved;
+  final AccountType type;
+  final int sortOrder;
+  final bool archived;
+  final String name;
+  final String balanceText;
+  final bool localized;
+
   const AccountFormState({
     required this.accountId,
     this.status = AccountFormStatus.initial,
@@ -20,19 +33,6 @@ class AccountFormState extends Equatable {
     this.balanceText = '',
     this.localized = false,
   });
-
-  final AccountFormStatus status;
-  final AccountFormError error;
-  final String accountId;
-  final bool prepared;
-  final bool editing;
-  final bool saved;
-  final AccountType type;
-  final int sortOrder;
-  final bool archived;
-  final String name;
-  final String balanceText;
-  final bool localized;
 
   AccountFormState copyWith({
     AccountFormStatus? status,

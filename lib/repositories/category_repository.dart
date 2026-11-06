@@ -18,9 +18,9 @@ abstract interface class CategoryRepository {
 }
 
 class SqliteCategoryRepository implements CategoryRepository {
-  SqliteCategoryRepository(this._database);
-
   final AppDatabase _database;
+
+  SqliteCategoryRepository(this._database);
 
   @override
   Future<List<CategoryModel>> getAll() {

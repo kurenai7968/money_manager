@@ -17,11 +17,10 @@ abstract interface class SqlExecutor {
 }
 
 class AppDatabase implements SqlExecutor {
-  AppDatabase._();
-
   static final AppDatabase instance = AppDatabase._();
-
   Database? _database;
+
+  AppDatabase._();
 
   Future<void> initialize({String? path}) async {
     if (_database != null) return;
@@ -109,9 +108,9 @@ class AppDatabase implements SqlExecutor {
 }
 
 class _SqlTransaction implements SqlExecutor {
-  _SqlTransaction(this._transaction);
-
   final Transaction _transaction;
+
+  _SqlTransaction(this._transaction);
 
   @override
   Future<void> update(

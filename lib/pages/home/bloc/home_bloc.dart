@@ -12,6 +12,12 @@ import 'package:money_manager/pages/transactions/bloc/transactions_bloc.dart';
 import 'package:money_manager/pages/transactions/bloc/transactions_state.dart';
 
 class HomeBloc extends Bloc<HomeEvent, HomeState> {
+  final TransactionsBloc _transactions;
+  final CategoriesBloc _categories;
+  final AccountsBloc _accounts;
+  final DateTime Function() _now;
+  final _subscriptions = <StreamSubscription<dynamic>>[];
+
   HomeBloc({
     required TransactionsBloc transactions,
     required CategoriesBloc categories,
@@ -28,12 +34,6 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     on<HomeDaySelected>(_onDaySelected);
     on<HomeSourcesChanged>(_onSourcesChanged);
   }
-
-  final TransactionsBloc _transactions;
-  final CategoriesBloc _categories;
-  final AccountsBloc _accounts;
-  final DateTime Function() _now;
-  final _subscriptions = <StreamSubscription<dynamic>>[];
 
   static HomeState _initial(DateTime Function() now) {
     final today = now();

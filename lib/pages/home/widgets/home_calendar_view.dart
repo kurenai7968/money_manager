@@ -11,6 +11,16 @@ import 'package:money_manager/widgets/ledger_calendar.dart';
 import 'package:money_manager/widgets/transaction_item.dart';
 
 class HomeCalendarView extends StatelessWidget {
+  final DateTime month;
+  final List<DayLedger> days;
+  final List<TransactionModel> dayItems;
+  final List<CategoryModel> categories;
+  final List<AccountModel> accounts;
+  final DateTime? selectedDay;
+  final FirstDayOfWeek firstDayOfWeek;
+  final String locale;
+  final ValueChanged<DateTime> onSelect;
+
   const HomeCalendarView({
     required this.month,
     required this.days,
@@ -23,16 +33,6 @@ class HomeCalendarView extends StatelessWidget {
     required this.onSelect,
     super.key,
   });
-
-  final DateTime month;
-  final List<DayLedger> days;
-  final List<TransactionModel> dayItems;
-  final List<CategoryModel> categories;
-  final List<AccountModel> accounts;
-  final DateTime? selectedDay;
-  final FirstDayOfWeek firstDayOfWeek;
-  final String locale;
-  final ValueChanged<DateTime> onSelect;
 
   @override
   Widget build(BuildContext context) {

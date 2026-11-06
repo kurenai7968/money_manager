@@ -6,6 +6,17 @@ part 'account_entity.g.dart';
 
 @JsonSerializable(fieldRename: FieldRename.snake)
 class AccountEntity extends Equatable {
+  final String id;
+  final String? name;
+  final String? languageEn;
+  final String? languageZh;
+  final String? languageZhCn;
+  final String type;
+  final int openingBalance;
+  final int sortOrder;
+  @BoolIntConverter()
+  final bool archived;
+
   const AccountEntity({
     required this.id,
     this.name,
@@ -20,18 +31,6 @@ class AccountEntity extends Equatable {
 
   factory AccountEntity.fromJson(Map<String, dynamic> json) =>
       _$AccountEntityFromJson(json);
-
-  final String id;
-  final String? name;
-  final String? languageEn;
-  final String? languageZh;
-  final String? languageZhCn;
-  final String type;
-  final int openingBalance;
-  final int sortOrder;
-
-  @BoolIntConverter()
-  final bool archived;
 
   Map<String, dynamic> toJson() => _$AccountEntityToJson(this);
 

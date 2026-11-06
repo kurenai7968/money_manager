@@ -4,27 +4,27 @@ import 'package:money_manager/models/account_model.dart';
 enum AccountsListStatus { initial, success, failure }
 
 class AccountLine extends Equatable {
-  const AccountLine({required this.account, required this.balanceMinor});
-
   final AccountModel account;
   final int balanceMinor;
+
+  const AccountLine({required this.account, required this.balanceMinor});
 
   @override
   List<Object?> get props => [account, balanceMinor];
 }
 
 class AccountsListState extends Equatable {
+  final AccountsListStatus status;
+  final List<AccountLine> assets;
+  final List<AccountLine> liabilities;
+  final int netWorth;
+
   const AccountsListState({
     this.status = AccountsListStatus.initial,
     this.assets = const [],
     this.liabilities = const [],
     this.netWorth = 0,
   });
-
-  final AccountsListStatus status;
-  final List<AccountLine> assets;
-  final List<AccountLine> liabilities;
-  final int netWorth;
 
   AccountsListState copyWith({
     AccountsListStatus? status,

@@ -13,6 +13,17 @@ import 'package:money_manager/pages/accounts/bloc/accounts_state.dart';
 import 'package:money_manager/pages/transactions/bloc/transactions_bloc.dart';
 
 class AccountFormBloc extends Bloc<AccountFormEvent, AccountFormState> {
+  final AccountsBloc _accounts;
+  final TransactionsBloc _transactions;
+  final _subscriptions = <StreamSubscription<dynamic>>[];
+  var _prepared = false;
+  var _submitting = false;
+  String? _languageCode;
+  String? _languageEn;
+  String? _languageZh;
+  String? _languageZhCn;
+  var _locale = 'en';
+
   AccountFormBloc({
     required AccountsBloc accounts,
     required TransactionsBloc transactions,
@@ -25,17 +36,6 @@ class AccountFormBloc extends Bloc<AccountFormEvent, AccountFormState> {
     on<AccountFormArchivePressed>(_onArchive);
     on<AccountFormSourcesChanged>(_onSourcesChanged);
   }
-
-  final AccountsBloc _accounts;
-  final TransactionsBloc _transactions;
-  final _subscriptions = <StreamSubscription<dynamic>>[];
-  var _prepared = false;
-  var _submitting = false;
-  String? _languageCode;
-  String? _languageEn;
-  String? _languageZh;
-  String? _languageZhCn;
-  var _locale = 'en';
 
   void _listen() {
     if (_subscriptions.isNotEmpty) {

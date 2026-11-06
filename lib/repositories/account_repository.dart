@@ -18,9 +18,9 @@ abstract interface class AccountRepository {
 }
 
 class SqliteAccountRepository implements AccountRepository {
-  SqliteAccountRepository(this._database);
-
   final AppDatabase _database;
+
+  SqliteAccountRepository(this._database);
 
   @override
   Future<List<AccountModel>> getAll() {

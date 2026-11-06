@@ -11,6 +11,10 @@ import 'package:money_manager/pages/transactions/bloc/transactions_bloc.dart';
 import 'package:money_manager/pages/transactions/bloc/transactions_state.dart';
 
 class AccountsListBloc extends Bloc<AccountsListEvent, AccountsListState> {
+  final AccountsBloc _accounts;
+  final TransactionsBloc _transactions;
+  final _subscriptions = <StreamSubscription<dynamic>>[];
+
   AccountsListBloc({
     required AccountsBloc accounts,
     required TransactionsBloc transactions,
@@ -20,10 +24,6 @@ class AccountsListBloc extends Bloc<AccountsListEvent, AccountsListState> {
     on<AccountsListStarted>(_onStarted);
     on<AccountsListSourcesChanged>(_onSourcesChanged);
   }
-
-  final AccountsBloc _accounts;
-  final TransactionsBloc _transactions;
-  final _subscriptions = <StreamSubscription<dynamic>>[];
 
   void _listen() {
     if (_subscriptions.isNotEmpty) {

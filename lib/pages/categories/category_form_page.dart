@@ -8,14 +8,14 @@ import 'package:money_manager/pages/categories/widgets/category_form_app_bar.dar
 import 'package:money_manager/pages/categories/widgets/category_form_body.dart';
 
 class CategoryFormPage extends StatelessWidget {
+  final String? categoryId;
+  final CategoryKind initialKind;
+
   const CategoryFormPage({
     this.categoryId,
     this.initialKind = CategoryKind.expense,
     super.key,
   });
-
-  final String? categoryId;
-  final CategoryKind initialKind;
 
   @override
   Widget build(BuildContext context) {

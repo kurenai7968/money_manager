@@ -1,17 +1,17 @@
 enum AmountOperator { add, subtract, multiply, divide }
 
 class AmountExpression {
+  final String current;
+  final int? accumulatorMinor;
+  final AmountOperator? operator;
+  final bool replaceOnNextDigit;
+
   const AmountExpression({
     this.current = '0',
     this.accumulatorMinor,
     this.operator,
     this.replaceOnNextDigit = false,
   });
-
-  final String current;
-  final int? accumulatorMinor;
-  final AmountOperator? operator;
-  final bool replaceOnNextDigit;
 
   static AmountExpression fromMinor(int minor) {
     return AmountExpression(current: _plain(minor));

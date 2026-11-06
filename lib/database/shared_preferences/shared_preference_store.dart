@@ -3,11 +3,10 @@ import 'package:money_manager/core/errors/app_exception.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class SharedPreferenceManager {
-  SharedPreferenceManager._();
-
   static final SharedPreferenceManager instance = SharedPreferenceManager._();
-
   SharedPreferenceStore? _store;
+
+  SharedPreferenceManager._();
 
   SharedPreferenceStore get store {
     final store = _store;
@@ -31,9 +30,9 @@ class SharedPreferenceManager {
 }
 
 class SharedPreferenceStore {
-  SharedPreferenceStore(this._preferences);
-
   final SharedPreferences _preferences;
+
+  SharedPreferenceStore(this._preferences);
 
   String? getString(String key) => _preferences.getString(key);
 

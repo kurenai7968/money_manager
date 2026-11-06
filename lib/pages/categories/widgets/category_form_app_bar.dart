@@ -3,9 +3,9 @@ import 'package:money_manager/core/extensions/context_extension.dart';
 
 class CategoryFormAppBar extends StatelessWidget
     implements PreferredSizeWidget {
-  const CategoryFormAppBar({required this.editing, super.key});
-
   final bool editing;
+
+  const CategoryFormAppBar({required this.editing, super.key});
 
   @override
   Size get preferredSize => const Size.fromHeight(kToolbarHeight);

@@ -3,32 +3,32 @@ import 'package:money_manager/models/ledger_kinds.dart';
 import 'package:money_manager/models/transaction_model.dart';
 
 class AnalysisTotal extends Equatable {
+  final String? id;
+  final int amountMinor;
+  final int? sharePercent;
+
   const AnalysisTotal({
     required this.id,
     required this.amountMinor,
     this.sharePercent,
   });
 
-  final String? id;
-  final int amountMinor;
-  final int? sharePercent;
-
   @override
   List<Object?> get props => [id, amountMinor, sharePercent];
 }
 
 class AnalysisRollup extends Equatable {
+  final List<DateTime> months;
+  final List<int> monthValues;
+  final List<AnalysisTotal> byCategory;
+  final List<AnalysisTotal> byAccount;
+
   const AnalysisRollup({
     required this.months,
     required this.monthValues,
     required this.byCategory,
     required this.byAccount,
   });
-
-  final List<DateTime> months;
-  final List<int> monthValues;
-  final List<AnalysisTotal> byCategory;
-  final List<AnalysisTotal> byAccount;
 
   int get current => monthValues.last;
 

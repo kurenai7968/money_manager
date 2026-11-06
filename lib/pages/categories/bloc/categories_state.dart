@@ -6,15 +6,15 @@ enum CategoriesStatus { initial, loading, success, failure }
 enum CategoriesError { none, saveFailed, nameRequired }
 
 class CategoriesState extends Equatable {
+  final CategoriesStatus status;
+  final List<CategoryModel> categories;
+  final CategoriesError error;
+
   const CategoriesState({
     this.status = CategoriesStatus.initial,
     this.categories = const [],
     this.error = CategoriesError.none,
   });
-
-  final CategoriesStatus status;
-  final List<CategoryModel> categories;
-  final CategoriesError error;
 
   List<CategoryModel> get active =>
       categories.where((category) => !category.archived).toList();

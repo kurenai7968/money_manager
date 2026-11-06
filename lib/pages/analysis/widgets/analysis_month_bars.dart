@@ -1,16 +1,16 @@
 import 'package:material_ui/material_ui.dart';
 
 class AnalysisMonthBars extends StatelessWidget {
+  final List<DateTime> months;
+  final List<int> values;
+  final int maxValue;
+
   const AnalysisMonthBars({
     required this.months,
     required this.values,
     required this.maxValue,
     super.key,
   });
-
-  final List<DateTime> months;
-  final List<int> values;
-  final int maxValue;
 
   @override
   Widget build(BuildContext context) {

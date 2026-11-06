@@ -6,6 +6,12 @@ import 'package:money_manager/themes/app_themes.dart';
 import 'package:money_manager/widgets/ledger_sheet.dart';
 
 class RecordTransferFields extends StatelessWidget {
+  final List<AccountModel> accounts;
+  final String? fromId;
+  final String? toId;
+  final ValueChanged<String> onFrom;
+  final ValueChanged<String> onTo;
+
   const RecordTransferFields({
     required this.accounts,
     required this.fromId,
@@ -14,12 +20,6 @@ class RecordTransferFields extends StatelessWidget {
     required this.onTo,
     super.key,
   });
-
-  final List<AccountModel> accounts;
-  final String? fromId;
-  final String? toId;
-  final ValueChanged<String> onFrom;
-  final ValueChanged<String> onTo;
 
   @override
   Widget build(BuildContext context) {

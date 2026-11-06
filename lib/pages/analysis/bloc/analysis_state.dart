@@ -7,6 +7,13 @@ import 'package:money_manager/models/ledger_kinds.dart';
 enum AnalysisStatus { initial, success, failure }
 
 class AnalysisState extends Equatable {
+  final AnalysisStatus status;
+  final DateTime month;
+  final CategoryKind kind;
+  final AnalysisRollup rollup;
+  final List<CategoryModel> categories;
+  final List<AccountModel> accounts;
+
   const AnalysisState({
     required this.month,
     required this.rollup,
@@ -15,13 +22,6 @@ class AnalysisState extends Equatable {
     this.categories = const [],
     this.accounts = const [],
   });
-
-  final AnalysisStatus status;
-  final DateTime month;
-  final CategoryKind kind;
-  final AnalysisRollup rollup;
-  final List<CategoryModel> categories;
-  final List<AccountModel> accounts;
 
   AnalysisState copyWith({
     AnalysisStatus? status,

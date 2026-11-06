@@ -6,15 +6,15 @@ enum AccountsStatus { initial, loading, success, failure }
 enum AccountsError { none, saveFailed, archiveBlocked, nameRequired }
 
 class AccountsState extends Equatable {
+  final AccountsStatus status;
+  final List<AccountModel> accounts;
+  final AccountsError error;
+
   const AccountsState({
     this.status = AccountsStatus.initial,
     this.accounts = const [],
     this.error = AccountsError.none,
   });
-
-  final AccountsStatus status;
-  final List<AccountModel> accounts;
-  final AccountsError error;
 
   List<AccountModel> get active =>
       accounts.where((account) => !account.archived).toList();

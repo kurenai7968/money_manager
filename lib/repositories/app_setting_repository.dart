@@ -14,9 +14,9 @@ abstract interface class AppSettingRepository {
 }
 
 class AppSettingRepositoryImpl implements AppSettingRepository {
-  AppSettingRepositoryImpl({required this.store});
-
   final SharedPreferenceStore store;
+
+  AppSettingRepositoryImpl({required this.store});
 
   @override
   Future<AppSettingModel> getAppSetting() async {
@@ -28,9 +28,8 @@ class AppSettingRepositoryImpl implements AppSettingRepository {
       if (decoded is! Map) {
         throw const FormatException('App setting JSON is not an object');
       }
-      return AppSettingEntity.fromJson(
-        Map<String, dynamic>.from(decoded),
-      ).toModel();
+      return AppSettingEntity.fromJson(Map<String, dynamic>.from(decoded))
+          .toModel();
     } on CacheException {
       rethrow;
     } catch (error) {

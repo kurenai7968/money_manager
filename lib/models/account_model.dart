@@ -2,6 +2,16 @@ import 'package:equatable/equatable.dart';
 import 'package:money_manager/models/ledger_kinds.dart';
 
 class AccountModel extends Equatable {
+  final String id;
+  final String? name;
+  final String? languageEn;
+  final String? languageZh;
+  final String? languageZhCn;
+  final AccountType type;
+  final int openingBalanceMinor;
+  final int sortOrder;
+  final bool archived;
+
   const AccountModel({
     required this.id,
     this.name,
@@ -13,16 +23,6 @@ class AccountModel extends Equatable {
     required this.sortOrder,
     this.archived = false,
   });
-
-  final String id;
-  final String? name;
-  final String? languageEn;
-  final String? languageZh;
-  final String? languageZhCn;
-  final AccountType type;
-  final int openingBalanceMinor;
-  final int sortOrder;
-  final bool archived;
 
   String labelFor(String languageCode) {
     final localized = switch (languageCode) {

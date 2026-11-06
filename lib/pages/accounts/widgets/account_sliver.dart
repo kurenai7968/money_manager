@@ -4,14 +4,14 @@ import 'package:money_manager/pages/accounts/widgets/account_row.dart';
 import 'package:money_manager/widgets/ledger_reorder.dart';
 
 class AccountSliver extends StatefulWidget {
+  final List<AccountLine> lines;
+  final ValueChanged<List<String>> onReorder;
+
   const AccountSliver({
     required this.lines,
     required this.onReorder,
     super.key,
   });
-
-  final List<AccountLine> lines;
-  final ValueChanged<List<String>> onReorder;
 
   @override
   State<AccountSliver> createState() => _AccountSliverState();

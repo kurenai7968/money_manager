@@ -9,15 +9,15 @@ import 'package:money_manager/repositories/account_repository.dart';
 import 'package:money_manager/repositories/transaction_repository.dart';
 
 class TransactionsBloc extends Bloc<TransactionsEvent, TransactionsState> {
+  final TransactionRepository _repository;
+  final AccountRepository _accounts;
+
   TransactionsBloc(this._repository, this._accounts)
     : super(const TransactionsState()) {
     on<TransactionsStarted>(_onStarted);
     on<TransactionSavePressed>(_onSave);
     on<TransactionDeletePressed>(_onDelete);
   }
-
-  final TransactionRepository _repository;
-  final AccountRepository _accounts;
 
   Future<void> _onStarted(
     TransactionsStarted event,

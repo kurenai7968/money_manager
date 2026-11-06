@@ -10,6 +10,9 @@ import 'package:money_manager/repositories/account_repository.dart';
 import 'package:money_manager/repositories/transaction_repository.dart';
 
 class AccountsBloc extends Bloc<AccountsEvent, AccountsState> {
+  final AccountRepository _repository;
+  final TransactionRepository _transactions;
+
   AccountsBloc(this._repository, this._transactions)
     : super(const AccountsState()) {
     on<AccountsStarted>(_onAccountsStarted);
@@ -17,9 +20,6 @@ class AccountsBloc extends Bloc<AccountsEvent, AccountsState> {
     on<AccountArchivePressed>(_onAccountArchivePressed);
     on<AccountsReorderPressed>(_onAccountsReorderPressed);
   }
-
-  final AccountRepository _repository;
-  final TransactionRepository _transactions;
 
   Future<void> _onAccountsStarted(
     AccountsStarted event,

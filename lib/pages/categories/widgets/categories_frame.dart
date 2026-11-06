@@ -2,9 +2,9 @@ import 'package:material_ui/material_ui.dart';
 import 'package:money_manager/models/ledger_kinds.dart';
 
 class CategoriesFrame extends StatefulWidget {
-  const CategoriesFrame({required this.child, super.key});
-
   final Widget child;
+
+  const CategoriesFrame({required this.child, super.key});
 
   static CategoriesFrameState of(BuildContext context) {
     final scope = context
@@ -40,9 +40,9 @@ class CategoriesFrameState extends State<CategoriesFrame>
 }
 
 class _CategoriesScope extends InheritedWidget {
-  const _CategoriesScope({required this.state, required super.child});
-
   final CategoriesFrameState state;
+
+  const _CategoriesScope({required this.state, required super.child});
 
   @override
   bool updateShouldNotify(_CategoriesScope oldWidget) => true;

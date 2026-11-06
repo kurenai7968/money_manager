@@ -2,6 +2,16 @@ import 'package:equatable/equatable.dart';
 import 'package:money_manager/models/ledger_kinds.dart';
 
 class TransactionModel extends Equatable {
+  final String id;
+  final TransactionType type;
+  final int amountMinor;
+  final DateTime date;
+  final String note;
+  final String? accountId;
+  final String? categoryId;
+  final String? fromAccountId;
+  final String? toAccountId;
+
   const TransactionModel({
     required this.id,
     required this.type,
@@ -13,16 +23,6 @@ class TransactionModel extends Equatable {
     this.fromAccountId,
     this.toAccountId,
   });
-
-  final String id;
-  final TransactionType type;
-  final int amountMinor;
-  final DateTime date;
-  final String note;
-  final String? accountId;
-  final String? categoryId;
-  final String? fromAccountId;
-  final String? toAccountId;
 
   TransactionModel copyWith({
     String? id,

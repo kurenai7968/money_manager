@@ -16,6 +16,19 @@ import 'package:money_manager/pages/transactions/bloc/transactions_event.dart';
 import 'package:money_manager/pages/transactions/bloc/transactions_state.dart';
 
 class RecordBloc extends Bloc<RecordEvent, RecordState> {
+  final TransactionsBloc _transactions;
+  final AccountsBloc _accounts;
+  final CategoriesBloc _categories;
+  final DateTime Function() _now;
+  final _subscriptions = <StreamSubscription<dynamic>>[];
+  String? _transactionId;
+  TransactionType? _initialType;
+  String? _initialAccountId;
+  String? _draftId;
+  var _opened = false;
+  var _existingReady = false;
+  var _submitting = false;
+
   RecordBloc({
     required TransactionsBloc transactions,
     required AccountsBloc accounts,
@@ -45,19 +58,6 @@ class RecordBloc extends Bloc<RecordEvent, RecordState> {
     on<RecordDeletePressed>(_onDelete);
     on<RecordSourcesChanged>(_onSourcesChanged);
   }
-
-  final TransactionsBloc _transactions;
-  final AccountsBloc _accounts;
-  final CategoriesBloc _categories;
-  final DateTime Function() _now;
-  final _subscriptions = <StreamSubscription<dynamic>>[];
-  String? _transactionId;
-  TransactionType? _initialType;
-  String? _initialAccountId;
-  String? _draftId;
-  var _opened = false;
-  var _existingReady = false;
-  var _submitting = false;
 
   void _listen() {
     if (_subscriptions.isNotEmpty) {

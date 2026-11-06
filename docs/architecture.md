@@ -182,6 +182,7 @@ Follow the [bloc library naming conventions](https://bloclibrary.dev/naming-conv
 ## Invariants
 
 - Use `final` fields and `const` constructors.
+- Declare fields before the constructor.
 - Do not hardcode user-facing strings. Use `context.l10n.key` through a `ContextExtension`.
 - Define `GoRouter` routes with an enum such as `AppRoutes`. Do not hardcode path strings.
 - Repositories throw custom exceptions from `core/errors/`. Blocs catch them and emit an error state.

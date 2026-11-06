@@ -5,6 +5,16 @@ part 'transaction_entity.g.dart';
 
 @JsonSerializable(fieldRename: FieldRename.snake)
 class TransactionEntity extends Equatable {
+  final String id;
+  final String type;
+  final int amountMinor;
+  final String date;
+  final String? note;
+  final String? accountId;
+  final String? categoryId;
+  final String? fromAccountId;
+  final String? toAccountId;
+
   const TransactionEntity({
     required this.id,
     required this.type,
@@ -19,16 +29,6 @@ class TransactionEntity extends Equatable {
 
   factory TransactionEntity.fromJson(Map<String, dynamic> json) =>
       _$TransactionEntityFromJson(json);
-
-  final String id;
-  final String type;
-  final int amountMinor;
-  final String date;
-  final String? note;
-  final String? accountId;
-  final String? categoryId;
-  final String? fromAccountId;
-  final String? toAccountId;
 
   Map<String, dynamic> toJson() => _$TransactionEntityToJson(this);
 

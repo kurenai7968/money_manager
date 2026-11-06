@@ -2,9 +2,9 @@ import 'package:material_ui/material_ui.dart';
 import 'package:money_manager/themes/app_themes.dart';
 
 class AccountSectionLabel extends StatelessWidget {
-  const AccountSectionLabel(this.text, {super.key});
-
   final String text;
+
+  const AccountSectionLabel(this.text, {super.key});
 
   @override
   Widget build(BuildContext context) {

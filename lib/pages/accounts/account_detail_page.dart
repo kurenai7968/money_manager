@@ -13,9 +13,9 @@ import 'package:money_manager/pages/transactions/bloc/transactions_bloc.dart';
 import 'package:money_manager/pages/transactions/bloc/transactions_event.dart';
 
 class AccountDetailPage extends StatelessWidget {
-  const AccountDetailPage({required this.accountId, super.key});
-
   final String accountId;
+
+  const AccountDetailPage({required this.accountId, super.key});
 
   @override
   Widget build(BuildContext context) {

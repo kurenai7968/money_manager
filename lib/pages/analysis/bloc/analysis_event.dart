@@ -13,9 +13,9 @@ class AnalysisStarted extends AnalysisEvent {
 }
 
 class AnalysisKindSelected extends AnalysisEvent {
-  const AnalysisKindSelected(this.kind);
-
   final CategoryKind kind;
+
+  const AnalysisKindSelected(this.kind);
 
   @override
   List<Object?> get props => [kind];

@@ -83,10 +83,10 @@ void _apply(
 }
 
 class MonthFigures extends Equatable {
-  const MonthFigures({required this.incomeMinor, required this.expenseMinor});
-
   final int incomeMinor;
   final int expenseMinor;
+
+  const MonthFigures({required this.incomeMinor, required this.expenseMinor});
 
   int get balanceMinor => incomeMinor - expenseMinor;
 
@@ -119,15 +119,15 @@ bool sameDay(DateTime a, DateTime b) {
 }
 
 class DayLedger extends Equatable {
+  final DateTime day;
+  final int netMinor;
+  final List<TransactionModel> transactions;
+
   const DayLedger({
     required this.day,
     required this.netMinor,
     required this.transactions,
   });
-
-  final DateTime day;
-  final int netMinor;
-  final List<TransactionModel> transactions;
 
   @override
   List<Object?> get props => [day, netMinor, transactions];

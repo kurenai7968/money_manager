@@ -15,6 +15,11 @@ import 'package:money_manager/routes/app_router.dart';
 import 'package:money_manager/themes/app_themes.dart';
 
 class App extends StatefulWidget {
+  final AccountRepository? accounts;
+  final CategoryRepository? categories;
+  final TransactionRepository? transactions;
+  final AppSettingRepository? settings;
+
   const App({
     super.key,
     this.accounts,
@@ -22,11 +27,6 @@ class App extends StatefulWidget {
     this.transactions,
     this.settings,
   });
-
-  final AccountRepository? accounts;
-  final CategoryRepository? categories;
-  final TransactionRepository? transactions;
-  final AppSettingRepository? settings;
 
   @override
   State<App> createState() => _AppState();

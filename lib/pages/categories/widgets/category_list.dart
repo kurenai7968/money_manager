@@ -11,9 +11,9 @@ import 'package:money_manager/themes/ledger_palette.dart';
 import 'package:money_manager/widgets/ledger_reorder.dart';
 
 class CategoryList extends StatefulWidget {
-  const CategoryList({required this.categories, super.key});
-
   final List<CategoryModel> categories;
+
+  const CategoryList({required this.categories, super.key});
 
   @override
   State<CategoryList> createState() => _CategoryListState();

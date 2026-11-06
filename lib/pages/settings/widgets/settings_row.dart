@@ -1,16 +1,16 @@
 import 'package:material_ui/material_ui.dart';
 
 class SettingsRow extends StatelessWidget {
+  final String title;
+  final String value;
+  final VoidCallback onTap;
+
   const SettingsRow({
     required this.title,
     required this.value,
     required this.onTap,
     super.key,
   });
-
-  final String title;
-  final String value;
-  final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {

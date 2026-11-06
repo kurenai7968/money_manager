@@ -4,14 +4,14 @@ import 'package:money_manager/models/account_model.dart';
 import 'package:money_manager/themes/app_themes.dart';
 
 class RecordAccountSheet extends StatelessWidget {
+  final List<AccountModel> accounts;
+  final String? selectedId;
+
   const RecordAccountSheet({
     required this.accounts,
     this.selectedId,
     super.key,
   });
-
-  final List<AccountModel> accounts;
-  final String? selectedId;
 
   @override
   Widget build(BuildContext context) {

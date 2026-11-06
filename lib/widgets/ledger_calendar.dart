@@ -5,6 +5,17 @@ import 'package:money_manager/themes/app_themes.dart';
 import 'package:table_calendar/table_calendar.dart';
 
 class LedgerCalendar extends StatelessWidget {
+  static final firstDay = DateTime(2000);
+  static final lastDay = DateTime(2100, 12, 31);
+  final DateTime focusedDay;
+  final DateTime? selectedDay;
+  final FirstDayOfWeek firstDayOfWeek;
+  final void Function(DateTime selectedDay, DateTime focusedDay) onDaySelected;
+  final ValueChanged<DateTime>? onPageChanged;
+  final Widget? Function(BuildContext context, DateTime day)? dayDetail;
+  final bool headerVisible;
+  final bool enableSwipe;
+
   const LedgerCalendar({
     required this.focusedDay,
     required this.selectedDay,
@@ -16,18 +27,6 @@ class LedgerCalendar extends StatelessWidget {
     this.enableSwipe = true,
     super.key,
   });
-
-  static final firstDay = DateTime(2000);
-  static final lastDay = DateTime(2100, 12, 31);
-
-  final DateTime focusedDay;
-  final DateTime? selectedDay;
-  final FirstDayOfWeek firstDayOfWeek;
-  final void Function(DateTime selectedDay, DateTime focusedDay) onDaySelected;
-  final ValueChanged<DateTime>? onPageChanged;
-  final Widget? Function(BuildContext context, DateTime day)? dayDetail;
-  final bool headerVisible;
-  final bool enableSwipe;
 
   static double extent(BuildContext context, {required bool header}) {
     final scale = MediaQuery.textScalerOf(context).scale(1);
@@ -141,17 +140,17 @@ class LedgerCalendar extends StatelessWidget {
 }
 
 class _DayCell extends StatelessWidget {
+  final DateTime day;
+  final bool selected;
+  final Widget? detail;
+  final bool reserveDetail;
+
   const _DayCell({
     required this.day,
     required this.selected,
     required this.detail,
     required this.reserveDetail,
   });
-
-  final DateTime day;
-  final bool selected;
-  final Widget? detail;
-  final bool reserveDetail;
 
   @override
   Widget build(BuildContext context) {

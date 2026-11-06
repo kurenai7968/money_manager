@@ -5,14 +5,14 @@ import 'package:money_manager/core/errors/app_exception.dart';
 import 'package:money_manager/repositories/app_setting_repository.dart';
 
 class AppSettingBloc extends Bloc<AppSettingEvent, AppSettingState> {
+  final AppSettingRepository appSettingRepository;
+
   AppSettingBloc({required this.appSettingRepository})
     : super(const AppSettingState()) {
     on<AppSettingInitialized>(_onAppSettingInitialized);
     on<AppSettingChanged>(_onAppSettingChanged);
     add(const AppSettingInitialized());
   }
-
-  final AppSettingRepository appSettingRepository;
 
   Future<void> _onAppSettingInitialized(
     AppSettingInitialized event,

@@ -5,6 +5,9 @@ import 'package:money_manager/repositories/category_repository.dart';
 import 'package:money_manager/repositories/transaction_repository.dart';
 
 class CategoriesBloc extends Bloc<CategoriesEvent, CategoriesState> {
+  final CategoryRepository _repository;
+  final TransactionRepository? transactions;
+
   CategoriesBloc(this._repository, {this.transactions})
     : super(const CategoriesState()) {
     on<CategoriesStarted>(_onCategoriesStarted);
@@ -12,9 +15,6 @@ class CategoriesBloc extends Bloc<CategoriesEvent, CategoriesState> {
     on<CategoryDeletePressed>(_onCategoryDeletePressed);
     on<CategoriesReorderPressed>(_onCategoriesReorderPressed);
   }
-
-  final CategoryRepository _repository;
-  final TransactionRepository? transactions;
 
   Future<void> _onCategoriesStarted(
     CategoriesStarted event,

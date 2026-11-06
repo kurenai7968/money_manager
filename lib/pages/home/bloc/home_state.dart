@@ -9,6 +9,17 @@ enum HomeView { summary, calendar }
 enum HomeStatus { initial, success, failure }
 
 class HomeState extends Equatable {
+  final HomeStatus status;
+  final HomeView view;
+  final DateTime month;
+  final DateTime? selectedDay;
+  final List<TransactionModel> transactions;
+  final MonthFigures figures;
+  final List<DayLedger> days;
+  final List<TransactionModel> selectedTransactions;
+  final List<CategoryModel> categories;
+  final List<AccountModel> accounts;
+
   const HomeState({
     required this.month,
     required this.selectedDay,
@@ -21,17 +32,6 @@ class HomeState extends Equatable {
     this.categories = const [],
     this.accounts = const [],
   });
-
-  final HomeStatus status;
-  final HomeView view;
-  final DateTime month;
-  final DateTime? selectedDay;
-  final List<TransactionModel> transactions;
-  final MonthFigures figures;
-  final List<DayLedger> days;
-  final List<TransactionModel> selectedTransactions;
-  final List<CategoryModel> categories;
-  final List<AccountModel> accounts;
 
   HomeState copyWith({
     HomeStatus? status,

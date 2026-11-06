@@ -16,16 +16,16 @@ import 'package:money_manager/pages/transactions/bloc/transactions_bloc.dart';
 import 'package:money_manager/pages/transactions/bloc/transactions_event.dart';
 
 class RecordPage extends StatelessWidget {
+  final String? transactionId;
+  final TransactionType? initialType;
+  final String? initialAccountId;
+
   const RecordPage({
     this.transactionId,
     this.initialType,
     this.initialAccountId,
     super.key,
   });
-
-  final String? transactionId;
-  final TransactionType? initialType;
-  final String? initialAccountId;
 
   @override
   Widget build(BuildContext context) {

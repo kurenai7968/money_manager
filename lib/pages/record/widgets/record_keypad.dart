@@ -4,6 +4,16 @@ import 'package:money_manager/core/utils/amount_expression.dart';
 import 'package:money_manager/themes/app_themes.dart';
 
 class RecordKeypad extends StatelessWidget {
+  final AmountExpression expression;
+  final ValueChanged<String> onDigit;
+  final VoidCallback onDoubleZero;
+  final VoidCallback onDecimal;
+  final VoidCallback onBackspace;
+  final VoidCallback onClear;
+  final ValueChanged<AmountOperator> onOperator;
+  final VoidCallback onEquals;
+  final VoidCallback onSubmit;
+
   const RecordKeypad({
     required this.expression,
     required this.onDigit,
@@ -16,16 +26,6 @@ class RecordKeypad extends StatelessWidget {
     required this.onSubmit,
     super.key,
   });
-
-  final AmountExpression expression;
-  final ValueChanged<String> onDigit;
-  final VoidCallback onDoubleZero;
-  final VoidCallback onDecimal;
-  final VoidCallback onBackspace;
-  final VoidCallback onClear;
-  final ValueChanged<AmountOperator> onOperator;
-  final VoidCallback onEquals;
-  final VoidCallback onSubmit;
 
   @override
   Widget build(BuildContext context) {
@@ -151,18 +151,17 @@ class RecordKeypad extends StatelessWidget {
 }
 
 class _CommitKey extends StatelessWidget {
+  final bool calculating;
+  final VoidCallback onEquals;
+  final VoidCallback onSubmit;
+  static const _height = 96.0;
+  static const _maxWidth = 72.0;
+
   const _CommitKey({
     required this.calculating,
     required this.onEquals,
     required this.onSubmit,
   });
-
-  final bool calculating;
-  final VoidCallback onEquals;
-  final VoidCallback onSubmit;
-
-  static const _height = 96.0;
-  static const _maxWidth = 72.0;
 
   @override
   Widget build(BuildContext context) {

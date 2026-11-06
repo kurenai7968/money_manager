@@ -6,6 +6,13 @@ import 'package:money_manager/models/transaction_model.dart';
 enum AccountDetailStatus { initial, success, failure }
 
 class AccountDetailState extends Equatable {
+  final AccountDetailStatus status;
+  final AccountModel? account;
+  final int balanceMinor;
+  final List<TransactionModel> history;
+  final List<CategoryModel> categories;
+  final List<AccountModel> accounts;
+
   const AccountDetailState({
     this.status = AccountDetailStatus.initial,
     this.account,
@@ -14,13 +21,6 @@ class AccountDetailState extends Equatable {
     this.categories = const [],
     this.accounts = const [],
   });
-
-  final AccountDetailStatus status;
-  final AccountModel? account;
-  final int balanceMinor;
-  final List<TransactionModel> history;
-  final List<CategoryModel> categories;
-  final List<AccountModel> accounts;
 
   AccountDetailState copyWith({
     AccountDetailStatus? status,

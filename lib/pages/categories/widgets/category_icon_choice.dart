@@ -2,6 +2,11 @@ import 'package:material_ui/material_ui.dart';
 import 'package:money_manager/themes/ledger_palette.dart';
 
 class CategoryIconChoice extends StatelessWidget {
+  final String iconKey;
+  final bool selected;
+  final Color color;
+  final VoidCallback onPressed;
+
   const CategoryIconChoice({
     required this.iconKey,
     required this.selected,
@@ -9,11 +14,6 @@ class CategoryIconChoice extends StatelessWidget {
     required this.onPressed,
     super.key,
   });
-
-  final String iconKey;
-  final bool selected;
-  final Color color;
-  final VoidCallback onPressed;
 
   @override
   Widget build(BuildContext context) {

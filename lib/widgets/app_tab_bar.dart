@@ -3,16 +3,16 @@ import 'package:money_manager/core/extensions/context_extension.dart';
 import 'package:money_manager/themes/app_themes.dart';
 
 class AppTabBar extends StatelessWidget {
+  final int selectedIndex;
+  final ValueChanged<int> onSelected;
+  final VoidCallback onRecord;
+
   const AppTabBar({
     required this.selectedIndex,
     required this.onSelected,
     required this.onRecord,
     super.key,
   });
-
-  final int selectedIndex;
-  final ValueChanged<int> onSelected;
-  final VoidCallback onRecord;
 
   @override
   Widget build(BuildContext context) {
@@ -79,17 +79,17 @@ class AppTabBar extends StatelessWidget {
 }
 
 class _TabItem extends StatelessWidget {
+  final bool selected;
+  final IconData icon;
+  final String label;
+  final VoidCallback onTap;
+
   const _TabItem({
     required this.selected,
     required this.icon,
     required this.label,
     required this.onTap,
   });
-
-  final bool selected;
-  final IconData icon;
-  final String label;
-  final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {

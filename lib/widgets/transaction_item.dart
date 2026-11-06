@@ -12,6 +12,12 @@ import 'package:money_manager/themes/app_themes.dart';
 import 'package:money_manager/themes/ledger_palette.dart';
 
 class TransactionList extends StatelessWidget {
+  final List<TransactionModel> transactions;
+  final List<CategoryModel> categories;
+  final List<AccountModel> accounts;
+  final String locale;
+  final bool showDayHeaders;
+
   const TransactionList({
     required this.transactions,
     required this.categories,
@@ -20,12 +26,6 @@ class TransactionList extends StatelessWidget {
     this.showDayHeaders = true,
     super.key,
   });
-
-  final List<TransactionModel> transactions;
-  final List<CategoryModel> categories;
-  final List<AccountModel> accounts;
-  final String locale;
-  final bool showDayHeaders;
 
   @override
   Widget build(BuildContext context) {
@@ -107,6 +107,13 @@ class TransactionList extends StatelessWidget {
 }
 
 class TransactionItem extends StatelessWidget {
+  final TransactionModel transaction;
+  final List<CategoryModel> categories;
+  final List<AccountModel> accounts;
+  final String locale;
+  final Map<String, CategoryModel>? categoriesById;
+  final Map<String, AccountModel>? accountsById;
+
   const TransactionItem({
     required this.transaction,
     required this.categories,
@@ -116,13 +123,6 @@ class TransactionItem extends StatelessWidget {
     this.accountsById,
     super.key,
   });
-
-  final TransactionModel transaction;
-  final List<CategoryModel> categories;
-  final List<AccountModel> accounts;
-  final String locale;
-  final Map<String, CategoryModel>? categoriesById;
-  final Map<String, AccountModel>? accountsById;
 
   @override
   Widget build(BuildContext context) {
@@ -299,10 +299,10 @@ class TransactionItem extends StatelessWidget {
 }
 
 class _TransactionIcon extends StatelessWidget {
-  const _TransactionIcon({required this.category, required this.type});
-
   final CategoryModel? category;
   final TransactionType type;
+
+  const _TransactionIcon({required this.category, required this.type});
 
   @override
   Widget build(BuildContext context) {
@@ -331,10 +331,10 @@ class _TransactionIcon extends StatelessWidget {
 }
 
 class _NoteText extends StatelessWidget {
-  const _NoteText({required this.note, required this.style});
-
   final String note;
   final TextStyle? style;
+
+  const _NoteText({required this.note, required this.style});
 
   @override
   Widget build(BuildContext context) {
@@ -374,17 +374,17 @@ class _NoteText extends StatelessWidget {
 }
 
 class _TransactionDayHeader extends StatelessWidget {
+  final DateTime day;
+  final int expenseMinor;
+  final String locale;
+  final bool first;
+
   const _TransactionDayHeader({
     required this.day,
     required this.expenseMinor,
     required this.locale,
     required this.first,
   });
-
-  final DateTime day;
-  final int expenseMinor;
-  final String locale;
-  final bool first;
 
   @override
   Widget build(BuildContext context) {
@@ -426,10 +426,10 @@ class _TransactionDayHeader extends StatelessWidget {
 }
 
 class _DayGroup {
-  _DayGroup(this.day, this.items);
-
   final DateTime day;
   final List<TransactionModel> items;
+
+  _DayGroup(this.day, this.items);
 
   int get expenseMinor {
     var total = 0;
@@ -445,22 +445,22 @@ class _DayGroup {
 sealed class _Entry {}
 
 class _DayHeaderEntry extends _Entry {
+  final DateTime day;
+  final int expenseMinor;
+  final bool first;
+
   _DayHeaderEntry({
     required this.day,
     required this.expenseMinor,
     required this.first,
   });
-
-  final DateTime day;
-  final int expenseMinor;
-  final bool first;
 }
 
 class _TransactionEntry extends _Entry {
-  _TransactionEntry({required this.transaction, required this.divider});
-
   final TransactionModel transaction;
   final bool divider;
+
+  _TransactionEntry({required this.transaction, required this.divider});
 }
 
 final _noteTag = RegExp(r'#[^\s#]+');

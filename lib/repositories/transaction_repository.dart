@@ -16,9 +16,9 @@ abstract interface class TransactionRepository {
 }
 
 class SqliteTransactionRepository implements TransactionRepository {
-  SqliteTransactionRepository(this._database);
-
   final AppDatabase _database;
+
+  SqliteTransactionRepository(this._database);
 
   @override
   Future<List<TransactionModel>> getAll() {
