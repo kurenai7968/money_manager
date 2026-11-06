@@ -21,3 +21,8 @@ enum FirstDayOfWeek {
     };
   }
 }
+
+int leadingCalendarBlanks(DateTime firstOfMonth, FirstDayOfWeek firstDay) {
+  final start = firstDay.index + 1;
+  return (firstOfMonth.weekday - start + 7) % 7;
+}

@@ -1,5 +1,9 @@
+import 'dart:convert';
+import 'dart:ui';
+
 import 'package:flutter_test/flutter_test.dart';
 import 'package:money_manager/app_config.dart';
+import 'package:money_manager/core/errors/app_exception.dart';
 import 'package:money_manager/database/shared_preferences/shared_preference_store.dart';
 import 'package:money_manager/models/app_setting_model.dart';
 import 'package:money_manager/models/enums/app_appearance.dart';
@@ -21,36 +25,67 @@ void main() {
     );
   });
 
-  test('saves appearance under the existing theme key', () async {
-    await repository.updateAppSetting(
-      const AppSettingModel(
-        languageCode: 'zh',
-        appearance: AppAppearance.dark,
-        firstDayOfWeek: FirstDayOfWeek.wednesday,
-      ),
+  test('saves and loads the setting as one JSON value', () async {
+    const setting = AppSettingModel(
+      languageCode: 'zh',
+      countryCode: 'CN',
+      appearance: AppAppearance.dark,
+      firstDayOfWeek: FirstDayOfWeek.wednesday,
     );
 
-    expect(preferences.getString(AppConfig.languageKey), 'zh');
-    expect(preferences.getString(AppConfig.themeKey), 'dark');
-    expect(preferences.getString(AppConfig.weekStartKey), 'wednesday');
+    await repository.updateAppSetting(setting);
 
-    final loaded = await repository.getAppSetting();
-    expect(loaded.languageCode, 'zh');
-    expect(loaded.appearance, AppAppearance.dark);
-    expect(loaded.firstDayOfWeek, FirstDayOfWeek.wednesday);
+    expect(jsonDecode(preferences.getString(AppConfig.appSettingKey)!), {
+      'language_code': 'zh',
+      'country_code': 'CN',
+      'appearance': 'dark',
+      'first_day_of_week': 'wednesday',
+    });
+    expect(await repository.getAppSetting(), setting);
+    expect(setting.locale, const Locale('zh', 'CN'));
   });
 
-  test('clears a language that follows the system', () async {
+  test('loads defaults when nothing is stored', () async {
+    final loaded = await repository.getAppSetting();
+
+    expect(loaded, const AppSettingModel());
+    expect(loaded.locale, isNull);
+  });
+
+  test('stores an empty language when the app follows the system', () async {
     await repository.updateAppSetting(
       const AppSettingModel(languageCode: 'en'),
     );
+    expect((await repository.getAppSetting()).locale, const Locale('en'));
+
     await repository.updateAppSetting(
       const AppSettingModel(appearance: AppAppearance.light),
     );
 
-    expect(preferences.getString(AppConfig.languageKey), isNull);
     final loaded = await repository.getAppSetting();
-    expect(loaded.languageCode, isNull);
+    expect(loaded.languageCode, isEmpty);
+    expect(loaded.countryCode, isEmpty);
+    expect(loaded.locale, isNull);
     expect(loaded.appearance, AppAppearance.light);
+  });
+
+  test('rejects JSON that is not an object', () async {
+    await preferences.setString(AppConfig.appSettingKey, '[]');
+
+    expect(repository.getAppSetting(), throwsA(isA<CacheException>()));
+  });
+
+  test('rejects an unrecognized appearance', () async {
+    await preferences.setString(
+      AppConfig.appSettingKey,
+      jsonEncode({
+        'language_code': 'en',
+        'country_code': '',
+        'appearance': 'sepia',
+        'first_day_of_week': 'monday',
+      }),
+    );
+
+    expect(repository.getAppSetting(), throwsA(isA<CacheException>()));
   });
 }

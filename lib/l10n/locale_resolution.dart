@@ -1,14 +1,5 @@
 import 'package:flutter/widgets.dart';
 
-Locale? localeFor(String? languageCode) {
-  return switch (languageCode) {
-    'en' => const Locale('en'),
-    'zh' => const Locale('zh'),
-    'zh_CN' => const Locale('zh', 'CN'),
-    _ => null,
-  };
-}
-
 Locale resolveLocale(Locale? locale, Iterable<Locale> _) {
   if (locale != null && locale.languageCode == 'zh') {
     final simplified =

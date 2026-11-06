@@ -4,13 +4,13 @@ import 'package:money_manager/models/app_setting_model.dart';
 enum AppSettingStatus { initial, loading, success, failure }
 
 class AppSettingState extends Equatable {
+  final AppSettingStatus status;
+  final AppSettingModel appSetting;
+
   const AppSettingState({
     this.status = AppSettingStatus.initial,
     this.appSetting = const AppSettingModel(),
   });
-
-  final AppSettingStatus status;
-  final AppSettingModel appSetting;
 
   AppSettingState copyWith({
     AppSettingStatus? status,

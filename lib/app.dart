@@ -46,12 +46,12 @@ class _AppState extends State<App> {
           BlocSelector<
             AppSettingBloc,
             AppSettingState,
-            (AppAppearance, String?)
+            (AppAppearance, Locale?)
           >(
             selector: (state) =>
-                (state.appSetting.appearance, state.appSetting.languageCode),
+                (state.appSetting.appearance, state.appSetting.locale),
             builder: (context, data) {
-              final (appearance, languageCode) = data;
+              final (appearance, locale) = data;
               return MaterialApp.router(
                 debugShowCheckedModeBanner: false,
                 onGenerateTitle: (context) => context.l10n.home,
@@ -59,7 +59,7 @@ class _AppState extends State<App> {
                 theme: AppThemes.light,
                 darkTheme: AppThemes.dark,
                 themeMode: appearance.themeMode,
-                locale: localeFor(languageCode),
+                locale: locale,
                 localeResolutionCallback: resolveLocale,
                 localizationsDelegates: const [
                   AppLocalizations.delegate,

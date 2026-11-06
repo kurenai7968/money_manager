@@ -36,3 +36,4 @@ Ids are five digits, starting at `00001`. The next id is one greater than the hi
 - 00026 Screen blocs and weekdays
 - 00027 First day to calendar weekday
 - 00028 Calendar day amount slot
+- 00029 Store app settings as JSON

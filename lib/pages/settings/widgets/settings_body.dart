@@ -27,28 +27,28 @@ class SettingsBody extends StatelessWidget {
             SettingsSection(l10n.general),
             SettingsRow(
               title: l10n.language,
-              value: switch (setting.languageCode) {
-                'zh' => l10n.traditionalChinese,
-                'zh_CN' => l10n.simplifiedChinese,
-                'en' => l10n.english,
+              value: switch ((setting.languageCode, setting.countryCode)) {
+                ('zh', 'CN') => l10n.simplifiedChinese,
+                ('zh', _) => l10n.traditionalChinese,
+                ('en', _) => l10n.english,
                 _ => l10n.followSystem,
               },
-              onTap: () => showSettingsChoice<String?>(
+              onTap: () => showSettingsChoice<(String, String)>(
                 context,
                 title: l10n.language,
                 options: [
-                  (null, l10n.followSystem),
-                  ('zh', l10n.traditionalChinese),
-                  ('zh_CN', l10n.simplifiedChinese),
-                  ('en', l10n.english),
+                  (('', ''), l10n.followSystem),
+                  (('zh', ''), l10n.traditionalChinese),
+                  (('zh', 'CN'), l10n.simplifiedChinese),
+                  (('en', ''), l10n.english),
                 ],
-                selected: setting.languageCode,
+                selected: (setting.languageCode, setting.countryCode),
                 onSelected: (value) {
                   context.read<AppSettingBloc>().add(
                     AppSettingChanged(
                       setting.copyWith(
-                        languageCode: value,
-                        clearLanguage: value == null,
+                        languageCode: value.$1,
+                        countryCode: value.$2,
                       ),
                     ),
                   );
