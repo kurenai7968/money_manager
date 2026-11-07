@@ -7,6 +7,7 @@ import 'package:money_manager/models/transaction_model.dart';
 import 'package:money_manager/repositories/account_repository.dart';
 import 'package:money_manager/repositories/category_repository.dart';
 import 'package:money_manager/repositories/transaction_repository.dart';
+import 'package:money_manager/routes/app_router.dart';
 
 import 'test_stores.dart';
 
@@ -35,6 +36,7 @@ Future<void> pumpApp(
   for (final transaction in transactions) {
     await transactionRepository.save(transaction);
   }
+  AppRouter.reset();
   await tester.pumpWidget(const App());
 }
 

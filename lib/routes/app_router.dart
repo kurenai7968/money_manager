@@ -7,8 +7,17 @@ import 'package:money_manager/widgets/app_shell.dart';
 
 class AppRouter {
   static final _rootKey = GlobalKey<NavigatorState>(debugLabel: 'root');
+  static GoRouter? _router;
 
-  static GoRouter create() {
+  static GoRouter get router => _router ??= _create();
+
+  @visibleForTesting
+  static void reset() {
+    _router?.dispose();
+    _router = _create();
+  }
+
+  static GoRouter _create() {
     return GoRouter(
       navigatorKey: _rootKey,
       initialLocation: AppRoutes.home.path,

@@ -5,7 +5,6 @@ import 'package:money_manager/blocs/app_setting_bloc/app_setting_bloc.dart';
 import 'package:money_manager/blocs/app_setting_bloc/app_setting_state.dart';
 import 'package:money_manager/core/extensions/context_extension.dart';
 import 'package:money_manager/l10n/app_localizations.dart';
-import 'package:money_manager/l10n/locale_resolution.dart';
 import 'package:money_manager/routes/app_router.dart';
 import 'package:money_manager/themes/app_themes.dart';
 
@@ -28,13 +27,15 @@ class App extends StatelessWidget {
             darkTheme: AppThemes.dark,
             themeMode: state.appSetting.appThemeMode.themeMode,
             locale: state.appSetting.locale,
-            localeResolutionCallback: resolveLocale,
-            localizationsDelegates: const [
-              AppLocalizations.delegate,
+            localizationsDelegates: [
+              ...AppLocalizations.localizationsDelegates,
               ...GlobalMaterialLocalizations.delegates,
             ],
             supportedLocales: AppLocalizations.supportedLocales,
-            routerConfig: AppRouter.create(),
+            routeInformationParser: AppRouter.router.routeInformationParser,
+            routerDelegate: AppRouter.router.routerDelegate,
+            routeInformationProvider: AppRouter.router.routeInformationProvider,
+            backButtonDispatcher: AppRouter.router.backButtonDispatcher,
           );
         },
       ),

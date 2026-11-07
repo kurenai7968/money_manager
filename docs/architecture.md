@@ -15,7 +15,7 @@ The navigation shell, ledger, home, analysis, and settings are implemented. New 
 - Calendar: `table_calendar`. The home month grid and the record date picker both use `TableCalendar`. Do not build a day grid and do not call `showDatePicker`.
 - State management: `flutter_bloc`
 - Navigation: `go_router`
-- Localization: ARB files generate `AppLocalizations`. `MaterialApp` registers `AppLocalizations.delegate` and `GlobalMaterialLocalizations.delegates` from `material_ui`.
+- Localization: ARB files generate `AppLocalizations`. `MaterialApp` registers `AppLocalizations.localizationsDelegates` and `GlobalMaterialLocalizations.delegates` from `material_ui`.
 - Database: SQLite via `sqflite`, and `shared_preferences`. Both are wrapped under `lib/database/`.
 - Equality: `equatable`
 - Serialization: `json_serializable`
