@@ -9,7 +9,6 @@ import 'package:money_manager/models/app_setting_model.dart';
 
 abstract interface class AppSettingRepository {
   Future<AppSettingModel> getAppSetting();
-
   Future<void> updateAppSetting(AppSettingModel appSetting);
 }
 

@@ -9,7 +9,7 @@ import '../support/test_stores.dart';
 void main() {
   test('saves language names without a default name', () async {
     await openTestDatabase();
-    final repository = SqliteCategoryRepository(AppDatabase.instance);
+    final repository = CategoryRepositoryImpl(database: AppDatabase.instance);
     const food = CategoryModel(
       id: 'food',
       languageEn: 'Food',
@@ -29,7 +29,7 @@ void main() {
 
   test('saving a name clears the default language fields', () async {
     await openTestDatabase();
-    final repository = SqliteCategoryRepository(AppDatabase.instance);
+    final repository = CategoryRepositoryImpl(database: AppDatabase.instance);
     const food = CategoryModel(
       id: 'food',
       languageEn: 'Food',

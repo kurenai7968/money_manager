@@ -5,9 +5,8 @@ import 'package:money_manager/blocs/app_setting_bloc/app_setting_event.dart';
 import 'package:money_manager/blocs/app_setting_bloc/app_setting_state.dart';
 import 'package:money_manager/core/errors/app_exception.dart';
 import 'package:money_manager/models/app_setting_model.dart';
-import 'package:money_manager/models/enums/app_appearance.dart';
+import 'package:money_manager/models/enums/app_theme_mode.dart';
 import 'package:money_manager/models/enums/first_day_of_week.dart';
-import 'package:table_calendar/table_calendar.dart';
 import 'package:money_manager/repositories/app_setting_repository.dart';
 
 class _MemoryAppSettingRepository implements AppSettingRepository {
@@ -49,22 +48,22 @@ void main() {
   );
 
   blocTest<AppSettingBloc, AppSettingState>(
-    'saves an appearance change',
+    'saves a theme mode change',
     build: () => AppSettingBloc(appSettingRepository: repository),
     act: (bloc) => bloc.add(
-      const AppSettingChanged(AppSettingModel(appearance: AppAppearance.dark)),
+      const AppSettingThemeModeChanged(appThemeMode: AppThemeMode.dark),
     ),
     expect: () => const [
       AppSettingState(status: AppSettingStatus.loading),
       AppSettingState(status: AppSettingStatus.success),
       AppSettingState(
         status: AppSettingStatus.success,
-        appSetting: AppSettingModel(appearance: AppAppearance.dark),
+        appSetting: AppSettingModel(appThemeMode: AppThemeMode.dark),
       ),
     ],
     verify: (bloc) {
-      expect(bloc.state.appSetting.appearance, AppAppearance.dark);
-      expect(repository.appSetting.appearance, AppAppearance.dark);
+      expect(bloc.state.appSetting.appThemeMode, AppThemeMode.dark);
+      expect(repository.appSetting.appThemeMode, AppThemeMode.dark);
     },
   );
 
@@ -87,7 +86,7 @@ void main() {
       return AppSettingBloc(appSettingRepository: repository);
     },
     act: (bloc) => bloc.add(
-      const AppSettingChanged(AppSettingModel(appearance: AppAppearance.light)),
+      const AppSettingThemeModeChanged(appThemeMode: AppThemeMode.light),
     ),
     expect: () => const [
       AppSettingState(status: AppSettingStatus.loading),

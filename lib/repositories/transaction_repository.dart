@@ -7,18 +7,15 @@ import 'package:money_manager/models/transaction_model.dart';
 
 abstract interface class TransactionRepository {
   Future<List<TransactionModel>> getAll();
-
   Future<void> save(TransactionModel transaction);
-
   Future<void> delete(String id);
-
   Future<int> countForCategory(String categoryId);
 }
 
-class SqliteTransactionRepository implements TransactionRepository {
+class TransactionRepositoryImpl implements TransactionRepository {
   final AppDatabase _database;
 
-  SqliteTransactionRepository(this._database);
+  TransactionRepositoryImpl({required this._database});
 
   @override
   Future<List<TransactionModel>> getAll() {

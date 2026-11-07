@@ -10,42 +10,27 @@ import 'package:money_manager/repositories/transaction_repository.dart';
 
 class AppProviders extends StatelessWidget {
   final Widget child;
-  final AccountRepository? accounts;
-  final CategoryRepository? categories;
-  final TransactionRepository? transactions;
-  final AppSettingRepository? settings;
 
-  const AppProviders({
-    super.key,
-    required this.child,
-    this.accounts,
-    this.categories,
-    this.transactions,
-    this.settings,
-  });
+  const AppProviders({super.key, required this.child});
 
   @override
   Widget build(BuildContext context) {
     return MultiRepositoryProvider(
       providers: [
         RepositoryProvider<AppSettingRepository>(
-          create: (_) =>
-              settings ??
-              AppSettingRepositoryImpl(
-                store: SharedPreferenceManager.instance.store,
-              ),
+          create: (_) => AppSettingRepositoryImpl(
+            store: SharedPreferenceManager.instance.store,
+          ),
         ),
         RepositoryProvider<AccountRepository>(
-          create: (_) =>
-              accounts ?? SqliteAccountRepository(AppDatabase.instance),
+          create: (_) => AccountRepositoryImpl(database: AppDatabase.instance),
         ),
         RepositoryProvider<CategoryRepository>(
-          create: (_) =>
-              categories ?? SqliteCategoryRepository(AppDatabase.instance),
+          create: (_) => CategoryRepositoryImpl(database: AppDatabase.instance),
         ),
         RepositoryProvider<TransactionRepository>(
           create: (_) =>
-              transactions ?? SqliteTransactionRepository(AppDatabase.instance),
+              TransactionRepositoryImpl(database: AppDatabase.instance),
         ),
       ],
       child: BlocProvider(

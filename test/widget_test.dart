@@ -1,27 +1,18 @@
 import 'package:material_ui/material_ui.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:intl/intl.dart';
-import 'package:money_manager/app.dart';
 import 'package:money_manager/widgets/app_tab_bar.dart';
 
-import 'support/memory_account_repository.dart';
-import 'support/memory_app_setting_repository.dart';
-import 'support/memory_category_repository.dart';
-import 'support/memory_transaction_repository.dart';
+import 'support/pump_app.dart';
 
 void main() {
+  useAppTestBinding();
+
   testWidgets('Shell opens Home and reaches the other tabs', (tester) async {
     tester.platformDispatcher.localeTestValue = const Locale('en');
     addTearDown(tester.platformDispatcher.clearLocaleTestValue);
 
-    await tester.pumpWidget(
-      App(
-        accounts: MemoryAccountRepository(),
-        categories: MemoryCategoryRepository(),
-        transactions: MemoryTransactionRepository(),
-        settings: MemoryAppSettingRepository(),
-      ),
-    );
+    await pumpApp(tester);
     await tester.pumpAndSettle();
 
     final now = DateTime.now();
@@ -81,14 +72,7 @@ void main() {
     tester.platformDispatcher.localeTestValue = const Locale('en');
     addTearDown(tester.platformDispatcher.clearLocaleTestValue);
 
-    await tester.pumpWidget(
-      App(
-        accounts: MemoryAccountRepository(),
-        categories: MemoryCategoryRepository(),
-        transactions: MemoryTransactionRepository(),
-        settings: MemoryAppSettingRepository(),
-      ),
-    );
+    await pumpApp(tester);
     await tester.pumpAndSettle();
 
     await tester.tap(find.byTooltip('Record'));
@@ -107,14 +91,7 @@ void main() {
     tester.platformDispatcher.localeTestValue = const Locale('en');
     addTearDown(tester.platformDispatcher.clearLocaleTestValue);
 
-    await tester.pumpWidget(
-      App(
-        accounts: MemoryAccountRepository(),
-        categories: MemoryCategoryRepository(),
-        transactions: MemoryTransactionRepository(),
-        settings: MemoryAppSettingRepository(),
-      ),
-    );
+    await pumpApp(tester);
     await tester.pumpAndSettle();
 
     await tester.tap(find.text('Accounts'));
@@ -132,15 +109,7 @@ void main() {
     tester.platformDispatcher.localeTestValue = const Locale('en');
     addTearDown(tester.platformDispatcher.clearLocaleTestValue);
 
-    final accounts = MemoryAccountRepository();
-    await tester.pumpWidget(
-      App(
-        accounts: accounts,
-        categories: MemoryCategoryRepository(),
-        transactions: MemoryTransactionRepository(),
-        settings: MemoryAppSettingRepository(),
-      ),
-    );
+    await pumpApp(tester);
     await tester.pumpAndSettle();
 
     await tester.tap(find.text('Accounts'));
@@ -157,7 +126,7 @@ void main() {
 
     await tester.tap(find.text('Cancel'));
     await tester.pumpAndSettle();
-    expect(accounts.accounts.single.archived, isFalse);
+    expect((await loadAccounts()).single.archived, isFalse);
 
     await tester.ensureVisible(find.text('Delete'));
     await tester.tap(find.text('Delete'));
@@ -170,6 +139,6 @@ void main() {
     );
     await tester.pumpAndSettle();
 
-    expect(accounts.accounts.single.archived, isTrue);
+    expect((await loadAccounts()).single.archived, isTrue);
   });
 }

@@ -1,7 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:intl/intl.dart';
 import 'package:material_ui/material_ui.dart';
-import 'package:money_manager/app.dart';
 import 'package:money_manager/l10n/app_localizations.dart';
 import 'package:money_manager/models/account_model.dart';
 import 'package:money_manager/models/category_model.dart';
@@ -12,10 +11,7 @@ import 'package:money_manager/themes/ledger_palette.dart';
 import 'package:money_manager/widgets/app_tab_bar.dart';
 import 'package:money_manager/widgets/transaction_item.dart';
 
-import '../support/memory_account_repository.dart';
-import '../support/memory_app_setting_repository.dart';
-import '../support/memory_category_repository.dart';
-import '../support/memory_transaction_repository.dart';
+import '../support/pump_app.dart';
 
 const _delegates = [
   AppLocalizations.delegate,
@@ -48,6 +44,8 @@ const _card = AccountModel(
 );
 
 void main() {
+  useAppTestBinding();
+
   testWidgets('row shows category, note, amount, and account', (tester) async {
     await _pumpItem(
       tester,
@@ -217,19 +215,19 @@ void main() {
     tester.platformDispatcher.localeTestValue = const Locale('en');
     addTearDown(tester.platformDispatcher.clearLocaleTestValue);
     final now = DateTime.now();
-    final accounts = MemoryAccountRepository()
-      ..accounts.add(
-        const AccountModel(
+    await pumpApp(
+      tester,
+      accounts: const [
+        AccountModel(
           id: 'cash',
           name: 'Wallet',
           type: AccountType.cash,
           openingBalanceMinor: 0,
           sortOrder: 0,
         ),
-      );
-    final categories = MemoryCategoryRepository()..categories.add(_food);
-    final transactions = MemoryTransactionRepository()
-      ..transactions.add(
+      ],
+      categories: const [_food],
+      transactions: [
         TransactionModel(
           id: 'lunch',
           type: TransactionType.expense,
@@ -239,15 +237,7 @@ void main() {
           accountId: 'cash',
           categoryId: _food.id,
         ),
-      );
-
-    await tester.pumpWidget(
-      App(
-        accounts: accounts,
-        categories: categories,
-        transactions: transactions,
-        settings: MemoryAppSettingRepository(),
-      ),
+      ],
     );
     await tester.pumpAndSettle();
 

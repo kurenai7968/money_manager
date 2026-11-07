@@ -7,20 +7,16 @@ import 'package:money_manager/models/category_model.dart';
 
 abstract interface class CategoryRepository {
   Future<List<CategoryModel>> getAll();
-
   Future<bool> isEmpty();
-
   Future<void> save(CategoryModel category);
-
   Future<void> delete(String id);
-
   Future<void> reorder(List<String> ids);
 }
 
-class SqliteCategoryRepository implements CategoryRepository {
+class CategoryRepositoryImpl implements CategoryRepository {
   final AppDatabase _database;
 
-  SqliteCategoryRepository(this._database);
+  CategoryRepositoryImpl({required this._database});
 
   @override
   Future<List<CategoryModel>> getAll() {

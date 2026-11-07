@@ -9,7 +9,7 @@ import '../support/test_stores.dart';
 void main() {
   test('saves and reads an account', () async {
     await openTestDatabase();
-    final repository = SqliteAccountRepository(AppDatabase.instance);
+    final repository = AccountRepositoryImpl(database: AppDatabase.instance);
     const account = AccountModel(
       id: 'bank',
       name: 'Bank',
@@ -26,7 +26,7 @@ void main() {
 
   test('saves the default cash account languages', () async {
     await openTestDatabase();
-    final repository = SqliteAccountRepository(AppDatabase.instance);
+    final repository = AccountRepositoryImpl(database: AppDatabase.instance);
     const cash = AccountModel(
       id: 'cash',
       languageEn: 'Cash',

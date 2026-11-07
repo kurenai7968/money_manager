@@ -6,69 +6,38 @@ import 'package:money_manager/blocs/app_setting_bloc/app_setting_state.dart';
 import 'package:money_manager/core/extensions/context_extension.dart';
 import 'package:money_manager/l10n/app_localizations.dart';
 import 'package:money_manager/l10n/locale_resolution.dart';
-import 'package:money_manager/models/enums/app_appearance.dart';
-import 'package:money_manager/repositories/account_repository.dart';
-import 'package:money_manager/repositories/app_setting_repository.dart';
-import 'package:money_manager/repositories/category_repository.dart';
-import 'package:money_manager/repositories/transaction_repository.dart';
 import 'package:money_manager/routes/app_router.dart';
 import 'package:money_manager/themes/app_themes.dart';
 
-class App extends StatefulWidget {
-  final AccountRepository? accounts;
-  final CategoryRepository? categories;
-  final TransactionRepository? transactions;
-  final AppSettingRepository? settings;
-
-  const App({
-    super.key,
-    this.accounts,
-    this.categories,
-    this.transactions,
-    this.settings,
-  });
-
-  @override
-  State<App> createState() => _AppState();
-}
-
-class _AppState extends State<App> {
-  late final _router = AppRouter.create();
+class App extends StatelessWidget {
+  const App({super.key});
 
   @override
   Widget build(BuildContext context) {
     return AppProviders(
-      accounts: widget.accounts,
-      categories: widget.categories,
-      transactions: widget.transactions,
-      settings: widget.settings,
-      child:
-          BlocSelector<
-            AppSettingBloc,
-            AppSettingState,
-            (AppAppearance, Locale?)
-          >(
-            selector: (state) =>
-                (state.appSetting.appearance, state.appSetting.locale),
-            builder: (context, data) {
-              final (appearance, locale) = data;
-              return MaterialApp.router(
-                debugShowCheckedModeBanner: false,
-                onGenerateTitle: (context) => context.l10n.home,
-                routerConfig: _router,
-                theme: AppThemes.light,
-                darkTheme: AppThemes.dark,
-                themeMode: appearance.themeMode,
-                locale: locale,
-                localeResolutionCallback: resolveLocale,
-                localizationsDelegates: const [
-                  AppLocalizations.delegate,
-                  ...GlobalMaterialLocalizations.delegates,
-                ],
-                supportedLocales: AppLocalizations.supportedLocales,
-              );
-            },
-          ),
+      child: BlocBuilder<AppSettingBloc, AppSettingState>(
+        buildWhen: (previous, current) =>
+            previous.appSetting.appThemeMode !=
+                current.appSetting.appThemeMode ||
+            previous.appSetting.locale != current.appSetting.locale,
+        builder: (context, state) {
+          return MaterialApp.router(
+            debugShowCheckedModeBanner: false,
+            onGenerateTitle: (context) => context.l10n.home,
+            theme: AppThemes.light,
+            darkTheme: AppThemes.dark,
+            themeMode: state.appSetting.appThemeMode.themeMode,
+            locale: state.appSetting.locale,
+            localeResolutionCallback: resolveLocale,
+            localizationsDelegates: const [
+              AppLocalizations.delegate,
+              ...GlobalMaterialLocalizations.delegates,
+            ],
+            supportedLocales: AppLocalizations.supportedLocales,
+            routerConfig: AppRouter.create(),
+          );
+        },
+      ),
     );
   }
 }

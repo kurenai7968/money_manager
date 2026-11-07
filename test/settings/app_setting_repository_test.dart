@@ -6,7 +6,7 @@ import 'package:money_manager/app_config.dart';
 import 'package:money_manager/core/errors/app_exception.dart';
 import 'package:money_manager/database/shared_preferences/shared_preference_store.dart';
 import 'package:money_manager/models/app_setting_model.dart';
-import 'package:money_manager/models/enums/app_appearance.dart';
+import 'package:money_manager/models/enums/app_theme_mode.dart';
 import 'package:money_manager/models/enums/first_day_of_week.dart';
 import 'package:money_manager/repositories/app_setting_repository.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -29,7 +29,7 @@ void main() {
     const setting = AppSettingModel(
       languageCode: 'zh',
       countryCode: 'CN',
-      appearance: AppAppearance.dark,
+      appThemeMode: AppThemeMode.dark,
       firstDayOfWeek: FirstDayOfWeek.wednesday,
     );
 
@@ -59,14 +59,14 @@ void main() {
     expect((await repository.getAppSetting()).locale, const Locale('en'));
 
     await repository.updateAppSetting(
-      const AppSettingModel(appearance: AppAppearance.light),
+      const AppSettingModel(appThemeMode: AppThemeMode.light),
     );
 
     final loaded = await repository.getAppSetting();
     expect(loaded.languageCode, isEmpty);
     expect(loaded.countryCode, isEmpty);
     expect(loaded.locale, isNull);
-    expect(loaded.appearance, AppAppearance.light);
+    expect(loaded.appThemeMode, AppThemeMode.light);
   });
 
   test('rejects JSON that is not an object', () async {

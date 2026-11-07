@@ -6,7 +6,7 @@ import 'package:money_manager/blocs/app_setting_bloc/app_setting_event.dart';
 import 'package:money_manager/blocs/app_setting_bloc/app_setting_state.dart';
 import 'package:money_manager/core/extensions/context_extension.dart';
 import 'package:money_manager/l10n/app_localizations.dart';
-import 'package:money_manager/models/enums/app_appearance.dart';
+import 'package:money_manager/models/enums/app_theme_mode.dart';
 import 'package:money_manager/models/enums/first_day_of_week.dart';
 import 'package:money_manager/pages/settings/widgets/settings_choice_sheet.dart';
 import 'package:money_manager/pages/settings/widgets/settings_row.dart';
@@ -45,11 +45,9 @@ class SettingsBody extends StatelessWidget {
                 selected: (setting.languageCode, setting.countryCode),
                 onSelected: (value) {
                   context.read<AppSettingBloc>().add(
-                    AppSettingChanged(
-                      setting.copyWith(
-                        languageCode: value.$1,
-                        countryCode: value.$2,
-                      ),
+                    AppSettingLanguageChanged(
+                      languageCode: value.$1,
+                      countryCode: value.$2,
                     ),
                   );
                 },
@@ -57,23 +55,23 @@ class SettingsBody extends StatelessWidget {
             ),
             SettingsRow(
               title: l10n.appearance,
-              value: switch (setting.appearance) {
-                AppAppearance.light => l10n.light,
-                AppAppearance.dark => l10n.dark,
-                AppAppearance.system => l10n.followSystem,
+              value: switch (setting.appThemeMode) {
+                AppThemeMode.light => l10n.light,
+                AppThemeMode.dark => l10n.dark,
+                AppThemeMode.system => l10n.followSystem,
               },
-              onTap: () => showSettingsChoice<AppAppearance>(
+              onTap: () => showSettingsChoice<AppThemeMode>(
                 context,
                 title: l10n.appearance,
                 options: [
-                  (AppAppearance.system, l10n.followSystem),
-                  (AppAppearance.light, l10n.light),
-                  (AppAppearance.dark, l10n.dark),
+                  (AppThemeMode.system, l10n.followSystem),
+                  (AppThemeMode.light, l10n.light),
+                  (AppThemeMode.dark, l10n.dark),
                 ],
-                selected: setting.appearance,
+                selected: setting.appThemeMode,
                 onSelected: (value) {
                   context.read<AppSettingBloc>().add(
-                    AppSettingChanged(setting.copyWith(appearance: value)),
+                    AppSettingThemeModeChanged(appThemeMode: value),
                   );
                 },
               ),
@@ -91,7 +89,7 @@ class SettingsBody extends StatelessWidget {
                 selected: setting.firstDayOfWeek,
                 onSelected: (value) {
                   context.read<AppSettingBloc>().add(
-                    AppSettingChanged(setting.copyWith(firstDayOfWeek: value)),
+                    AppSettingFirstDayOfWeekChanged(firstDayOfWeek: value),
                   );
                 },
               ),

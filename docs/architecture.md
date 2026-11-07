@@ -30,7 +30,7 @@ lib/
 │       ├── app_setting_event.dart
 │       └── app_setting_state.dart
 ├── main.dart                      # Entry point
-├── app.dart                       # AppProviders, then BlocSelector applies the setting to MaterialApp.router
+├── app.dart                       # AppProviders, then BlocBuilder applies theme mode and locale to MaterialApp.router
 ├── app_config.dart                # Banner ids, app setting keys, and similar constants
 ├── app_providers.dart             # RepositoryProviders and AppSettingBloc
 ├── l10n/                     # Localization (.arb files)
@@ -45,7 +45,7 @@ lib/
 │   └── shared_preferences/   # wrapper around package:shared_preferences
 ├── entities/                 # Persistence types. json_serializable, fromJson, toJson, Equatable.
 ├── models/                   # UI and business data only. No entity mapping on the class.
-├── repositories/             # One class per data source
+├── repositories/             # One interface and one [Name]RepositoryImpl per data source
 ├── pages/
 │   ├── [feature_name]/
 │   │   ├── bloc/             # Feature-specific bloc
@@ -59,7 +59,7 @@ lib/
 
 ## Data flow
 
-`AppProviders` provides the repositories and `AppSettingBloc`. `MaterialApp` reads language and appearance from `AppSettingBloc`, so that bloc stays above the router. A page creates the other blocs it uses and dispatches their start events. When an ancestor already provides one of those blocs, the page uses that instance. A page that stays mounted reloads those blocs when the route changes, so a save on another route shows up after returning.
+`App` is a `StatelessWidget`. `AppProviders` constructs `AccountRepositoryImpl`, `CategoryRepositoryImpl`, `TransactionRepositoryImpl`, and `AppSettingRepositoryImpl`, then provides those repositories and `AppSettingBloc`. It does not take repository arguments. Each implementation is named `[Name]RepositoryImpl` and takes named constructor arguments (`database` for SQLite, `store` for settings). `MaterialApp` reads language and `appThemeMode` from `AppSettingBloc` through a `BlocBuilder` whose `buildWhen` watches `appThemeMode` and `locale`, so that bloc stays above the router. A page creates the other blocs it uses and dispatches their start events. When an ancestor already provides one of those blocs, the page uses that instance. A page that stays mounted reloads those blocs when the route changes, so a save on another route shows up after returning.
 
 A screen bloc may subscribe to another bloc and emit the figures and lists that screen shows. The widget does not derive those figures.
 
@@ -131,7 +131,7 @@ An account's opening balance is an income or an expense on that account. The sto
 
 ### Settings
 
-`AppSettingBloc` stores language, appearance (`light`, `dark`, or `system`), and the first day of the week. The first day of the week is `FirstDayOfWeek`, Monday through Sunday. The default is Monday. The stored value is the weekday name. Amounts are stored as numbers.
+`AppSettingModel` stores `languageCode`, `countryCode`, `appThemeMode`, and `firstDayOfWeek`. `appThemeMode` is `AppThemeMode`: `system`, `light`, or `dark`. The JSON field name stays `appearance`. The first day of the week is `FirstDayOfWeek`, Monday through Sunday. The default is Monday. The stored value is the weekday name. Amounts are stored as numbers.
 
 ### Month
 
@@ -147,7 +147,7 @@ The tab bar is Home, Analysis, Accounts, and Settings, with the record button in
 - The record page title is the date and opens the date picker. A segment switches expense, income, and transfer. Expense and income use a category grid and one account, chosen from a bottom sheet. Transfer uses from and to, and has no account button. The check key commits. Edit uses the same page, and delete is the app bar action. Keypad layout is specified in `DESIGN.md`.
 - Accounts shows assets, liabilities, and net worth. An account opens its detail: balance, movement for the month, history, and transfer.
 - Analysis compares the selected month with the previous month, shows the last six months, then totals by category and by account.
-- Settings edits language, appearance, the first weekday, and categories.
+- Settings edits language, theme mode, the first weekday, and categories.
 
 ## Widgets
 
@@ -170,6 +170,8 @@ An account's opening balance appears in the account history and the home list as
 
 The page widget provides each feature bloc it uses, as in Widgets. `AppSettingBloc` is the exception and is created in `AppProviders`.
 
+A widget dispatches one event for the field the user changed. `AppSettingBloc` handles `AppSettingLanguageChanged`, `AppSettingThemeModeChanged`, and `AppSettingFirstDayOfWeekChanged`. Each handler copies the current `AppSettingModel` and saves that copy. The widget does not send a replacement model.
+
 Screen rules live in the bloc. That includes which transactions fall in the month, month totals, day nets, analysis rollups, asset and liability groups, net worth, account history, and whether a record or form can be saved. The bloc calls the pure functions in `core/utils/`. Widgets display the emitted state.
 
 Follow the [bloc library naming conventions](https://bloclibrary.dev/naming-conventions/).
@@ -191,3 +193,5 @@ Follow the [bloc library naming conventions](https://bloclibrary.dev/naming-conv
 - Monthly balance is income minus expense. Transfers stay out of it.
 - A transfer keeps net worth unchanged and uses two different accounts.
 - An account is archived only at a zero balance. A category with transactions is archived, not deleted.
+- Name a repository implementation `[Name]RepositoryImpl` and pass its dependencies as named constructor arguments.
+- Dispatch one bloc event per changed field. The bloc copies the current model and saves it.

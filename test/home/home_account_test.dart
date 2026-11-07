@@ -1,15 +1,13 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:material_ui/material_ui.dart';
-import 'package:money_manager/app.dart';
 import 'package:money_manager/models/account_model.dart';
 import 'package:money_manager/models/ledger_kinds.dart';
 
-import '../support/memory_account_repository.dart';
-import '../support/memory_app_setting_repository.dart';
-import '../support/memory_category_repository.dart';
-import '../support/memory_transaction_repository.dart';
+import '../support/pump_app.dart';
 
 void main() {
+  useAppTestBinding();
+
   testWidgets('Home selects one account or all accounts', (tester) async {
     tester.platformDispatcher.localeTestValue = const Locale('en');
     addTearDown(tester.platformDispatcher.clearLocaleTestValue);
@@ -18,14 +16,7 @@ void main() {
     addTearDown(tester.view.resetPhysicalSize);
     addTearDown(tester.view.resetDevicePixelRatio);
 
-    await tester.pumpWidget(
-      App(
-        accounts: MemoryAccountRepository(),
-        categories: MemoryCategoryRepository(),
-        transactions: MemoryTransactionRepository(),
-        settings: MemoryAppSettingRepository(),
-      ),
-    );
+    await pumpApp(tester);
     await tester.pumpAndSettle();
 
     expect(find.text('All'), findsOneWidget);
@@ -60,26 +51,18 @@ void main() {
     addTearDown(tester.view.resetPhysicalSize);
     addTearDown(tester.view.resetDevicePixelRatio);
 
-    final accounts = MemoryAccountRepository();
-    for (var index = 0; index < 40; index++) {
-      accounts.accounts.add(
-        AccountModel(
-          id: 'account-$index',
-          name: 'Account $index',
-          type: AccountType.cash,
-          openingBalanceMinor: 0,
-          sortOrder: index,
-        ),
-      );
-    }
-
-    await tester.pumpWidget(
-      App(
-        accounts: accounts,
-        categories: MemoryCategoryRepository(),
-        transactions: MemoryTransactionRepository(),
-        settings: MemoryAppSettingRepository(),
-      ),
+    await pumpApp(
+      tester,
+      accounts: [
+        for (var index = 0; index < 40; index++)
+          AccountModel(
+            id: 'account-$index',
+            name: 'Account $index',
+            type: AccountType.cash,
+            openingBalanceMinor: 0,
+            sortOrder: index,
+          ),
+      ],
     );
     await tester.pumpAndSettle();
     await tester.tap(find.byTooltip('Choose account'));

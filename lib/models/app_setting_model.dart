@@ -1,19 +1,19 @@
 import 'dart:ui';
 
 import 'package:equatable/equatable.dart';
-import 'package:money_manager/models/enums/app_appearance.dart';
+import 'package:money_manager/models/enums/app_theme_mode.dart';
 import 'package:money_manager/models/enums/first_day_of_week.dart';
 
 class AppSettingModel extends Equatable {
   final String languageCode;
   final String countryCode;
-  final AppAppearance appearance;
+  final AppThemeMode appThemeMode;
   final FirstDayOfWeek firstDayOfWeek;
 
   const AppSettingModel({
     this.languageCode = '',
     this.countryCode = '',
-    this.appearance = AppAppearance.system,
+    this.appThemeMode = AppThemeMode.system,
     this.firstDayOfWeek = FirstDayOfWeek.monday,
   });
 
@@ -26,13 +26,13 @@ class AppSettingModel extends Equatable {
   AppSettingModel copyWith({
     String? languageCode,
     String? countryCode,
-    AppAppearance? appearance,
+    AppThemeMode? appThemeMode,
     FirstDayOfWeek? firstDayOfWeek,
   }) {
     return AppSettingModel(
       languageCode: languageCode ?? this.languageCode,
       countryCode: countryCode ?? this.countryCode,
-      appearance: appearance ?? this.appearance,
+      appThemeMode: appThemeMode ?? this.appThemeMode,
       firstDayOfWeek: firstDayOfWeek ?? this.firstDayOfWeek,
     );
   }
@@ -41,7 +41,7 @@ class AppSettingModel extends Equatable {
   List<Object?> get props => [
     languageCode,
     countryCode,
-    appearance,
+    appThemeMode,
     firstDayOfWeek,
   ];
 }

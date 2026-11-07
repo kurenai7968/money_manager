@@ -1,17 +1,15 @@
 import 'package:material_ui/material_ui.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:intl/intl.dart';
-import 'package:money_manager/app.dart';
 import 'package:money_manager/pages/record/widgets/record_category_grid.dart';
 import 'package:money_manager/widgets/app_tab_bar.dart';
 import 'package:table_calendar/table_calendar.dart';
 
-import '../support/memory_account_repository.dart';
-import '../support/memory_app_setting_repository.dart';
-import '../support/memory_category_repository.dart';
-import '../support/memory_transaction_repository.dart';
+import '../support/pump_app.dart';
 
 void main() {
+  useAppTestBinding();
+
   testWidgets('Expense records the selected category and can be edited', (
     tester,
   ) async {
@@ -363,14 +361,7 @@ Future<void> pumpLedger(
   await tester.binding.setSurfaceSize(size);
   addTearDown(() => tester.binding.setSurfaceSize(null));
 
-  await tester.pumpWidget(
-    App(
-      accounts: MemoryAccountRepository(),
-      categories: MemoryCategoryRepository(),
-      transactions: MemoryTransactionRepository(),
-      settings: MemoryAppSettingRepository(),
-    ),
-  );
+  await pumpApp(tester);
   await tester.pumpAndSettle();
 }
 

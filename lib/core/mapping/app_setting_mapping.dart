@@ -1,6 +1,6 @@
 import 'package:money_manager/entities/app_setting_entity.dart';
 import 'package:money_manager/models/app_setting_model.dart';
-import 'package:money_manager/models/enums/app_appearance.dart';
+import 'package:money_manager/models/enums/app_theme_mode.dart';
 import 'package:money_manager/models/enums/first_day_of_week.dart';
 
 extension AppSettingEntityMapping on AppSettingEntity {
@@ -8,7 +8,7 @@ extension AppSettingEntityMapping on AppSettingEntity {
     return AppSettingModel(
       languageCode: languageCode,
       countryCode: countryCode,
-      appearance: AppAppearance.values.byName(appearance),
+      appThemeMode: AppThemeMode.values.byName(appearance),
       firstDayOfWeek: FirstDayOfWeek.values.byName(firstDayOfWeek),
     );
   }
@@ -19,7 +19,7 @@ extension AppSettingModelMapping on AppSettingModel {
     return AppSettingEntity(
       languageCode: languageCode,
       countryCode: countryCode,
-      appearance: appearance.name,
+      appearance: appThemeMode.name,
       firstDayOfWeek: firstDayOfWeek.name,
     );
   }

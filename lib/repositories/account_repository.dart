@@ -7,20 +7,16 @@ import 'package:money_manager/models/account_model.dart';
 
 abstract interface class AccountRepository {
   Future<List<AccountModel>> getAll();
-
   Future<bool> isEmpty();
-
   Future<void> save(AccountModel account);
-
   Future<void> archive(String id);
-
   Future<void> reorder(List<String> ids);
 }
 
-class SqliteAccountRepository implements AccountRepository {
+class AccountRepositoryImpl implements AccountRepository {
   final AppDatabase _database;
 
-  SqliteAccountRepository(this._database);
+  AccountRepositoryImpl({required this._database});
 
   @override
   Future<List<AccountModel>> getAll() {
