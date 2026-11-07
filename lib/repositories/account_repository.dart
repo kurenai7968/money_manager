@@ -20,7 +20,7 @@ class AccountRepositoryImpl implements AccountRepository {
 
   @override
   Future<List<AccountModel>> getAll() {
-    return _guard('Accounts could not be read.', () async {
+    return guard('Accounts could not be read.', () async {
       final rows = await _database.query(
         AccountTable.tableName,
         orderBy: '${AccountTable.sortOrder} ASC, ${AccountTable.name} ASC',
@@ -34,7 +34,7 @@ class AccountRepositoryImpl implements AccountRepository {
 
   @override
   Future<bool> isEmpty() {
-    return _guard('Accounts could not be read.', () async {
+    return guard('Accounts could not be read.', () async {
       final count = await _database.count(
         'SELECT COUNT(*) FROM ${AccountTable.tableName}',
       );
@@ -44,7 +44,7 @@ class AccountRepositoryImpl implements AccountRepository {
 
   @override
   Future<void> save(AccountModel account) {
-    return _guard('Account could not be saved.', () async {
+    return guard('Account could not be saved.', () async {
       await _database.insert(
         AccountTable.tableName,
         account.toEntity().toJson(),
@@ -54,7 +54,7 @@ class AccountRepositoryImpl implements AccountRepository {
 
   @override
   Future<void> archive(String id) {
-    return _guard('Account could not be archived.', () {
+    return guard('Account could not be archived.', () {
       return _database.update(
         AccountTable.tableName,
         {AccountTable.archived: 1},
@@ -66,7 +66,7 @@ class AccountRepositoryImpl implements AccountRepository {
 
   @override
   Future<void> reorder(List<String> ids) {
-    return _guard('Accounts could not be reordered.', () {
+    return guard('Accounts could not be reordered.', () {
       return _database.transaction((txn) async {
         for (var index = 0; index < ids.length; index++) {
           await txn.update(
@@ -78,15 +78,5 @@ class AccountRepositoryImpl implements AccountRepository {
         }
       });
     });
-  }
-}
-
-Future<T> _guard<T>(String message, Future<T> Function() action) async {
-  try {
-    return await action();
-  } on AppException {
-    rethrow;
-  } catch (error) {
-    throw CacheException('$message $error');
   }
 }

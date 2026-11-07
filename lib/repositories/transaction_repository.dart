@@ -19,7 +19,7 @@ class TransactionRepositoryImpl implements TransactionRepository {
 
   @override
   Future<List<TransactionModel>> getAll() {
-    return _guard('Transactions could not be read.', () async {
+    return guard('Transactions could not be read.', () async {
       final rows = await _database.query(
         TransactionTable.tableName,
         orderBy: '${TransactionTable.date} DESC, ${TransactionTable.id} DESC',
@@ -33,7 +33,7 @@ class TransactionRepositoryImpl implements TransactionRepository {
 
   @override
   Future<void> save(TransactionModel transaction) {
-    return _guard('Transaction could not be saved.', () async {
+    return guard('Transaction could not be saved.', () async {
       await _database.insert(
         TransactionTable.tableName,
         transaction.toEntity().toJson(),
@@ -43,7 +43,7 @@ class TransactionRepositoryImpl implements TransactionRepository {
 
   @override
   Future<void> delete(String id) {
-    return _guard('Transaction could not be deleted.', () {
+    return guard('Transaction could not be deleted.', () {
       return _database.delete(
         TransactionTable.tableName,
         where: '${TransactionTable.id} = ?',
@@ -54,21 +54,11 @@ class TransactionRepositoryImpl implements TransactionRepository {
 
   @override
   Future<int> countForCategory(String categoryId) {
-    return _guard('Transactions could not be read.', () {
+    return guard('Transactions could not be read.', () {
       return _database.count(
         'SELECT COUNT(*) FROM ${TransactionTable.tableName} WHERE ${TransactionTable.categoryId} = ?',
         [categoryId],
       );
     });
-  }
-}
-
-Future<T> _guard<T>(String message, Future<T> Function() action) async {
-  try {
-    return await action();
-  } on AppException {
-    rethrow;
-  } catch (error) {
-    throw CacheException('$message $error');
   }
 }

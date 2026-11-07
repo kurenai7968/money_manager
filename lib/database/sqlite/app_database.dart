@@ -1,4 +1,5 @@
 import 'package:flutter/foundation.dart';
+import 'package:money_manager/app_config.dart';
 import 'package:money_manager/core/errors/app_exception.dart';
 import 'package:money_manager/database/sqlite/account_table.dart';
 import 'package:money_manager/database/sqlite/category_table.dart';
@@ -26,7 +27,7 @@ class AppDatabase implements SqlExecutor {
     if (_database != null) return;
     _database = await openDatabase(
       path ?? await _defaultPath(),
-      version: 1,
+      version: AppConfig.databaseVersion,
       onCreate: (db, version) async {
         await db.execute(AccountTable.createSql);
         await db.execute(CategoryTable.createSql);
@@ -103,7 +104,7 @@ class AppDatabase implements SqlExecutor {
 
   static Future<String> _defaultPath() async {
     final directory = await getApplicationDocumentsDirectory();
-    return path.join(directory.path, 'money_manager.db');
+    return path.join(directory.path, AppConfig.databaseName);
   }
 }
 

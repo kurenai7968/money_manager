@@ -18,35 +18,27 @@ class AppSettingRepositoryImpl implements AppSettingRepository {
   AppSettingRepositoryImpl({required this.store});
 
   @override
-  Future<AppSettingModel> getAppSetting() async {
-    final json = store.getString(AppConfig.appSettingKey);
-    if (json == null) return const AppSettingModel();
+  Future<AppSettingModel> getAppSetting() {
+    return guard('App setting could not be read.', () async {
+      final json = store.getString(AppConfig.appSettingKey);
+      if (json == null) return const AppSettingModel();
 
-    try {
       final decoded = jsonDecode(json);
       if (decoded is! Map) {
         throw const FormatException('App setting JSON is not an object');
       }
       return AppSettingEntity.fromJson(Map<String, dynamic>.from(decoded))
           .toModel();
-    } on CacheException {
-      rethrow;
-    } catch (error) {
-      throw CacheException('App setting could not be read. $error');
-    }
+    });
   }
 
   @override
-  Future<void> updateAppSetting(AppSettingModel appSetting) async {
-    try {
-      await store.setString(
+  Future<void> updateAppSetting(AppSettingModel appSetting) {
+    return guard('App setting could not be saved.', () {
+      return store.setString(
         AppConfig.appSettingKey,
         jsonEncode(appSetting.toEntity().toJson()),
       );
-    } on AppException {
-      rethrow;
-    } catch (error) {
-      throw CacheException('App setting could not be saved. $error');
-    }
+    });
   }
 }

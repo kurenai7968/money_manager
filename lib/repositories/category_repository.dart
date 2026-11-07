@@ -20,7 +20,7 @@ class CategoryRepositoryImpl implements CategoryRepository {
 
   @override
   Future<List<CategoryModel>> getAll() {
-    return _guard('Categories could not be read.', () async {
+    return guard('Categories could not be read.', () async {
       final rows = await _database.query(
         CategoryTable.tableName,
         orderBy: '${CategoryTable.sortOrder} ASC, ${CategoryTable.name} ASC',
@@ -34,7 +34,7 @@ class CategoryRepositoryImpl implements CategoryRepository {
 
   @override
   Future<bool> isEmpty() {
-    return _guard('Categories could not be read.', () async {
+    return guard('Categories could not be read.', () async {
       final count = await _database.count(
         'SELECT COUNT(*) FROM ${CategoryTable.tableName}',
       );
@@ -44,7 +44,7 @@ class CategoryRepositoryImpl implements CategoryRepository {
 
   @override
   Future<void> save(CategoryModel category) {
-    return _guard('Category could not be saved.', () async {
+    return guard('Category could not be saved.', () async {
       await _database.insert(
         CategoryTable.tableName,
         category.toEntity().toJson(),
@@ -54,7 +54,7 @@ class CategoryRepositoryImpl implements CategoryRepository {
 
   @override
   Future<void> delete(String id) {
-    return _guard('Category could not be deleted.', () {
+    return guard('Category could not be deleted.', () {
       return _database.delete(
         CategoryTable.tableName,
         where: '${CategoryTable.id} = ?',
@@ -65,7 +65,7 @@ class CategoryRepositoryImpl implements CategoryRepository {
 
   @override
   Future<void> reorder(List<String> ids) {
-    return _guard('Categories could not be reordered.', () {
+    return guard('Categories could not be reordered.', () {
       return _database.transaction((txn) async {
         for (var index = 0; index < ids.length; index++) {
           await txn.update(
@@ -77,15 +77,5 @@ class CategoryRepositoryImpl implements CategoryRepository {
         }
       });
     });
-  }
-}
-
-Future<T> _guard<T>(String message, Future<T> Function() action) async {
-  try {
-    return await action();
-  } on AppException {
-    rethrow;
-  } catch (error) {
-    throw CacheException('$message $error');
   }
 }
