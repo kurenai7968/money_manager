@@ -65,6 +65,9 @@
   "invalidTransaction": "Enter an amount greater than zero",
   "needDifferentAccounts": "Choose two different accounts",
   "cancel": "Cancel",
+  "deleteTransactionMessage": "Delete this transaction?",
+  "deleteAccountMessage": "Delete this account?",
+  "deleteCategoryMessage": "Delete this category?",
   "done": "Done",
   "@done": {
     "description": "Confirms the date chosen in the record date picker."

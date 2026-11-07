@@ -187,6 +187,15 @@ class AppLocalizationsZh extends AppLocalizations {
   String get cancel => '取消';
 
   @override
+  String get deleteTransactionMessage => '要刪除這筆交易嗎？';
+
+  @override
+  String get deleteAccountMessage => '要刪除這個帳戶嗎？';
+
+  @override
+  String get deleteCategoryMessage => '要刪除這個分類嗎？';
+
+  @override
   String get done => '完成';
 
   @override
@@ -445,6 +454,15 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
 
   @override
   String get cancel => '取消';
+
+  @override
+  String get deleteTransactionMessage => '要删除这笔交易吗？';
+
+  @override
+  String get deleteAccountMessage => '要删除这个账户吗？';
+
+  @override
+  String get deleteCategoryMessage => '要删除这个分类吗？';
 
   @override
   String get done => '完成';

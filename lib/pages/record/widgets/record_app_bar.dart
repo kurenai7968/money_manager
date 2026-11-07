@@ -8,6 +8,7 @@ import 'package:money_manager/models/ledger_kinds.dart';
 import 'package:money_manager/pages/record/bloc/record_bloc.dart';
 import 'package:money_manager/pages/record/bloc/record_event.dart';
 import 'package:money_manager/pages/record/widgets/record_date_dialog.dart';
+import 'package:money_manager/widgets/confirm_delete_dialog.dart';
 
 class RecordAppBar extends StatelessWidget implements PreferredSizeWidget {
   const RecordAppBar({super.key});
@@ -31,8 +32,7 @@ class RecordAppBar extends StatelessWidget implements PreferredSizeWidget {
       actions: [
         if (state.transactionId != null)
           TextButton(
-            onPressed: () =>
-                context.read<RecordBloc>().add(const RecordDeletePressed()),
+            onPressed: () => _delete(context),
             child: Text(l10n.delete),
           ),
       ],
@@ -64,6 +64,16 @@ class RecordAppBar extends StatelessWidget implements PreferredSizeWidget {
         ),
       ),
     );
+  }
+
+  Future<void> _delete(BuildContext context) async {
+    final confirmed = await showConfirmDeleteDialog(
+      context,
+      context.l10n.deleteTransactionMessage,
+    );
+    if (confirmed && context.mounted) {
+      context.read<RecordBloc>().add(const RecordDeletePressed());
+    }
   }
 
   Future<void> _pickDate(BuildContext context) async {

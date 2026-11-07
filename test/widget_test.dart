@@ -127,4 +127,49 @@ void main() {
 
     expect(find.text('Wallet'), findsOneWidget);
   });
+
+  testWidgets('deleting an account asks for confirmation', (tester) async {
+    tester.platformDispatcher.localeTestValue = const Locale('en');
+    addTearDown(tester.platformDispatcher.clearLocaleTestValue);
+
+    final accounts = MemoryAccountRepository();
+    await tester.pumpWidget(
+      App(
+        accounts: accounts,
+        categories: MemoryCategoryRepository(),
+        transactions: MemoryTransactionRepository(),
+        settings: MemoryAppSettingRepository(),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text('Accounts'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Cash'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Edit'));
+    await tester.pumpAndSettle();
+
+    await tester.ensureVisible(find.text('Delete'));
+    await tester.tap(find.text('Delete'));
+    await tester.pumpAndSettle();
+    expect(find.text('Delete this account?'), findsOneWidget);
+
+    await tester.tap(find.text('Cancel'));
+    await tester.pumpAndSettle();
+    expect(accounts.accounts.single.archived, isFalse);
+
+    await tester.ensureVisible(find.text('Delete'));
+    await tester.tap(find.text('Delete'));
+    await tester.pumpAndSettle();
+    await tester.tap(
+      find.descendant(
+        of: find.byType(AlertDialog),
+        matching: find.text('Delete'),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(accounts.accounts.single.archived, isTrue);
+  });
 }

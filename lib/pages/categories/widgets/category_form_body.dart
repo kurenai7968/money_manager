@@ -11,6 +11,7 @@ import 'package:money_manager/pages/categories/bloc/categories_state.dart';
 import 'package:money_manager/pages/categories/widgets/category_icon_choice.dart';
 import 'package:money_manager/themes/app_themes.dart';
 import 'package:money_manager/themes/ledger_palette.dart';
+import 'package:money_manager/widgets/confirm_delete_dialog.dart';
 
 class CategoryFormBody extends StatefulWidget {
   final String? categoryId;
@@ -202,9 +203,16 @@ class _CategoryFormBodyState extends State<CategoryFormBody> {
     );
   }
 
-  void _delete() {
+  Future<void> _delete() async {
     final id = widget.categoryId;
     if (id == null) {
+      return;
+    }
+    final confirmed = await showConfirmDeleteDialog(
+      context,
+      context.l10n.deleteCategoryMessage,
+    );
+    if (!confirmed || !mounted) {
       return;
     }
     _waiting = true;

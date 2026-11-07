@@ -187,6 +187,15 @@ class AppLocalizationsEn extends AppLocalizations {
   String get cancel => 'Cancel';
 
   @override
+  String get deleteTransactionMessage => 'Delete this transaction?';
+
+  @override
+  String get deleteAccountMessage => 'Delete this account?';
+
+  @override
+  String get deleteCategoryMessage => 'Delete this category?';
+
+  @override
   String get done => 'Done';
 
   @override

@@ -453,6 +453,24 @@ abstract class AppLocalizations {
   /// **'Cancel'**
   String get cancel;
 
+  /// No description provided for @deleteTransactionMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete this transaction?'**
+  String get deleteTransactionMessage;
+
+  /// No description provided for @deleteAccountMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete this account?'**
+  String get deleteAccountMessage;
+
+  /// No description provided for @deleteCategoryMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete this category?'**
+  String get deleteCategoryMessage;
+
   /// Confirms the date chosen in the record date picker.
   ///
   /// In en, this message translates to:

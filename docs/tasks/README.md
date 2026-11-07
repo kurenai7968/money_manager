@@ -38,3 +38,4 @@ Ids are five digits, starting at `00001`. The next id is one greater than the hi
 - 00028 Calendar day amount slot
 - 00029 Store app settings as JSON
 - 00030 Fields before constructors
+- 00031 Confirm before delete

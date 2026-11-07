@@ -8,6 +8,7 @@ import 'package:money_manager/pages/accounts/bloc/account_form_bloc.dart';
 import 'package:money_manager/pages/accounts/bloc/account_form_event.dart';
 import 'package:money_manager/pages/accounts/bloc/account_form_state.dart';
 import 'package:money_manager/themes/app_themes.dart';
+import 'package:money_manager/widgets/confirm_delete_dialog.dart';
 
 class AccountFormBody extends StatefulWidget {
   final String? accountId;
@@ -101,15 +102,20 @@ class _AccountFormBodyState extends State<AccountFormBody> {
             child: Text(l10n.save),
           ),
           if (widget.accountId != null)
-            TextButton(
-              onPressed: () => context.read<AccountFormBloc>().add(
-                const AccountFormArchivePressed(),
-              ),
-              child: Text(l10n.delete),
-            ),
+            TextButton(onPressed: _delete, child: Text(l10n.delete)),
         ],
       ),
     );
+  }
+
+  Future<void> _delete() async {
+    final confirmed = await showConfirmDeleteDialog(
+      context,
+      context.l10n.deleteAccountMessage,
+    );
+    if (confirmed && mounted) {
+      context.read<AccountFormBloc>().add(const AccountFormArchivePressed());
+    }
   }
 }
 

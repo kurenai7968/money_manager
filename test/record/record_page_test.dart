@@ -79,6 +79,20 @@ void main() {
 
     await tester.tap(find.text('Delete'));
     await tester.pumpAndSettle();
+    expect(find.text('Delete this transaction?'), findsOneWidget);
+    await tester.tap(find.text('Cancel'));
+    await tester.pumpAndSettle();
+    expect(find.text('Lunch'), findsOneWidget);
+
+    await tester.tap(find.text('Delete'));
+    await tester.pumpAndSettle();
+    await tester.tap(
+      find.descendant(
+        of: find.byType(AlertDialog),
+        matching: find.text('Delete'),
+      ),
+    );
+    await tester.pumpAndSettle();
     expect(find.text('No transactions this month'), findsOneWidget);
     expect(find.text('Lunch'), findsNothing);
     expect(tester.takeException(), isNull);

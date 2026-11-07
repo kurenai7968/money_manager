@@ -197,6 +197,33 @@ void main() {
     expect(saved.labelFor('zh'), 'Groceries');
     expect(saved.labelFor('zh_CN'), 'Groceries');
   });
+
+  testWidgets('deleting a category asks for confirmation', (tester) async {
+    final categories = _repository([_food]);
+    await _pumpForm(tester, categories, categoryId: 'food');
+
+    await tester.ensureVisible(find.text('Delete'));
+    await tester.tap(find.text('Delete'));
+    await tester.pumpAndSettle();
+    expect(find.text('Delete this category?'), findsOneWidget);
+
+    await tester.tap(find.text('Cancel'));
+    await tester.pumpAndSettle();
+    expect(await categories.getAll(), hasLength(1));
+
+    await tester.ensureVisible(find.text('Delete'));
+    await tester.tap(find.text('Delete'));
+    await tester.pumpAndSettle();
+    await tester.tap(
+      find.descendant(
+        of: find.byType(AlertDialog),
+        matching: find.text('Delete'),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(await categories.getAll(), isEmpty);
+  });
 }
 
 const _delegates = [
