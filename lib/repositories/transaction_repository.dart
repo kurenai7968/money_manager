@@ -22,8 +22,7 @@ class TransactionRepositoryImpl implements TransactionRepository {
     return _guard('Transactions could not be read.', () async {
       final rows = await _database.query(
         TransactionTable.tableName,
-        orderBy:
-            '${TransactionTable.date.column} DESC, ${TransactionTable.id.column} DESC',
+        orderBy: '${TransactionTable.date} DESC, ${TransactionTable.id} DESC',
       );
       return [
         for (final row in rows)
@@ -47,7 +46,7 @@ class TransactionRepositoryImpl implements TransactionRepository {
     return _guard('Transaction could not be deleted.', () {
       return _database.delete(
         TransactionTable.tableName,
-        where: '${TransactionTable.id.column} = ?',
+        where: '${TransactionTable.id} = ?',
         whereArgs: [id],
       );
     });
@@ -57,7 +56,7 @@ class TransactionRepositoryImpl implements TransactionRepository {
   Future<int> countForCategory(String categoryId) {
     return _guard('Transactions could not be read.', () {
       return _database.count(
-        'SELECT COUNT(*) FROM ${TransactionTable.tableName} WHERE ${TransactionTable.categoryId.column} = ?',
+        'SELECT COUNT(*) FROM ${TransactionTable.tableName} WHERE ${TransactionTable.categoryId} = ?',
         [categoryId],
       );
     });

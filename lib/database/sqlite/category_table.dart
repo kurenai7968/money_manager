@@ -1,32 +1,27 @@
-import 'package:money_manager/database/sqlite/table_field.dart';
-
 class CategoryTable {
   static const tableName = 'categories';
 
-  static const id = TableField('id', 'TEXT PRIMARY KEY');
-  static const name = TableField('name', 'TEXT');
-  static const icon = TableField('icon', 'TEXT NOT NULL');
-  static const color = TableField('color', 'TEXT NOT NULL');
-  static const kind = TableField('kind', 'TEXT NOT NULL');
-  static const sortOrder = TableField('sort_order', 'INTEGER NOT NULL');
-  static const archived = TableField('archived', 'INTEGER NOT NULL');
-  static const languageEn = TableField('language_en', 'TEXT');
-  static const languageZh = TableField('language_zh', 'TEXT');
-  static const languageZhCn = TableField('language_zh_cn', 'TEXT');
+  static const id = 'id';
+  static const name = 'name';
+  static const icon = 'icon';
+  static const color = 'color';
+  static const kind = 'kind';
+  static const sortOrder = 'sort_order';
+  static const archived = 'archived';
+  static const languageEn = 'language_en';
+  static const languageZh = 'language_zh';
+  static const languageZhCn = 'language_zh_cn';
 
-  static const fields = [
-    id,
-    name,
-    icon,
-    color,
-    kind,
-    sortOrder,
-    archived,
-    languageEn,
-    languageZh,
-    languageZhCn,
-  ];
-
-  static String get createSql =>
-      'CREATE TABLE $tableName (${fields.map((field) => field.declaration).join(', ')})';
+  static const createSql =
+      'CREATE TABLE $tableName ('
+      '$id TEXT PRIMARY KEY, '
+      '$name TEXT, '
+      '$icon TEXT NOT NULL, '
+      '$color TEXT NOT NULL, '
+      '$kind TEXT NOT NULL, '
+      '$sortOrder INTEGER NOT NULL, '
+      '$archived INTEGER NOT NULL, '
+      '$languageEn TEXT, '
+      '$languageZh TEXT, '
+      '$languageZhCn TEXT)';
 }

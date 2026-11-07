@@ -23,8 +23,7 @@ class CategoryRepositoryImpl implements CategoryRepository {
     return _guard('Categories could not be read.', () async {
       final rows = await _database.query(
         CategoryTable.tableName,
-        orderBy:
-            '${CategoryTable.sortOrder.column} ASC, ${CategoryTable.name.column} ASC',
+        orderBy: '${CategoryTable.sortOrder} ASC, ${CategoryTable.name} ASC',
       );
       return [
         for (final row in rows)
@@ -58,7 +57,7 @@ class CategoryRepositoryImpl implements CategoryRepository {
     return _guard('Category could not be deleted.', () {
       return _database.delete(
         CategoryTable.tableName,
-        where: '${CategoryTable.id.column} = ?',
+        where: '${CategoryTable.id} = ?',
         whereArgs: [id],
       );
     });
@@ -71,8 +70,8 @@ class CategoryRepositoryImpl implements CategoryRepository {
         for (var index = 0; index < ids.length; index++) {
           await txn.update(
             CategoryTable.tableName,
-            {CategoryTable.sortOrder.column: index},
-            where: '${CategoryTable.id.column} = ?',
+            {CategoryTable.sortOrder: index},
+            where: '${CategoryTable.id} = ?',
             whereArgs: [ids[index]],
           );
         }

@@ -1,33 +1,25 @@
-import 'package:money_manager/database/sqlite/table_field.dart';
-
 class AccountTable {
   static const tableName = 'accounts';
 
-  static const id = TableField('id', 'TEXT PRIMARY KEY');
-  static const name = TableField('name', 'TEXT');
-  static const type = TableField('type', 'TEXT NOT NULL');
-  static const openingBalance = TableField(
-    'opening_balance',
-    'INTEGER NOT NULL',
-  );
-  static const sortOrder = TableField('sort_order', 'INTEGER NOT NULL');
-  static const archived = TableField('archived', 'INTEGER NOT NULL');
-  static const languageEn = TableField('language_en', 'TEXT');
-  static const languageZh = TableField('language_zh', 'TEXT');
-  static const languageZhCn = TableField('language_zh_cn', 'TEXT');
+  static const id = 'id';
+  static const name = 'name';
+  static const type = 'type';
+  static const openingBalance = 'opening_balance';
+  static const sortOrder = 'sort_order';
+  static const archived = 'archived';
+  static const languageEn = 'language_en';
+  static const languageZh = 'language_zh';
+  static const languageZhCn = 'language_zh_cn';
 
-  static const fields = [
-    id,
-    name,
-    type,
-    openingBalance,
-    sortOrder,
-    archived,
-    languageEn,
-    languageZh,
-    languageZhCn,
-  ];
-
-  static String get createSql =>
-      'CREATE TABLE $tableName (${fields.map((field) => field.declaration).join(', ')})';
+  static const createSql =
+      'CREATE TABLE $tableName ('
+      '$id TEXT PRIMARY KEY, '
+      '$name TEXT, '
+      '$type TEXT NOT NULL, '
+      '$openingBalance INTEGER NOT NULL, '
+      '$sortOrder INTEGER NOT NULL, '
+      '$archived INTEGER NOT NULL, '
+      '$languageEn TEXT, '
+      '$languageZh TEXT, '
+      '$languageZhCn TEXT)';
 }

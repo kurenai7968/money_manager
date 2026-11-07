@@ -44,3 +44,4 @@ Ids are five digits, starting at `00001`. The next id is one greater than the hi
 - 00034 Match code style in the architecture
 - 00035 Wire router and localization fields
 - 00036 Document localization delegates
+- 00037 SQL column constants

@@ -23,8 +23,7 @@ class AccountRepositoryImpl implements AccountRepository {
     return _guard('Accounts could not be read.', () async {
       final rows = await _database.query(
         AccountTable.tableName,
-        orderBy:
-            '${AccountTable.sortOrder.column} ASC, ${AccountTable.name.column} ASC',
+        orderBy: '${AccountTable.sortOrder} ASC, ${AccountTable.name} ASC',
       );
       return [
         for (final row in rows)
@@ -58,8 +57,8 @@ class AccountRepositoryImpl implements AccountRepository {
     return _guard('Account could not be archived.', () {
       return _database.update(
         AccountTable.tableName,
-        {AccountTable.archived.column: 1},
-        where: '${AccountTable.id.column} = ?',
+        {AccountTable.archived: 1},
+        where: '${AccountTable.id} = ?',
         whereArgs: [id],
       );
     });
@@ -72,8 +71,8 @@ class AccountRepositoryImpl implements AccountRepository {
         for (var index = 0; index < ids.length; index++) {
           await txn.update(
             AccountTable.tableName,
-            {AccountTable.sortOrder.column: index},
-            where: '${AccountTable.id.column} = ?',
+            {AccountTable.sortOrder: index},
+            where: '${AccountTable.id} = ?',
             whereArgs: [ids[index]],
           );
         }
