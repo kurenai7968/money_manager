@@ -43,9 +43,17 @@ void main() {
           .hitTestable(),
       findsNothing,
     );
+    final sheet = tester.widget<BottomSheet>(find.byType(BottomSheet));
+    expect(sheet.backgroundColor, AppThemes.light.scaffoldBackgroundColor);
+    final theme = Theme.of(tester.element(find.byType(BottomSheet)))
+        .bottomSheetTheme;
+    expect(theme.elevation, 0);
+    expect(theme.modalElevation, 0);
     expect(
-      tester.widget<BottomSheet>(find.byType(BottomSheet)).backgroundColor,
-      AppThemes.light.scaffoldBackgroundColor,
+      theme.shape,
+      const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(AppRadius.m)),
+      ),
     );
   });
 }

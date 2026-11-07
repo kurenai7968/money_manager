@@ -19,6 +19,7 @@ class HomeState extends Equatable {
   final List<TransactionModel> selectedTransactions;
   final List<CategoryModel> categories;
   final List<AccountModel> accounts;
+  final String? selectedAccountId;
 
   const HomeState({
     required this.month,
@@ -31,6 +32,7 @@ class HomeState extends Equatable {
     this.selectedTransactions = const [],
     this.categories = const [],
     this.accounts = const [],
+    this.selectedAccountId,
   });
 
   HomeState copyWith({
@@ -45,6 +47,8 @@ class HomeState extends Equatable {
     List<TransactionModel>? selectedTransactions,
     List<CategoryModel>? categories,
     List<AccountModel>? accounts,
+    String? selectedAccountId,
+    bool clearSelectedAccount = false,
   }) {
     return HomeState(
       status: status ?? this.status,
@@ -57,6 +61,9 @@ class HomeState extends Equatable {
       selectedTransactions: selectedTransactions ?? this.selectedTransactions,
       categories: categories ?? this.categories,
       accounts: accounts ?? this.accounts,
+      selectedAccountId: clearSelectedAccount
+          ? null
+          : selectedAccountId ?? this.selectedAccountId,
     );
   }
 
@@ -72,5 +79,6 @@ class HomeState extends Equatable {
     selectedTransactions,
     categories,
     accounts,
+    selectedAccountId,
   ];
 }

@@ -141,7 +141,7 @@ The home summary and calendar share one month. That month has one balance: incom
 
 The tab bar is Home, Analysis, Accounts, and Settings, with the record button in the center. Every tab uses that bar. The record page hides it. App bar titles are centered.
 
-- Home is one page. The title is the month. One action switches summary and calendar.
+- Home is one page. The title is the month. A leading control selects one account or all accounts. One action switches summary and calendar. Summary, calendar, and the transaction list follow that selection. All accounts is the default. A single account includes its expenses, incomes, and transfers that use it. Archived accounts stay out of the picker. When the selected account is gone, the selection returns to all accounts. The choice lasts for this home session.
 - Summary shows income and expense, then a donut with the month balance in the center. Under the donut is a transaction list.
 - Calendar uses the same month. A selected day shows that day's transactions.
 - The record page title is the date and opens the date picker. A segment switches expense, income, and transfer. Expense and income use a category grid and one account, chosen from a bottom sheet. Transfer uses from and to, and has no account button. The check key commits. Edit uses the same page, and delete is the app bar action. Keypad layout is specified in `DESIGN.md`.
@@ -160,7 +160,7 @@ BlocProvider(
 )
 ```
 
-A page that needs more than one bloc nests those providers the same way. `SettingsPage` does not create `AppSettingBloc`. The bloc for that screen holds the decisions shared by the app bar and the body: selected month, selected day, summary or calendar, analysis kind, and the record draft. Widgets read the bloc state and send events. They format text, paint, and lay out children. A widget keeps a controller only for a text field or a tab bar.
+A page that needs more than one bloc nests those providers the same way. `SettingsPage` does not create `AppSettingBloc`. The bloc for that screen holds the decisions shared by the app bar and the body: selected month, selected day, summary or calendar, the home account (one account or all), analysis kind, and the record draft. Widgets read the bloc state and send events. They format text, paint, and lay out children. A widget keeps a controller only for a text field or a tab bar.
 
 Split the rest of a screen into small widgets by responsibility, section, or interaction. Keep widgets used by one feature in `pages/[feature_name]/widgets/`. Move a widget to `lib/widgets/` only when more than one feature uses it and it has no feature-specific presentation logic.
 

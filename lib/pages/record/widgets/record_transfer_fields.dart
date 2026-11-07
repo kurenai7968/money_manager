@@ -65,6 +65,7 @@ class RecordTransferFields extends StatelessWidget {
   ) async {
     final selected = await showLedgerSheet<String>(
       context: context,
+      maxHeightFactor: 0.5,
       builder: (context) =>
           RecordAccountSheet(accounts: accounts, selectedId: selectedId),
     );

@@ -180,6 +180,7 @@ class _RecordMeta extends StatelessWidget {
   Future<void> _pickAccount(BuildContext context, RecordState state) async {
     final selected = await showLedgerSheet<String>(
       context: context,
+      maxHeightFactor: 0.5,
       builder: (context) {
         return RecordAccountSheet(
           accounts: state.accounts,

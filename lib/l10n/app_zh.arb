@@ -53,6 +53,7 @@
   "fromAccount": "從",
   "toAccount": "到",
   "chooseAccount": "選擇帳戶",
+  "allAccounts": "全部",
   "netUnchanged": "淨資產不變",
   "needAccount": "請先新增帳戶",
   "needCategory": "請選擇分類",

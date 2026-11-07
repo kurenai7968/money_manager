@@ -69,6 +69,14 @@ abstract final class AppThemes {
         backgroundColor: scheme.surface,
         modalBackgroundColor: scheme.surface,
         surfaceTintColor: Colors.transparent,
+        elevation: 0,
+        modalElevation: 0,
+        clipBehavior: Clip.antiAlias,
+        shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(
+            top: Radius.circular(AppRadius.m),
+          ),
+        ),
       ),
     );
   }

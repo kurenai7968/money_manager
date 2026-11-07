@@ -5,6 +5,9 @@ import 'package:money_manager/core/utils/cached_date_format.dart';
 import 'package:money_manager/pages/home/bloc/home_bloc.dart';
 import 'package:money_manager/pages/home/bloc/home_event.dart';
 import 'package:money_manager/pages/home/bloc/home_state.dart';
+import 'package:money_manager/pages/home/widgets/home_account_sheet.dart';
+import 'package:money_manager/themes/app_themes.dart';
+import 'package:money_manager/widgets/ledger_sheet.dart';
 
 class HomeAppBar extends StatelessWidget implements PreferredSizeWidget {
   const HomeAppBar({super.key});
@@ -20,6 +23,12 @@ class HomeAppBar extends StatelessWidget implements PreferredSizeWidget {
     final locale = Localizations.localeOf(context).toString();
     final monthLabel = cachedYearMonth(locale).format(state.month);
     return AppBar(
+      leadingWidth: 120,
+      leading: _HomeAccountButton(
+        label: _accountLabel(context, state),
+        tooltip: l10n.chooseAccount,
+        onPressed: () => _pickAccount(context, state),
+      ),
       title: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -48,6 +57,79 @@ class HomeAppBar extends StatelessWidget implements PreferredSizeWidget {
           ),
         ),
       ],
+    );
+  }
+
+  Future<void> _pickAccount(BuildContext context, HomeState state) async {
+    final picked = await showLedgerSheet<HomeAccountPick>(
+      context: context,
+      maxHeightFactor: 0.5,
+      builder: (context) {
+        return HomeAccountSheet(
+          accounts: [
+            for (final account in state.accounts)
+              if (!account.archived) account,
+          ],
+          selectedId: state.selectedAccountId,
+        );
+      },
+    );
+    if (picked != null && context.mounted) {
+      context.read<HomeBloc>().add(HomeAccountSelected(picked.accountId));
+    }
+  }
+}
+
+String _accountLabel(BuildContext context, HomeState state) {
+  final selectedId = state.selectedAccountId;
+  if (selectedId == null) {
+    return context.l10n.allAccounts;
+  }
+  for (final account in state.accounts) {
+    if (account.id == selectedId) {
+      return account.labelFor(context.categoryLanguageCode);
+    }
+  }
+  return context.l10n.allAccounts;
+}
+
+class _HomeAccountButton extends StatelessWidget {
+  final String label;
+  final String tooltip;
+  final VoidCallback onPressed;
+
+  const _HomeAccountButton({
+    required this.label,
+    required this.tooltip,
+    required this.onPressed,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Tooltip(
+      message: tooltip,
+      child: InkWell(
+        onTap: onPressed,
+        child: SizedBox(
+          height: kToolbarHeight,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: AppSpacing.s),
+            child: Row(
+              children: [
+                Flexible(
+                  child: Text(
+                    label,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: Theme.of(context).textTheme.labelLarge,
+                  ),
+                ),
+                const Icon(Icons.expand_more, size: 18),
+              ],
+            ),
+          ),
+        ),
+      ),
     );
   }
 }

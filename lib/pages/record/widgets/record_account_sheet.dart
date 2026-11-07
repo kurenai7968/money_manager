@@ -17,8 +17,8 @@ class RecordAccountSheet extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = context.l10n;
     return SafeArea(
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
+      child: ListView(
+        shrinkWrap: true,
         children: [
           Padding(
             padding: const EdgeInsets.all(AppSpacing.l),

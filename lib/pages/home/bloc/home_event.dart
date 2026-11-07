@@ -36,3 +36,12 @@ class HomeDaySelected extends HomeEvent {
 class HomeSourcesChanged extends HomeEvent {
   const HomeSourcesChanged();
 }
+
+class HomeAccountSelected extends HomeEvent {
+  final String? accountId;
+
+  const HomeAccountSelected(this.accountId);
+
+  @override
+  List<Object?> get props => [accountId];
+}

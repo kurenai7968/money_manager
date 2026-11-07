@@ -53,6 +53,7 @@
   "fromAccount": "从",
   "toAccount": "到",
   "chooseAccount": "选择账户",
+  "allAccounts": "全部",
   "netUnchanged": "净资产不变",
   "needAccount": "请先新增账户",
   "needCategory": "请选择分类",

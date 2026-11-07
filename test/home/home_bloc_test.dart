@@ -1,6 +1,7 @@
 import 'package:bloc_test/bloc_test.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:money_manager/models/account_model.dart';
 import 'package:money_manager/models/category_defaults.dart';
 import 'package:money_manager/models/ledger_kinds.dart';
 import 'package:money_manager/models/transaction_model.dart';
@@ -26,11 +27,13 @@ void main() {
   const now = _Now();
 
   late MemoryTransactionRepository transactionsRepo;
+  late MemoryAccountRepository accountRepo;
   late TransactionsBloc transactions;
   late CategoriesBloc categories;
   late AccountsBloc accounts;
 
   setUp(() {
+    accountRepo = MemoryAccountRepository();
     transactionsRepo = MemoryTransactionRepository()
       ..transactions.add(
         TransactionModel(
@@ -57,7 +60,7 @@ void main() {
       MemoryAccountRepository(),
     );
     categories = CategoriesBloc(MemoryCategoryRepository());
-    accounts = AccountsBloc(MemoryAccountRepository(), transactionsRepo);
+    accounts = AccountsBloc(accountRepo, transactionsRepo);
   });
 
   tearDown(() async {
@@ -141,6 +144,110 @@ void main() {
           .having((state) => state.transactions, 'rows', isEmpty),
     ],
   );
+
+  blocTest<HomeBloc, HomeState>(
+    'limits the month to one account and can return to all',
+    build: () => HomeBloc(
+      transactions: transactions,
+      categories: categories,
+      accounts: accounts,
+      now: now,
+    ),
+    act: (bloc) async {
+      accountRepo.accounts.add(_account('cash', 0));
+      accountRepo.accounts.add(_account('bank', 1, type: AccountType.bank));
+      transactionsRepo.transactions.add(
+        TransactionModel(
+          id: 'pay',
+          type: TransactionType.income,
+          amountMinor: 900,
+          date: DateTime(2026, 10, 15),
+          accountId: 'bank',
+          categoryId: 'salary',
+        ),
+      );
+      await _load(transactions, categories, accounts);
+      bloc.add(const HomeStarted());
+      bloc.add(const HomeAccountSelected('bank'));
+      bloc.add(const HomeAccountSelected('cash'));
+      bloc.add(const HomeAccountSelected(null));
+    },
+    expect: () => [
+      isA<HomeState>()
+          .having((state) => state.selectedAccountId, 'account', isNull)
+          .having((state) => state.figures.incomeMinor, 'income', 900)
+          .having((state) => state.figures.expenseMinor, 'expense', 1800)
+          .having((state) => state.transactions, 'rows', hasLength(3)),
+      isA<HomeState>()
+          .having((state) => state.selectedAccountId, 'account', 'bank')
+          .having((state) => state.figures.incomeMinor, 'income', 900)
+          .having((state) => state.figures.expenseMinor, 'expense', 0)
+          .having((state) => state.transactions, 'rows', hasLength(2)),
+      isA<HomeState>()
+          .having((state) => state.selectedAccountId, 'account', 'cash')
+          .having((state) => state.figures.incomeMinor, 'income', 0)
+          .having((state) => state.figures.expenseMinor, 'expense', 1800)
+          .having((state) => state.transactions, 'rows', hasLength(2))
+          .having((state) => state.days.single.netMinor, 'net', -1800),
+      isA<HomeState>()
+          .having((state) => state.selectedAccountId, 'account', isNull)
+          .having((state) => state.transactions, 'rows', hasLength(3)),
+    ],
+  );
+
+  blocTest<HomeBloc, HomeState>(
+    'returns to all when the selected account is missing or archived',
+    build: () => HomeBloc(
+      transactions: transactions,
+      categories: categories,
+      accounts: accounts,
+      now: now,
+    ),
+    act: (bloc) async {
+      accountRepo.accounts.add(_account('cash', 0));
+      await _load(transactions, categories, accounts);
+      bloc.add(const HomeStarted());
+      bloc.add(const HomeAccountSelected('missing'));
+      bloc.add(const HomeAccountSelected('cash'));
+      accountRepo.accounts[0] = accountRepo.accounts[0].copyWith(
+        archived: true,
+      );
+      accounts.add(const AccountsStarted());
+      await _until(accounts, (state) => state.status == AccountsStatus.success);
+    },
+    expect: () => [
+      isA<HomeState>().having(
+        (state) => state.selectedAccountId,
+        'account',
+        isNull,
+      ),
+      isA<HomeState>()
+          .having((state) => state.selectedAccountId, 'account', 'cash')
+          .having((state) => state.transactions, 'rows', hasLength(2)),
+      isA<HomeState>()
+          .having((state) => state.selectedAccountId, 'account', isNull)
+          .having((state) => state.transactions, 'rows', hasLength(2))
+          .having(
+            (state) => state.accounts.single.archived,
+            'archived',
+            isTrue,
+          ),
+    ],
+  );
+}
+
+AccountModel _account(
+  String id,
+  int sortOrder, {
+  AccountType type = AccountType.cash,
+}) {
+  return AccountModel(
+    id: id,
+    name: id,
+    type: type,
+    openingBalanceMinor: 0,
+    sortOrder: sortOrder,
+  );
 }
 
 class _Now {
@@ -177,10 +284,7 @@ Future<void> _load(
   );
 }
 
-Future<void> _until<S>(
-  BlocBase<S> bloc,
-  bool Function(S state) done,
-) async {
+Future<void> _until<S>(BlocBase<S> bloc, bool Function(S state) done) async {
   if (done(bloc.state)) {
     return;
   }

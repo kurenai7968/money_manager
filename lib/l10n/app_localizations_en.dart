@@ -169,6 +169,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get chooseAccount => 'Choose account';
 
   @override
+  String get allAccounts => 'All';
+
+  @override
   String get netUnchanged => 'Net worth stays the same';
 
   @override

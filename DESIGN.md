@@ -8,6 +8,7 @@ Personal ledger for one person. Phone first. Utility register.
 - Category colors, reused and not free-form: 飲食 `#C2410C`, 交通 `#1D4ED8`, 住房 `#B45309`, 購物 `#0F766E`, 娛樂 `#BE185D`, 醫療 `#0E7A42`, 其他 `#3F4A57`. A category uses its color for its icon circle and its slice of the summary donut.
 - Surfaces: one page color `#F7F7F6` for the screen and the keyboard. Hairline `#E6E6E4`, ink `#171717`, muted `#5C5C5C`. No separate keyboard panel.
 - Motion: Calm. Press feedback only. Sheets use the platform transition.
+- Sheets: the page background, a 12 top radius, and no shadow. An account sheet is at most half the screen tall.
 - Voice: Minimal and matter-of-fact. Traditional Chinese and English. Buttons name the outcome.
 - Dials: variance 3, motion 3, density 5.
 - Primary action: 記一筆. The center tab button opens the transaction page. On that page the keypad commits with a check key. While an operator is pending, that key shows equals and evaluates before the check returns. The tab bar is hidden. Default type is expense. A new expense or income selects the first category of that kind.
@@ -20,6 +21,8 @@ Personal ledger for one person. Phone first. Utility register.
 - 2026-10-23: Light editorial ledger and persimmon accent. Superseded the same day.
 - 2026-10-23: Style is Minimal and clean. Monochrome. Serif and persimmon are out.
 - 2026-10-23: Home is one page. The app bar has one action. Its icon is the other mode: calendar opens the calendar, bars return to the summary. The month stays in the title.
+- 2026-11-06: The home app bar keeps the month as the centered title and the action that switches summary and calendar. A leading control selects one account or all accounts. All is the default. The control opens a sheet.
+- 2026-11-06: Modal bottom sheets use the page background, a 12 top radius, and no shadow. An account sheet is at most half the screen and scrolls past that.
 - 2026-10-23: A month has one 結餘: income minus expense. Transfers stay out of 結餘.
 - 2026-10-23: Category create and edit live under Settings. The transaction page only picks a category.
 - 2026-10-23: Settings holds language, appearance, currency, first weekday, and categories.

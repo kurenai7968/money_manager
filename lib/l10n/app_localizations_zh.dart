@@ -169,6 +169,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get chooseAccount => '選擇帳戶';
 
   @override
+  String get allAccounts => '全部';
+
+  @override
   String get netUnchanged => '淨資產不變';
 
   @override
@@ -436,6 +439,9 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
 
   @override
   String get chooseAccount => '选择账户';
+
+  @override
+  String get allAccounts => '全部';
 
   @override
   String get netUnchanged => '净资产不变';

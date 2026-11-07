@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:money_manager/core/utils/ledger_balance.dart';
+import 'package:money_manager/models/transaction_model.dart';
 import 'package:money_manager/pages/accounts/bloc/accounts_bloc.dart';
 import 'package:money_manager/pages/accounts/bloc/accounts_state.dart';
 import 'package:money_manager/pages/categories/bloc/categories_bloc.dart';
@@ -33,6 +34,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     on<HomeViewToggled>(_onViewToggled);
     on<HomeDaySelected>(_onDaySelected);
     on<HomeSourcesChanged>(_onSourcesChanged);
+    on<HomeAccountSelected>(_onAccountSelected);
   }
 
   static HomeState _initial(DateTime Function() now) {
@@ -98,13 +100,25 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     _publish(emit, state);
   }
 
+  void _onAccountSelected(HomeAccountSelected event, Emitter<HomeState> emit) {
+    _publish(
+      emit,
+      state.copyWith(
+        selectedAccountId: event.accountId,
+        clearSelectedAccount: event.accountId == null,
+      ),
+    );
+  }
+
   void _publish(Emitter<HomeState> emit, HomeState base) {
     final month = base.month;
-    final transactions = [
+    final inMonth = [
       for (final item in _transactions.state.transactions)
         if (item.date.year == month.year && item.date.month == month.month)
           item,
     ];
+    final accountId = _activeAccountId(base.selectedAccountId);
+    final transactions = _forAccount(inMonth, accountId);
     final days = daysOf(transactions);
     final failed =
         _transactions.state.status == TransactionsStatus.failure ||
@@ -113,6 +127,8 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     emit(
       base.copyWith(
         status: failed ? HomeStatus.failure : HomeStatus.success,
+        selectedAccountId: accountId,
+        clearSelectedAccount: accountId == null,
         transactions: transactions,
         figures: monthFigures(transactions, month),
         days: days,
@@ -123,6 +139,18 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     );
   }
 
+  String? _activeAccountId(String? accountId) {
+    if (accountId == null) {
+      return null;
+    }
+    for (final account in _accounts.state.accounts) {
+      if (account.id == accountId && !account.archived) {
+        return accountId;
+      }
+    }
+    return null;
+  }
+
   @override
   Future<void> close() {
     for (final subscription in _subscriptions) {
@@ -130,4 +158,20 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     }
     return super.close();
   }
+}
+
+List<TransactionModel> _forAccount(
+  List<TransactionModel> transactions,
+  String? accountId,
+) {
+  if (accountId == null) {
+    return transactions;
+  }
+  return [
+    for (final item in transactions)
+      if (item.accountId == accountId ||
+          item.fromAccountId == accountId ||
+          item.toAccountId == accountId)
+        item,
+  ];
 }

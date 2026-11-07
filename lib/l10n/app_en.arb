@@ -59,6 +59,7 @@
   "fromAccount": "From",
   "toAccount": "To",
   "chooseAccount": "Choose account",
+  "allAccounts": "All",
   "netUnchanged": "Net worth stays the same",
   "needAccount": "Add an account first",
   "needCategory": "Choose a category",

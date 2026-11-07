@@ -417,6 +417,12 @@ abstract class AppLocalizations {
   /// **'Choose account'**
   String get chooseAccount;
 
+  /// No description provided for @allAccounts.
+  ///
+  /// In en, this message translates to:
+  /// **'All'**
+  String get allAccounts;
+
   /// No description provided for @netUnchanged.
   ///
   /// In en, this message translates to:
