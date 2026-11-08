@@ -10,7 +10,3 @@ sealed class AccountDetailEvent extends Equatable {
 class AccountDetailStarted extends AccountDetailEvent {
   const AccountDetailStarted();
 }
-
-class AccountDetailSourcesChanged extends AccountDetailEvent {
-  const AccountDetailSourcesChanged();
-}

@@ -33,10 +33,6 @@ class HomeDaySelected extends HomeEvent {
   List<Object?> get props => [day];
 }
 
-class HomeSourcesChanged extends HomeEvent {
-  const HomeSourcesChanged();
-}
-
 class HomeAccountSelected extends HomeEvent {
   final String? accountId;
 

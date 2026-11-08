@@ -50,7 +50,3 @@ class AccountFormSavePressed extends AccountFormEvent {
 class AccountFormArchivePressed extends AccountFormEvent {
   const AccountFormArchivePressed();
 }
-
-class AccountFormSourcesChanged extends AccountFormEvent {
-  const AccountFormSourcesChanged();
-}

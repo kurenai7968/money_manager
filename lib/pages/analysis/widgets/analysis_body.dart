@@ -3,18 +3,12 @@ import 'package:material_ui/material_ui.dart';
 import 'package:money_manager/core/extensions/context_extension.dart';
 import 'package:money_manager/core/utils/money_format.dart';
 import 'package:money_manager/models/account_model.dart';
-import 'package:money_manager/models/category_defaults.dart';
 import 'package:money_manager/models/category_model.dart';
-import 'package:money_manager/pages/accounts/bloc/accounts_bloc.dart';
-import 'package:money_manager/pages/accounts/bloc/accounts_event.dart';
 import 'package:money_manager/pages/analysis/bloc/analysis_bloc.dart';
+import 'package:money_manager/pages/analysis/bloc/analysis_event.dart';
 import 'package:money_manager/pages/analysis/widgets/analysis_month_bars.dart';
 import 'package:money_manager/pages/analysis/widgets/analysis_total_row.dart';
-import 'package:money_manager/pages/categories/bloc/categories_bloc.dart';
-import 'package:money_manager/pages/categories/bloc/categories_event.dart';
 import 'package:money_manager/pages/route_reload.dart';
-import 'package:money_manager/pages/transactions/bloc/transactions_bloc.dart';
-import 'package:money_manager/pages/transactions/bloc/transactions_event.dart';
 import 'package:money_manager/themes/app_themes.dart';
 import 'package:money_manager/themes/ledger_palette.dart';
 
@@ -28,9 +22,7 @@ class AnalysisBody extends StatefulWidget {
 class _AnalysisBodyState extends State<AnalysisBody> with RouteReload {
   @override
   void reloadForRoute() {
-    context.read<AccountsBloc>().add(const AccountsStarted());
-    context.read<TransactionsBloc>().add(const TransactionsStarted());
-    context.read<CategoriesBloc>().add(CategoriesStarted(defaultCategories()));
+    context.read<AnalysisBloc>().add(const AnalysisStarted());
   }
 
   @override

@@ -1,8 +1,10 @@
 import 'package:bloc_test/bloc_test.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:money_manager/core/utils/ledger_balance.dart';
 import 'package:money_manager/models/account_model.dart';
 import 'package:money_manager/models/ledger_kinds.dart';
 import 'package:money_manager/models/transaction_model.dart';
+import 'package:money_manager/repositories/account_repository.dart';
 import 'package:money_manager/pages/accounts/bloc/accounts_bloc.dart';
 import 'package:money_manager/pages/accounts/bloc/accounts_event.dart';
 import 'package:money_manager/pages/accounts/bloc/accounts_state.dart';
@@ -69,8 +71,10 @@ void main() {
     'saves an account',
     build: () => AccountsBloc(repository, transactions),
     act: (bloc) => bloc.add(const AccountSavePressed(cash)),
-    expect: () => const [
-      AccountsState(status: AccountsStatus.success, accounts: [cash]),
+    expect: () => [
+      isA<AccountsState>()
+          .having((state) => state.status, 'status', AccountsStatus.success)
+          .having((state) => state.accounts, 'accounts', [cash]),
     ],
     verify: (bloc) {
       expect(bloc.state.netWorth, 1500);
@@ -211,6 +215,78 @@ void main() {
     },
   );
 
+  blocTest<AccountsBloc, AccountsState>(
+    'groups assets and liabilities and counts net worth once',
+    build: () => AccountsBloc(repository, transactions),
+    setUp: () {
+      repository.accounts.addAll(const [
+        AccountModel(
+          id: 'cash',
+          name: 'Cash',
+          type: AccountType.cash,
+          openingBalanceMinor: 10000,
+          sortOrder: 0,
+        ),
+        AccountModel(
+          id: 'card',
+          name: 'Card',
+          type: AccountType.credit,
+          openingBalanceMinor: 3000,
+          sortOrder: 1,
+        ),
+        AccountModel(
+          id: 'old',
+          name: 'Old',
+          type: AccountType.bank,
+          openingBalanceMinor: 0,
+          sortOrder: 2,
+          archived: true,
+        ),
+      ]);
+      transactions.transactions.add(
+        TransactionModel(
+          id: 'lunch',
+          type: TransactionType.expense,
+          amountMinor: 2000,
+          date: DateTime(2026, 10, 1),
+          accountId: 'cash',
+          categoryId: 'food',
+        ),
+      );
+    },
+    act: (bloc) => bloc.add(const AccountsStarted()),
+    verify: (bloc) {
+      expect(bloc.state.assets.map((line) => line.account.id), ['cash']);
+      expect(bloc.state.assets.single.balanceMinor, 8000);
+      expect(bloc.state.liabilities.single.account.id, 'card');
+      expect(
+        bloc.state.netWorth,
+        netWorthOf(
+          repository.accounts.where((item) => !item.archived),
+          transactions.transactions,
+        ),
+      );
+    },
+  );
+
+  blocTest<AccountsBloc, AccountsState>(
+    'emits failure when accounts cannot be read',
+    build: () => AccountsBloc(_FailingAccounts(), transactions),
+    act: (bloc) => bloc.add(const AccountsStarted()),
+    expect: () => [
+      isA<AccountsState>().having(
+        (state) => state.status,
+        'status',
+        AccountsStatus.loading,
+      ),
+      isA<AccountsState>().having(
+        (state) => state.status,
+        'status',
+        AccountsStatus.failure,
+      ),
+    ],
+  );
+
   test('net worth subtracts credit owed', () {
     expect(
       netWorthMinor(const [
@@ -232,4 +308,21 @@ void main() {
       3800,
     );
   });
+}
+
+class _FailingAccounts implements AccountRepository {
+  @override
+  Future<void> archive(String id) async {}
+
+  @override
+  Future<List<AccountModel>> getAll() async => throw StateError('unavailable');
+
+  @override
+  Future<bool> isEmpty() async => throw StateError('unavailable');
+
+  @override
+  Future<void> reorder(List<String> ids) async {}
+
+  @override
+  Future<void> save(AccountModel account) async {}
 }

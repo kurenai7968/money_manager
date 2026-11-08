@@ -1,32 +1,32 @@
-import 'dart:async';
-
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:money_manager/core/utils/id.dart';
 import 'package:money_manager/core/utils/ledger_balance.dart';
+import 'package:money_manager/core/utils/ledger_commands.dart';
+import 'package:money_manager/core/utils/queued_bloc.dart';
 import 'package:money_manager/core/utils/money_format.dart';
 import 'package:money_manager/models/account_model.dart';
+import 'package:money_manager/models/transaction_model.dart';
 import 'package:money_manager/pages/accounts/bloc/account_form_event.dart';
 import 'package:money_manager/pages/accounts/bloc/account_form_state.dart';
-import 'package:money_manager/pages/accounts/bloc/accounts_bloc.dart';
-import 'package:money_manager/pages/accounts/bloc/accounts_event.dart';
-import 'package:money_manager/pages/accounts/bloc/accounts_state.dart';
-import 'package:money_manager/pages/transactions/bloc/transactions_bloc.dart';
+import 'package:money_manager/repositories/account_repository.dart';
+import 'package:money_manager/repositories/transaction_repository.dart';
 
-class AccountFormBloc extends Bloc<AccountFormEvent, AccountFormState> {
-  final AccountsBloc _accounts;
-  final TransactionsBloc _transactions;
-  final _subscriptions = <StreamSubscription<dynamic>>[];
+class AccountFormBloc extends Bloc<AccountFormEvent, AccountFormState>
+    with QueuedBloc<AccountFormEvent, AccountFormState> {
+  final AccountRepository _accounts;
+  final TransactionRepository _transactions;
   var _prepared = false;
-  var _submitting = false;
   String? _languageCode;
   String? _languageEn;
   String? _languageZh;
   String? _languageZhCn;
   var _locale = 'en';
+  List<AccountModel> _accountRows = const [];
+  List<TransactionModel> _transactionRows = const [];
 
   AccountFormBloc({
-    required AccountsBloc accounts,
-    required TransactionsBloc transactions,
+    required AccountRepository accounts,
+    required TransactionRepository transactions,
   }) : _accounts = accounts,
        _transactions = transactions,
        super(AccountFormState(accountId: createId())) {
@@ -34,29 +34,29 @@ class AccountFormBloc extends Bloc<AccountFormEvent, AccountFormState> {
     on<AccountFormTypeSelected>(_onTypeSelected);
     on<AccountFormSavePressed>(_onSave);
     on<AccountFormArchivePressed>(_onArchive);
-    on<AccountFormSourcesChanged>(_onSourcesChanged);
   }
 
-  void _listen() {
-    if (_subscriptions.isNotEmpty) {
-      return;
-    }
-    _subscriptions.add(
-      _accounts.stream.listen((_) => add(const AccountFormSourcesChanged())),
-    );
-  }
-
-  void _onStarted(AccountFormStarted event, Emitter<AccountFormState> emit) {
+  Future<void> _onStarted(
+    AccountFormStarted event,
+    Emitter<AccountFormState> emit,
+  ) async {
     _locale = event.locale;
     _languageCode = event.languageCode;
-    _listen();
     final next = state.copyWith(
       editing: event.accountId != null,
       accountId: event.accountId ?? state.accountId,
     );
-    if (!_canPrepare()) {
+    if (_prepared || _languageCode == null) {
       emit(next);
       return;
+    }
+    try {
+      final loaded = await loadAccounts(_accounts, _transactions);
+      _accountRows = loaded.accounts;
+      _transactionRows = loaded.transactions;
+    } catch (_) {
+      _accountRows = const [];
+      _transactionRows = const [];
     }
     _emitPrepared(emit, next);
   }
@@ -68,7 +68,10 @@ class AccountFormBloc extends Bloc<AccountFormEvent, AccountFormState> {
     emit(state.copyWith(type: event.type));
   }
 
-  void _onSave(AccountFormSavePressed event, Emitter<AccountFormState> emit) {
+  Future<void> _onSave(
+    AccountFormSavePressed event,
+    Emitter<AccountFormState> emit,
+  ) async {
     final name = event.name.trim();
     if (name.isEmpty) {
       emit(
@@ -103,22 +106,36 @@ class AccountFormBloc extends Bloc<AccountFormEvent, AccountFormState> {
       sortOrder: state.sortOrder,
       archived: state.archived,
     );
-    _submitting = true;
-    emit(
-      state.copyWith(
-        status: AccountFormStatus.success,
-        error: AccountFormError.none,
-      ),
-    );
-    _accounts.add(AccountSavePressed(account));
+    if (!account.hasLabel) {
+      emit(
+        state.copyWith(
+          status: AccountFormStatus.failure,
+          error: AccountFormError.nameRequired,
+        ),
+      );
+      return;
+    }
+    try {
+      await _accounts.save(account);
+      await syncOpeningTransactions(_transactions, [account]);
+      emit(
+        state.copyWith(
+          status: AccountFormStatus.success,
+          error: AccountFormError.none,
+          saved: true,
+        ),
+      );
+    } catch (_) {
+      emit(state.copyWith(status: AccountFormStatus.failure));
+    }
   }
 
-  void _onArchive(
+  Future<void> _onArchive(
     AccountFormArchivePressed event,
     Emitter<AccountFormState> emit,
-  ) {
+  ) async {
     AccountModel? account;
-    for (final item in _accounts.state.accounts) {
+    for (final item in _accountRows) {
       if (item.id == state.accountId) {
         account = item;
         break;
@@ -127,65 +144,28 @@ class AccountFormBloc extends Bloc<AccountFormEvent, AccountFormState> {
     if (account == null) {
       return;
     }
-    final balance = balanceOf(account, _transactions.state.transactions);
-    _submitting = true;
-    _accounts.add(AccountArchivePressed(account, balanceMinor: balance));
-  }
-
-  void _onSourcesChanged(
-    AccountFormSourcesChanged event,
-    Emitter<AccountFormState> emit,
-  ) {
-    final accounts = _accounts.state;
-    if (_submitting) {
-      if (accounts.status == AccountsStatus.success &&
-          accounts.error == AccountsError.none) {
-        _submitting = false;
-        emit(
-          state.copyWith(
-            status: AccountFormStatus.success,
-            error: AccountFormError.none,
-            saved: true,
-          ),
-        );
-        return;
-      }
-      if (accounts.error == AccountsError.nameRequired) {
-        _submitting = false;
-        emit(
-          state.copyWith(
-            status: AccountFormStatus.failure,
-            error: AccountFormError.nameRequired,
-          ),
-        );
-        return;
-      }
-      if (accounts.error == AccountsError.archiveBlocked) {
-        _submitting = false;
-        emit(
-          state.copyWith(
-            status: AccountFormStatus.failure,
-            error: AccountFormError.archiveBlocked,
-          ),
-        );
-        return;
-      }
-      if (accounts.status == AccountsStatus.failure) {
-        _submitting = false;
-      }
-    }
-    if (!_canPrepare()) {
+    final balance = balanceOf(account, _transactionRows);
+    if (balance != 0) {
+      emit(
+        state.copyWith(
+          status: AccountFormStatus.failure,
+          error: AccountFormError.archiveBlocked,
+        ),
+      );
       return;
     }
-    _emitPrepared(emit, state);
-  }
-
-  bool _canPrepare() {
-    if (_prepared || _languageCode == null) {
-      return false;
+    try {
+      await _accounts.archive(account.id);
+      emit(
+        state.copyWith(
+          status: AccountFormStatus.success,
+          error: AccountFormError.none,
+          saved: true,
+        ),
+      );
+    } catch (_) {
+      emit(state.copyWith(status: AccountFormStatus.failure));
     }
-    final status = _accounts.state.status;
-    return status == AccountsStatus.success || status == AccountsStatus.failure;
   }
 
   void _emitPrepared(Emitter<AccountFormState> emit, AccountFormState current) {
@@ -194,9 +174,8 @@ class AccountFormBloc extends Bloc<AccountFormEvent, AccountFormState> {
       return;
     }
     _prepared = true;
-    final accounts = _accounts.state;
     AccountModel? existing;
-    for (final account in accounts.accounts) {
+    for (final account in _accountRows) {
       if (account.id == current.accountId) {
         existing = account;
         break;
@@ -228,7 +207,7 @@ class AccountFormBloc extends Bloc<AccountFormEvent, AccountFormState> {
       return;
     }
     var sortOrder = 0;
-    for (final account in accounts.accounts) {
+    for (final account in _accountRows) {
       if (account.sortOrder >= sortOrder) {
         sortOrder = account.sortOrder + 1;
       }
@@ -240,13 +219,5 @@ class AccountFormBloc extends Bloc<AccountFormEvent, AccountFormState> {
         sortOrder: sortOrder,
       ),
     );
-  }
-
-  @override
-  Future<void> close() {
-    for (final subscription in _subscriptions) {
-      subscription.cancel();
-    }
-    return super.close();
   }
 }

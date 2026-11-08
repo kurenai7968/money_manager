@@ -20,7 +20,3 @@ class AnalysisKindSelected extends AnalysisEvent {
   @override
   List<Object?> get props => [kind];
 }
-
-class AnalysisSourcesChanged extends AnalysisEvent {
-  const AnalysisSourcesChanged();
-}

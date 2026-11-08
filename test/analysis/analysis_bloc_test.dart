@@ -1,22 +1,12 @@
 import 'package:bloc_test/bloc_test.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:money_manager/models/account_model.dart';
 import 'package:money_manager/models/category_model.dart';
 import 'package:money_manager/models/ledger_kinds.dart';
 import 'package:money_manager/models/transaction_model.dart';
-import 'package:money_manager/pages/accounts/bloc/accounts_bloc.dart';
-import 'package:money_manager/pages/accounts/bloc/accounts_event.dart';
-import 'package:money_manager/pages/accounts/bloc/accounts_state.dart';
 import 'package:money_manager/pages/analysis/bloc/analysis_bloc.dart';
 import 'package:money_manager/pages/analysis/bloc/analysis_event.dart';
 import 'package:money_manager/pages/analysis/bloc/analysis_state.dart';
-import 'package:money_manager/pages/categories/bloc/categories_bloc.dart';
-import 'package:money_manager/pages/categories/bloc/categories_event.dart';
-import 'package:money_manager/pages/categories/bloc/categories_state.dart';
-import 'package:money_manager/pages/transactions/bloc/transactions_bloc.dart';
-import 'package:money_manager/pages/transactions/bloc/transactions_event.dart';
-import 'package:money_manager/pages/transactions/bloc/transactions_state.dart';
 import 'package:money_manager/repositories/transaction_repository.dart';
 
 import '../support/memory_account_repository.dart';
@@ -25,9 +15,8 @@ import '../support/memory_transaction_repository.dart';
 
 void main() {
   late MemoryTransactionRepository transactionsRepo;
-  late TransactionsBloc transactions;
-  late CategoriesBloc categories;
-  late AccountsBloc accounts;
+  late MemoryAccountRepository accountRepo;
+  late MemoryCategoryRepository categoryRepo;
 
   setUp(() {
     transactionsRepo = MemoryTransactionRepository()
@@ -65,9 +54,9 @@ void main() {
           toAccountId: 'bank',
         ),
       ]);
-    final categoriesRepo = MemoryCategoryRepository()
-      ..categories.addAll([
-        const CategoryModel(
+    categoryRepo = MemoryCategoryRepository()
+      ..categories.addAll(const [
+        CategoryModel(
           id: 'food',
           name: 'Food',
           icon: 'restaurant',
@@ -75,7 +64,7 @@ void main() {
           kind: CategoryKind.expense,
           sortOrder: 0,
         ),
-        const CategoryModel(
+        CategoryModel(
           id: 'salary',
           name: 'Salary',
           icon: 'payments',
@@ -84,36 +73,24 @@ void main() {
           sortOrder: 1,
         ),
       ]);
-    transactions = TransactionsBloc(
-      transactionsRepo,
-      MemoryAccountRepository(),
-    );
-    categories = CategoriesBloc(categoriesRepo);
-    accounts = AccountsBloc(
-      MemoryAccountRepository()..accounts.add(_cash),
-      transactionsRepo,
-    );
+    accountRepo = MemoryAccountRepository()..accounts.add(_cash);
   });
 
-  tearDown(() async {
-    await transactions.close();
-    await categories.close();
-    await accounts.close();
-  });
+  AnalysisBloc buildBloc() {
+    return AnalysisBloc(
+      accounts: accountRepo,
+      transactions: transactionsRepo,
+      categories: categoryRepo,
+      now: () => DateTime(2026, 10, 15),
+    );
+  }
 
   blocTest<AnalysisBloc, AnalysisState>(
     'compares expense with last month and ignores transfers',
-    build: () => AnalysisBloc(
-      transactions: transactions,
-      categories: categories,
-      accounts: accounts,
-      now: () => DateTime(2026, 10, 15),
-    ),
-    act: (bloc) async {
-      await _load(transactions, categories, accounts);
-      bloc.add(const AnalysisStarted());
-      bloc.add(const AnalysisKindSelected(CategoryKind.income));
-    },
+    build: buildBloc,
+    act: (bloc) => bloc
+      ..add(const AnalysisStarted())
+      ..add(const AnalysisKindSelected(CategoryKind.income)),
     expect: () => [
       isA<AnalysisState>()
           .having((state) => state.rollup.current, 'current', 400)
@@ -133,23 +110,13 @@ void main() {
 
   blocTest<AnalysisBloc, AnalysisState>(
     'emits an empty rollup when transactions cannot be read',
-    setUp: () async {
-      await transactions.close();
-      transactions = TransactionsBloc(
-        _FailingTransactions(),
-        MemoryAccountRepository(),
-      );
-    },
     build: () => AnalysisBloc(
-      transactions: transactions,
-      categories: categories,
-      accounts: accounts,
+      accounts: accountRepo,
+      transactions: _FailingTransactions(),
+      categories: categoryRepo,
       now: () => DateTime(2026, 10, 15),
     ),
-    act: (bloc) async {
-      await _load(transactions, categories, accounts);
-      bloc.add(const AnalysisStarted());
-    },
+    act: (bloc) => bloc.add(const AnalysisStarted()),
     expect: () => [
       isA<AnalysisState>()
           .having((state) => state.status, 'status', AnalysisStatus.failure)
@@ -167,41 +134,6 @@ const _cash = AccountModel(
   sortOrder: 0,
 );
 
-Future<void> _load(
-  TransactionsBloc transactions,
-  CategoriesBloc categories,
-  AccountsBloc accounts,
-) async {
-  transactions.add(const TransactionsStarted());
-  categories.add(const CategoriesStarted([]));
-  accounts.add(const AccountsStarted());
-  await _until(
-    transactions,
-    (state) =>
-        state.status == TransactionsStatus.success ||
-        state.status == TransactionsStatus.failure,
-  );
-  await _until(
-    categories,
-    (state) =>
-        state.status == CategoriesStatus.success ||
-        state.status == CategoriesStatus.failure,
-  );
-  await _until(
-    accounts,
-    (state) =>
-        state.status == AccountsStatus.success ||
-        state.status == AccountsStatus.failure,
-  );
-}
-
-Future<void> _until<S>(BlocBase<S> bloc, bool Function(S state) done) async {
-  if (done(bloc.state)) {
-    return;
-  }
-  await bloc.stream.firstWhere(done);
-}
-
 class _FailingTransactions implements TransactionRepository {
   @override
   Future<int> countForCategory(String categoryId) async => 0;
@@ -210,8 +142,9 @@ class _FailingTransactions implements TransactionRepository {
   Future<void> delete(String id) async {}
 
   @override
-  Future<List<TransactionModel>> getAll() async =>
-      throw StateError('unavailable');
+  Future<List<TransactionModel>> getAll() async {
+    throw StateError('unavailable');
+  }
 
   @override
   Future<void> save(TransactionModel transaction) async {}

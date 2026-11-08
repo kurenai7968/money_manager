@@ -1,43 +1,40 @@
-import 'dart:async';
-
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:money_manager/core/utils/amount_expression.dart';
 import 'package:money_manager/core/utils/id.dart';
+import 'package:money_manager/core/utils/ledger_commands.dart';
+import 'package:money_manager/core/utils/queued_bloc.dart';
 import 'package:money_manager/models/account_model.dart';
 import 'package:money_manager/models/category_model.dart';
 import 'package:money_manager/models/ledger_kinds.dart';
 import 'package:money_manager/models/transaction_model.dart';
-import 'package:money_manager/pages/accounts/bloc/accounts_bloc.dart';
-import 'package:money_manager/pages/categories/bloc/categories_bloc.dart';
 import 'package:money_manager/pages/record/bloc/record_event.dart';
 import 'package:money_manager/pages/record/bloc/record_state.dart';
-import 'package:money_manager/pages/transactions/bloc/transactions_bloc.dart';
-import 'package:money_manager/pages/transactions/bloc/transactions_event.dart';
-import 'package:money_manager/pages/transactions/bloc/transactions_state.dart';
+import 'package:money_manager/repositories/account_repository.dart';
+import 'package:money_manager/repositories/category_repository.dart';
+import 'package:money_manager/repositories/transaction_repository.dart';
 
-class RecordBloc extends Bloc<RecordEvent, RecordState> {
-  final TransactionsBloc _transactions;
-  final AccountsBloc _accounts;
-  final CategoriesBloc _categories;
+class RecordBloc extends Bloc<RecordEvent, RecordState>
+    with QueuedBloc<RecordEvent, RecordState> {
+  final TransactionRepository _transactions;
+  final AccountRepository _accounts;
+  final CategoryRepository _categories;
   final DateTime Function() _now;
-  final _subscriptions = <StreamSubscription<dynamic>>[];
   String? _transactionId;
   TransactionType? _initialType;
   String? _initialAccountId;
   String? _draftId;
   var _opened = false;
   var _existingReady = false;
-  var _submitting = false;
+  List<AccountModel> _accountRows = const [];
+  List<TransactionModel> _transactionRows = const [];
+  List<CategoryModel> _categoryRows = const [];
 
   RecordBloc({
-    required TransactionsBloc transactions,
-    required AccountsBloc accounts,
-    required CategoriesBloc categories,
+    required this._transactions,
+    required this._accounts,
+    required this._categories,
     DateTime Function()? now,
-  }) : _transactions = transactions,
-       _accounts = accounts,
-       _categories = categories,
-       _now = now ?? DateTime.now,
+  }) : _now = now ?? DateTime.now,
        super(RecordState(date: (now ?? DateTime.now)())) {
     on<RecordStarted>(_onStarted);
     on<RecordTypeSelected>(_onTypeSelected);
@@ -56,31 +53,25 @@ class RecordBloc extends Bloc<RecordEvent, RecordState> {
     on<RecordEqualsPressed>(_onEquals);
     on<RecordSavePressed>(_onSave);
     on<RecordDeletePressed>(_onDelete);
-    on<RecordSourcesChanged>(_onSourcesChanged);
   }
 
-  void _listen() {
-    if (_subscriptions.isNotEmpty) {
-      return;
-    }
-    _subscriptions.add(
-      _transactions.stream.listen(
-        (_) => add(const RecordSourcesChanged(transactions: true)),
-      ),
-    );
-    _subscriptions.add(
-      _accounts.stream.listen((_) => add(const RecordSourcesChanged())),
-    );
-    _subscriptions.add(
-      _categories.stream.listen((_) => add(const RecordSourcesChanged())),
-    );
-  }
-
-  void _onStarted(RecordStarted event, Emitter<RecordState> emit) {
+  Future<void> _onStarted(
+    RecordStarted event,
+    Emitter<RecordState> emit,
+  ) async {
     _transactionId = event.transactionId;
     _initialType = event.initialType;
     _initialAccountId = event.initialAccountId;
-    _listen();
+    try {
+      final loaded = await loadAccounts(_accounts, _transactions);
+      _accountRows = loaded.accounts;
+      _transactionRows = loaded.transactions;
+      _categoryRows = await loadCategories(_categories);
+    } catch (_) {
+      _accountRows = const [];
+      _transactionRows = const [];
+      _categoryRows = const [];
+    }
     emit(_refresh(state.copyWith(transactionId: event.transactionId)));
   }
 
@@ -93,7 +84,7 @@ class RecordBloc extends Bloc<RecordEvent, RecordState> {
       clearCategory = true;
     } else {
       CategoryModel? selected;
-      for (final item in _categories.state.categories) {
+      for (final item in _categoryRows) {
         if (item.id == categoryId) {
           selected = item;
           break;
@@ -237,7 +228,10 @@ class RecordBloc extends Bloc<RecordEvent, RecordState> {
     );
   }
 
-  void _onSave(RecordSavePressed event, Emitter<RecordState> emit) {
+  Future<void> _onSave(
+    RecordSavePressed event,
+    Emitter<RecordState> emit,
+  ) async {
     final accounts = state.accounts;
     final error = _validationError(state.result, accounts);
     if (error != null) {
@@ -245,11 +239,11 @@ class RecordBloc extends Bloc<RecordEvent, RecordState> {
       return;
     }
     _draftId ??= _transactionId ?? createId();
-    _submitting = true;
-    emit(state.copyWith(status: RecordStatus.success, error: RecordError.none));
     final type = state.type;
-    _transactions.add(
-      TransactionSavePressed(
+    try {
+      await saveLedgerTransaction(
+        _transactions,
+        _accounts,
         TransactionModel(
           id: _draftId!,
           type: type,
@@ -263,54 +257,46 @@ class RecordBloc extends Bloc<RecordEvent, RecordState> {
           fromAccountId: type == TransactionType.transfer ? state.fromId : null,
           toAccountId: type == TransactionType.transfer ? state.toId : null,
         ),
-      ),
-    );
+      );
+      emit(
+        state.copyWith(
+          status: RecordStatus.success,
+          error: RecordError.none,
+          closePage: true,
+        ),
+      );
+    } catch (_) {
+      emit(state.copyWith(status: RecordStatus.failure));
+    }
   }
 
-  void _onDelete(RecordDeletePressed event, Emitter<RecordState> emit) {
+  Future<void> _onDelete(
+    RecordDeletePressed event,
+    Emitter<RecordState> emit,
+  ) async {
     final id = _transactionId;
     if (id == null) {
       return;
     }
-    _submitting = true;
-    _transactions.add(TransactionDeletePressed(id));
-  }
-
-  void _onSourcesChanged(
-    RecordSourcesChanged event,
-    Emitter<RecordState> emit,
-  ) {
-    if (_submitting && event.transactions) {
-      final transactions = _transactions.state;
-      if (transactions.status == TransactionsStatus.success &&
-          transactions.error == TransactionsError.none) {
-        _submitting = false;
-        emit(
-          state.copyWith(
-            status: RecordStatus.success,
-            error: RecordError.none,
-            closePage: true,
-          ),
-        );
-        return;
-      }
-      if (transactions.error == TransactionsError.invalid) {
-        _submitting = false;
-        emit(
-          state.copyWith(
-            status: RecordStatus.failure,
-            error: RecordError.invalid,
-          ),
-        );
-        return;
-      }
+    try {
+      await deleteLedgerTransaction(_transactions, _accounts, id);
+      emit(
+        state.copyWith(
+          status: RecordStatus.success,
+          error: RecordError.none,
+          closePage: true,
+        ),
+      );
+    } catch (_) {
+      emit(state.copyWith(status: RecordStatus.failure));
     }
-    emit(_refresh(state));
   }
 
   RecordState _refresh(RecordState current) {
-    final loaded = _accounts.state.active;
-    final transactions = _transactions.state;
+    final loaded = [
+      for (final account in _accountRows)
+        if (!account.archived) account,
+    ];
     var next = current;
 
     if (!_opened) {
@@ -324,19 +310,14 @@ class RecordBloc extends Bloc<RecordEvent, RecordState> {
 
     if (!_existingReady && _transactionId != null) {
       TransactionModel? existing;
-      for (final item in transactions.transactions) {
+      for (final item in _transactionRows) {
         if (item.id == _transactionId) {
           existing = item;
           break;
         }
       }
       if (existing == null) {
-        if (transactions.status == TransactionsStatus.success ||
-            transactions.status == TransactionsStatus.failure) {
-          _existingReady = true;
-        } else {
-          return _withCategories(next, loaded);
-        }
+        _existingReady = true;
       } else {
         next = next.copyWith(
           type: existing.type,
@@ -370,8 +351,9 @@ class RecordBloc extends Bloc<RecordEvent, RecordState> {
 
   RecordState _withCategories(RecordState current, List<AccountModel> loaded) {
     final visible = [
-      for (final category in _categories.state.active)
-        if (category.kind.name == current.type.name) category,
+      for (final category in _categoryRows)
+        if (!category.archived && category.kind.name == current.type.name)
+          category,
     ]..sort((a, b) => a.sortOrder.compareTo(b.sortOrder));
     var categoryId = current.categoryId;
     var clearCategory = false;
@@ -433,13 +415,5 @@ class RecordBloc extends Bloc<RecordEvent, RecordState> {
       return RecordError.chooseAccount;
     }
     return null;
-  }
-
-  @override
-  Future<void> close() {
-    for (final subscription in _subscriptions) {
-      subscription.cancel();
-    }
-    return super.close();
   }
 }

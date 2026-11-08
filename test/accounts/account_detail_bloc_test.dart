@@ -1,5 +1,4 @@
 import 'package:bloc_test/bloc_test.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:money_manager/core/utils/ledger_balance.dart';
 import 'package:money_manager/models/account_model.dart';
@@ -8,15 +7,6 @@ import 'package:money_manager/models/transaction_model.dart';
 import 'package:money_manager/pages/accounts/bloc/account_detail_bloc.dart';
 import 'package:money_manager/pages/accounts/bloc/account_detail_event.dart';
 import 'package:money_manager/pages/accounts/bloc/account_detail_state.dart';
-import 'package:money_manager/pages/accounts/bloc/accounts_bloc.dart';
-import 'package:money_manager/pages/accounts/bloc/accounts_event.dart';
-import 'package:money_manager/pages/accounts/bloc/accounts_state.dart';
-import 'package:money_manager/pages/categories/bloc/categories_bloc.dart';
-import 'package:money_manager/pages/categories/bloc/categories_event.dart';
-import 'package:money_manager/pages/categories/bloc/categories_state.dart';
-import 'package:money_manager/pages/transactions/bloc/transactions_bloc.dart';
-import 'package:money_manager/pages/transactions/bloc/transactions_event.dart';
-import 'package:money_manager/pages/transactions/bloc/transactions_state.dart';
 import 'package:money_manager/repositories/account_repository.dart';
 
 import '../support/memory_account_repository.dart';
@@ -32,13 +22,13 @@ void main() {
     sortOrder: 0,
   );
 
-  late AccountsBloc accounts;
-  late TransactionsBloc transactions;
-  late CategoriesBloc categories;
+  late AccountRepository accountRepo;
+  late MemoryTransactionRepository transactionRepo;
+  late MemoryCategoryRepository categoryRepo;
 
   setUp(() {
-    final accountRepo = MemoryAccountRepository()..accounts.add(cash);
-    final transactionRepo = MemoryTransactionRepository()
+    accountRepo = MemoryAccountRepository()..accounts.add(cash);
+    transactionRepo = MemoryTransactionRepository()
       ..transactions.addAll([
         TransactionModel(
           id: 'lunch',
@@ -65,29 +55,18 @@ void main() {
           categoryId: 'food',
         ),
       ]);
-    accounts = AccountsBloc(accountRepo, transactionRepo);
-    transactions = TransactionsBloc(transactionRepo, accountRepo);
-    categories = CategoriesBloc(MemoryCategoryRepository());
-  });
-
-  tearDown(() async {
-    await accounts.close();
-    await transactions.close();
-    await categories.close();
+    categoryRepo = MemoryCategoryRepository();
   });
 
   blocTest<AccountDetailBloc, AccountDetailState>(
     'shows the account history and one balance',
     build: () => AccountDetailBloc(
       accountId: 'cash',
-      accounts: accounts,
-      transactions: transactions,
-      categories: categories,
+      accounts: accountRepo,
+      transactions: transactionRepo,
+      categories: categoryRepo,
     ),
-    act: (bloc) async {
-      await _load(accounts, transactions, categories);
-      bloc.add(const AccountDetailStarted());
-    },
+    act: (bloc) => bloc.add(const AccountDetailStarted()),
     verify: (bloc) {
       expect(bloc.state.history.map((item) => item.id), ['lunch', 'move']);
       expect(bloc.state.balanceMinor, balanceOf(cash, bloc.state.history));
@@ -105,14 +84,11 @@ void main() {
     'has no account when the id is missing',
     build: () => AccountDetailBloc(
       accountId: 'missing',
-      accounts: accounts,
-      transactions: transactions,
-      categories: categories,
+      accounts: accountRepo,
+      transactions: transactionRepo,
+      categories: categoryRepo,
     ),
-    act: (bloc) async {
-      await _load(accounts, transactions, categories);
-      bloc.add(const AccountDetailStarted());
-    },
+    act: (bloc) => bloc.add(const AccountDetailStarted()),
     expect: () => [
       isA<AccountDetailState>()
           .having((state) => state.account, 'account', isNull)
@@ -122,23 +98,16 @@ void main() {
 
   blocTest<AccountDetailBloc, AccountDetailState>(
     'emits failure when accounts cannot be read',
-    setUp: () async {
-      await accounts.close();
-      accounts = AccountsBloc(
-        _FailingAccounts(),
-        MemoryTransactionRepository(),
-      );
+    setUp: () {
+      accountRepo = _FailingAccounts();
     },
     build: () => AccountDetailBloc(
       accountId: 'cash',
-      accounts: accounts,
-      transactions: transactions,
-      categories: categories,
+      accounts: accountRepo,
+      transactions: transactionRepo,
+      categories: categoryRepo,
     ),
-    act: (bloc) async {
-      await _load(accounts, transactions, categories);
-      bloc.add(const AccountDetailStarted());
-    },
+    act: (bloc) => bloc.add(const AccountDetailStarted()),
     expect: () => [
       isA<AccountDetailState>()
           .having(
@@ -149,41 +118,6 @@ void main() {
           .having((state) => state.account, 'account', isNull),
     ],
   );
-}
-
-Future<void> _load(
-  AccountsBloc accounts,
-  TransactionsBloc transactions,
-  CategoriesBloc categories,
-) async {
-  accounts.add(const AccountsStarted());
-  transactions.add(const TransactionsStarted());
-  categories.add(const CategoriesStarted([]));
-  await _until(
-    accounts,
-    (state) =>
-        state.status == AccountsStatus.success ||
-        state.status == AccountsStatus.failure,
-  );
-  await _until(
-    transactions,
-    (state) =>
-        state.status == TransactionsStatus.success ||
-        state.status == TransactionsStatus.failure,
-  );
-  await _until(
-    categories,
-    (state) =>
-        state.status == CategoriesStatus.success ||
-        state.status == CategoriesStatus.failure,
-  );
-}
-
-Future<void> _until<S>(BlocBase<S> bloc, bool Function(S state) done) async {
-  if (done(bloc.state)) {
-    return;
-  }
-  await bloc.stream.firstWhere(done);
 }
 
 class _FailingAccounts implements AccountRepository {

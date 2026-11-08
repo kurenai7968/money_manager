@@ -1,22 +1,11 @@
 import 'package:bloc_test/bloc_test.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:money_manager/models/account_model.dart';
-import 'package:money_manager/models/category_defaults.dart';
 import 'package:money_manager/models/ledger_kinds.dart';
 import 'package:money_manager/models/transaction_model.dart';
-import 'package:money_manager/pages/accounts/bloc/accounts_bloc.dart';
-import 'package:money_manager/pages/accounts/bloc/accounts_event.dart';
-import 'package:money_manager/pages/accounts/bloc/accounts_state.dart';
-import 'package:money_manager/pages/categories/bloc/categories_bloc.dart';
-import 'package:money_manager/pages/categories/bloc/categories_event.dart';
-import 'package:money_manager/pages/categories/bloc/categories_state.dart';
 import 'package:money_manager/pages/home/bloc/home_bloc.dart';
 import 'package:money_manager/pages/home/bloc/home_event.dart';
 import 'package:money_manager/pages/home/bloc/home_state.dart';
-import 'package:money_manager/pages/transactions/bloc/transactions_bloc.dart';
-import 'package:money_manager/pages/transactions/bloc/transactions_event.dart';
-import 'package:money_manager/pages/transactions/bloc/transactions_state.dart';
 import 'package:money_manager/repositories/transaction_repository.dart';
 
 import '../support/memory_account_repository.dart';
@@ -28,12 +17,11 @@ void main() {
 
   late MemoryTransactionRepository transactionsRepo;
   late MemoryAccountRepository accountRepo;
-  late TransactionsBloc transactions;
-  late CategoriesBloc categories;
-  late AccountsBloc accounts;
+  late MemoryCategoryRepository categoryRepo;
 
   setUp(() {
     accountRepo = MemoryAccountRepository();
+    categoryRepo = MemoryCategoryRepository();
     transactionsRepo = MemoryTransactionRepository()
       ..transactions.add(
         TransactionModel(
@@ -55,32 +43,21 @@ void main() {
           toAccountId: 'bank',
         ),
       );
-    transactions = TransactionsBloc(
-      transactionsRepo,
-      MemoryAccountRepository(),
-    );
-    categories = CategoriesBloc(MemoryCategoryRepository());
-    accounts = AccountsBloc(accountRepo, transactionsRepo);
   });
 
-  tearDown(() async {
-    await transactions.close();
-    await categories.close();
-    await accounts.close();
-  });
+  HomeBloc buildBloc() {
+    return HomeBloc(
+      accounts: accountRepo,
+      transactions: transactionsRepo,
+      categories: categoryRepo,
+      now: now,
+    );
+  }
 
   blocTest<HomeBloc, HomeState>(
     'totals the open month and ignores transfers',
-    build: () => HomeBloc(
-      transactions: transactions,
-      categories: categories,
-      accounts: accounts,
-      now: now,
-    ),
-    act: (bloc) async {
-      await _load(transactions, categories, accounts);
-      bloc.add(const HomeStarted());
-    },
+    build: buildBloc,
+    act: (bloc) => bloc.add(const HomeStarted()),
     expect: () => [
       isA<HomeState>()
           .having((state) => state.status, 'status', HomeStatus.success)
@@ -94,17 +71,10 @@ void main() {
 
   blocTest<HomeBloc, HomeState>(
     'clears the selected day when the month is not the current one',
-    build: () => HomeBloc(
-      transactions: transactions,
-      categories: categories,
-      accounts: accounts,
-      now: now,
-    ),
-    act: (bloc) async {
-      await _load(transactions, categories, accounts);
-      bloc.add(const HomeStarted());
-      bloc.add(const HomeMonthShifted(1));
-    },
+    build: buildBloc,
+    act: (bloc) => bloc
+      ..add(const HomeStarted())
+      ..add(const HomeMonthShifted(1)),
     expect: () => [
       isA<HomeState>().having(
         (state) => state.selectedDay,
@@ -121,22 +91,12 @@ void main() {
   blocTest<HomeBloc, HomeState>(
     'emits failure when the ledger cannot be read',
     build: () => HomeBloc(
-      transactions: transactions,
-      categories: categories,
-      accounts: accounts,
+      accounts: accountRepo,
+      transactions: _FailingTransactions(),
+      categories: categoryRepo,
       now: now,
     ),
-    setUp: () async {
-      await transactions.close();
-      transactions = TransactionsBloc(
-        _FailingTransactions(),
-        MemoryAccountRepository(),
-      );
-    },
-    act: (bloc) async {
-      await _load(transactions, categories, accounts);
-      bloc.add(const HomeStarted());
-    },
+    act: (bloc) => bloc.add(const HomeStarted()),
     expect: () => [
       isA<HomeState>()
           .having((state) => state.status, 'status', HomeStatus.failure)
@@ -147,13 +107,8 @@ void main() {
 
   blocTest<HomeBloc, HomeState>(
     'limits the month to one account and can return to all',
-    build: () => HomeBloc(
-      transactions: transactions,
-      categories: categories,
-      accounts: accounts,
-      now: now,
-    ),
-    act: (bloc) async {
+    build: buildBloc,
+    act: (bloc) {
       accountRepo.accounts.add(_account('cash', 0));
       accountRepo.accounts.add(_account('bank', 1, type: AccountType.bank));
       transactionsRepo.transactions.add(
@@ -166,11 +121,11 @@ void main() {
           categoryId: 'salary',
         ),
       );
-      await _load(transactions, categories, accounts);
-      bloc.add(const HomeStarted());
-      bloc.add(const HomeAccountSelected('bank'));
-      bloc.add(const HomeAccountSelected('cash'));
-      bloc.add(const HomeAccountSelected(null));
+      bloc
+        ..add(const HomeStarted())
+        ..add(const HomeAccountSelected('bank'))
+        ..add(const HomeAccountSelected('cash'))
+        ..add(const HomeAccountSelected(null));
     },
     expect: () => [
       isA<HomeState>()
@@ -197,23 +152,20 @@ void main() {
 
   blocTest<HomeBloc, HomeState>(
     'returns to all when the selected account is missing or archived',
-    build: () => HomeBloc(
-      transactions: transactions,
-      categories: categories,
-      accounts: accounts,
-      now: now,
-    ),
+    build: buildBloc,
     act: (bloc) async {
       accountRepo.accounts.add(_account('cash', 0));
-      await _load(transactions, categories, accounts);
-      bloc.add(const HomeStarted());
-      bloc.add(const HomeAccountSelected('missing'));
-      bloc.add(const HomeAccountSelected('cash'));
+      bloc
+        ..add(const HomeStarted())
+        ..add(const HomeAccountSelected('missing'))
+        ..add(const HomeAccountSelected('cash'));
+      await bloc.stream.firstWhere(
+        (state) => state.selectedAccountId == 'cash',
+      );
       accountRepo.accounts[0] = accountRepo.accounts[0].copyWith(
         archived: true,
       );
-      accounts.add(const AccountsStarted());
-      await _until(accounts, (state) => state.status == AccountsStatus.success);
+      bloc.add(const HomeStarted());
     },
     expect: () => [
       isA<HomeState>().having(
@@ -254,41 +206,6 @@ class _Now {
   const _Now();
 
   DateTime call() => DateTime(2026, 10, 15);
-}
-
-Future<void> _load(
-  TransactionsBloc transactions,
-  CategoriesBloc categories,
-  AccountsBloc accounts,
-) async {
-  transactions.add(const TransactionsStarted());
-  categories.add(CategoriesStarted(defaultCategories()));
-  accounts.add(const AccountsStarted());
-  await _until(
-    transactions,
-    (state) =>
-        state.status == TransactionsStatus.success ||
-        state.status == TransactionsStatus.failure,
-  );
-  await _until(
-    categories,
-    (state) =>
-        state.status == CategoriesStatus.success ||
-        state.status == CategoriesStatus.failure,
-  );
-  await _until(
-    accounts,
-    (state) =>
-        state.status == AccountsStatus.success ||
-        state.status == AccountsStatus.failure,
-  );
-}
-
-Future<void> _until<S>(BlocBase<S> bloc, bool Function(S state) done) async {
-  if (done(bloc.state)) {
-    return;
-  }
-  await bloc.stream.firstWhere(done);
 }
 
 class _FailingTransactions implements TransactionRepository {

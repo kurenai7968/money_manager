@@ -132,12 +132,3 @@ class RecordSavePressed extends RecordEvent {
 class RecordDeletePressed extends RecordEvent {
   const RecordDeletePressed();
 }
-
-class RecordSourcesChanged extends RecordEvent {
-  final bool transactions;
-
-  const RecordSourcesChanged({this.transactions = false});
-
-  @override
-  List<Object?> get props => [transactions];
-}

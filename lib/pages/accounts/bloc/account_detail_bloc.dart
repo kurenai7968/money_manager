@@ -1,97 +1,89 @@
-import 'dart:async';
-
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:money_manager/core/utils/ledger_balance.dart';
+import 'package:money_manager/core/utils/ledger_commands.dart';
+import 'package:money_manager/core/utils/queued_bloc.dart';
 import 'package:money_manager/models/account_model.dart';
+import 'package:money_manager/models/category_model.dart';
+import 'package:money_manager/models/transaction_model.dart';
 import 'package:money_manager/pages/accounts/bloc/account_detail_event.dart';
 import 'package:money_manager/pages/accounts/bloc/account_detail_state.dart';
-import 'package:money_manager/pages/accounts/bloc/accounts_bloc.dart';
-import 'package:money_manager/pages/accounts/bloc/accounts_state.dart';
-import 'package:money_manager/pages/categories/bloc/categories_bloc.dart';
-import 'package:money_manager/pages/categories/bloc/categories_state.dart';
-import 'package:money_manager/pages/transactions/bloc/transactions_bloc.dart';
-import 'package:money_manager/pages/transactions/bloc/transactions_state.dart';
+import 'package:money_manager/repositories/account_repository.dart';
+import 'package:money_manager/repositories/category_repository.dart';
+import 'package:money_manager/repositories/transaction_repository.dart';
 
-class AccountDetailBloc extends Bloc<AccountDetailEvent, AccountDetailState> {
+class AccountDetailBloc extends Bloc<AccountDetailEvent, AccountDetailState>
+    with QueuedBloc<AccountDetailEvent, AccountDetailState> {
   final String accountId;
-  final AccountsBloc _accounts;
-  final TransactionsBloc _transactions;
-  final CategoriesBloc _categories;
-  final _subscriptions = <StreamSubscription<dynamic>>[];
+  final AccountRepository _accounts;
+  final TransactionRepository _transactions;
+  final CategoryRepository _categories;
 
   AccountDetailBloc({
     required this.accountId,
-    required AccountsBloc accounts,
-    required TransactionsBloc transactions,
-    required CategoriesBloc categories,
+    required AccountRepository accounts,
+    required TransactionRepository transactions,
+    required CategoryRepository categories,
   }) : _accounts = accounts,
        _transactions = transactions,
        _categories = categories,
        super(const AccountDetailState()) {
     on<AccountDetailStarted>(_onStarted);
-    on<AccountDetailSourcesChanged>(_onSourcesChanged);
   }
 
-  void _listen() {
-    if (_subscriptions.isNotEmpty) {
-      return;
-    }
-    _subscriptions.add(
-      _accounts.stream.listen((_) => add(const AccountDetailSourcesChanged())),
-    );
-    _subscriptions.add(
-      _transactions.stream.listen(
-        (_) => add(const AccountDetailSourcesChanged()),
-      ),
-    );
-    _subscriptions.add(
-      _categories.stream.listen(
-        (_) => add(const AccountDetailSourcesChanged()),
-      ),
-    );
-  }
-
-  void _onStarted(
+  Future<void> _onStarted(
     AccountDetailStarted event,
     Emitter<AccountDetailState> emit,
-  ) {
-    _listen();
-    _publish(emit);
+  ) async {
+    try {
+      final loaded = await loadAccounts(_accounts, _transactions);
+      final categories = await loadCategories(_categories);
+      _publish(
+        emit,
+        accounts: loaded.accounts,
+        transactions: loaded.transactions,
+        categories: categories,
+        failed: false,
+      );
+    } catch (_) {
+      _publish(
+        emit,
+        accounts: const [],
+        transactions: const [],
+        categories: const [],
+        failed: true,
+      );
+    }
   }
 
-  void _onSourcesChanged(
-    AccountDetailSourcesChanged event,
-    Emitter<AccountDetailState> emit,
-  ) {
-    _publish(emit);
-  }
-
-  void _publish(Emitter<AccountDetailState> emit) {
-    final failed =
-        _accounts.state.status == AccountsStatus.failure ||
-        _transactions.state.status == TransactionsStatus.failure ||
-        _categories.state.status == CategoriesStatus.failure;
+  void _publish(
+    Emitter<AccountDetailState> emit, {
+    required List<AccountModel> accounts,
+    required List<TransactionModel> transactions,
+    required List<CategoryModel> categories,
+    required bool failed,
+  }) {
     AccountModel? account;
-    for (final item in _accounts.state.accounts) {
+    for (final item in accounts) {
       if (item.id == accountId) {
         account = item;
         break;
       }
     }
+    final status = failed
+        ? AccountDetailStatus.failure
+        : AccountDetailStatus.success;
     if (account == null) {
       emit(
         AccountDetailState(
-          status: failed
-              ? AccountDetailStatus.failure
-              : AccountDetailStatus.success,
-          categories: _categories.state.categories,
-          accounts: _accounts.state.accounts,
+          status: status,
+          categories: categories,
+          accounts: accounts,
         ),
       );
       return;
     }
     final history = [
-      for (final item in _transactions.state.transactions)
+      for (final item in transactions)
         if (item.accountId == account.id ||
             item.fromAccountId == account.id ||
             item.toAccountId == account.id)
@@ -99,23 +91,13 @@ class AccountDetailBloc extends Bloc<AccountDetailEvent, AccountDetailState> {
     ];
     emit(
       AccountDetailState(
-        status: failed
-            ? AccountDetailStatus.failure
-            : AccountDetailStatus.success,
+        status: status,
         account: account,
         balanceMinor: balanceOf(account, history),
         history: history,
-        categories: _categories.state.categories,
-        accounts: _accounts.state.accounts,
+        categories: categories,
+        accounts: accounts,
       ),
     );
-  }
-
-  @override
-  Future<void> close() {
-    for (final subscription in _subscriptions) {
-      subscription.cancel();
-    }
-    return super.close();
   }
 }

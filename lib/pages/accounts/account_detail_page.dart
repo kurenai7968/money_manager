@@ -1,16 +1,9 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:material_ui/material_ui.dart';
-import 'package:money_manager/models/category_defaults.dart';
 import 'package:money_manager/pages/accounts/bloc/account_detail_bloc.dart';
 import 'package:money_manager/pages/accounts/bloc/account_detail_event.dart';
-import 'package:money_manager/pages/accounts/bloc/accounts_bloc.dart';
-import 'package:money_manager/pages/accounts/bloc/accounts_event.dart';
 import 'package:money_manager/pages/accounts/widgets/account_detail_app_bar.dart';
 import 'package:money_manager/pages/accounts/widgets/account_detail_body.dart';
-import 'package:money_manager/pages/categories/bloc/categories_bloc.dart';
-import 'package:money_manager/pages/categories/bloc/categories_event.dart';
-import 'package:money_manager/pages/transactions/bloc/transactions_bloc.dart';
-import 'package:money_manager/pages/transactions/bloc/transactions_event.dart';
 
 class AccountDetailPage extends StatelessWidget {
   final String accountId;
@@ -20,30 +13,15 @@ class AccountDetailPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (context) =>
-          AccountsBloc(context.read(), context.read())
-            ..add(const AccountsStarted()),
-      child: BlocProvider(
-        create: (context) =>
-            TransactionsBloc(context.read(), context.read())
-              ..add(const TransactionsStarted()),
-        child: BlocProvider(
-          create: (context) =>
-              CategoriesBloc(context.read(), transactions: context.read())
-                ..add(CategoriesStarted(defaultCategories())),
-          child: BlocProvider(
-            create: (context) => AccountDetailBloc(
-              accountId: accountId,
-              accounts: context.read(),
-              transactions: context.read(),
-              categories: context.read(),
-            )..add(const AccountDetailStarted()),
-            child: Scaffold(
-              appBar: AccountDetailAppBar(accountId: accountId),
-              body: AccountDetailBody(accountId: accountId),
-            ),
-          ),
-        ),
+      create: (context) => AccountDetailBloc(
+        accountId: accountId,
+        accounts: context.read(),
+        transactions: context.read(),
+        categories: context.read(),
+      )..add(const AccountDetailStarted()),
+      child: Scaffold(
+        appBar: AccountDetailAppBar(accountId: accountId),
+        body: AccountDetailBody(accountId: accountId),
       ),
     );
   }

@@ -1,39 +1,38 @@
-import 'dart:async';
-
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:money_manager/core/utils/ledger_balance.dart';
+import 'package:money_manager/core/utils/ledger_commands.dart';
+import 'package:money_manager/core/utils/queued_bloc.dart';
+import 'package:money_manager/models/account_model.dart';
+import 'package:money_manager/models/category_model.dart';
 import 'package:money_manager/models/transaction_model.dart';
-import 'package:money_manager/pages/accounts/bloc/accounts_bloc.dart';
-import 'package:money_manager/pages/accounts/bloc/accounts_state.dart';
-import 'package:money_manager/pages/categories/bloc/categories_bloc.dart';
-import 'package:money_manager/pages/categories/bloc/categories_state.dart';
 import 'package:money_manager/pages/home/bloc/home_event.dart';
 import 'package:money_manager/pages/home/bloc/home_state.dart';
-import 'package:money_manager/pages/transactions/bloc/transactions_bloc.dart';
-import 'package:money_manager/pages/transactions/bloc/transactions_state.dart';
+import 'package:money_manager/repositories/account_repository.dart';
+import 'package:money_manager/repositories/category_repository.dart';
+import 'package:money_manager/repositories/transaction_repository.dart';
 
-class HomeBloc extends Bloc<HomeEvent, HomeState> {
-  final TransactionsBloc _transactions;
-  final CategoriesBloc _categories;
-  final AccountsBloc _accounts;
+class HomeBloc extends Bloc<HomeEvent, HomeState>
+    with QueuedBloc<HomeEvent, HomeState> {
+  final AccountRepository _accounts;
+  final TransactionRepository _transactions;
+  final CategoryRepository _categories;
   final DateTime Function() _now;
-  final _subscriptions = <StreamSubscription<dynamic>>[];
+  var _failed = false;
+  List<AccountModel> _accountRows = const [];
+  List<TransactionModel> _transactionRows = const [];
+  List<CategoryModel> _categoryRows = const [];
 
   HomeBloc({
-    required TransactionsBloc transactions,
-    required CategoriesBloc categories,
-    required AccountsBloc accounts,
+    required this._accounts,
+    required this._transactions,
+    required this._categories,
     DateTime Function()? now,
-  }) : _transactions = transactions,
-       _categories = categories,
-       _accounts = accounts,
-       _now = now ?? DateTime.now,
+  }) : _now = now ?? DateTime.now,
        super(_initial(now ?? DateTime.now)) {
     on<HomeStarted>(_onStarted);
     on<HomeMonthShifted>(_onMonthShifted);
     on<HomeViewToggled>(_onViewToggled);
     on<HomeDaySelected>(_onDaySelected);
-    on<HomeSourcesChanged>(_onSourcesChanged);
     on<HomeAccountSelected>(_onAccountSelected);
   }
 
@@ -45,24 +44,21 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     );
   }
 
-  void _listen() {
-    if (_subscriptions.isNotEmpty) {
-      return;
-    }
-    _subscriptions.add(
-      _transactions.stream.listen((_) => add(const HomeSourcesChanged())),
-    );
-    _subscriptions.add(
-      _categories.stream.listen((_) => add(const HomeSourcesChanged())),
-    );
-    _subscriptions.add(
-      _accounts.stream.listen((_) => add(const HomeSourcesChanged())),
-    );
+  Future<void> _onStarted(HomeStarted event, Emitter<HomeState> emit) async {
+    await _load();
+    _publish(emit, state);
   }
 
-  void _onStarted(HomeStarted event, Emitter<HomeState> emit) {
-    _listen();
-    _publish(emit, state);
+  Future<void> _load() async {
+    try {
+      final loaded = await loadAccounts(_accounts, _transactions);
+      _accountRows = loaded.accounts;
+      _transactionRows = loaded.transactions;
+      _categoryRows = await loadCategories(_categories);
+      _failed = false;
+    } catch (_) {
+      _failed = true;
+    }
   }
 
   void _onMonthShifted(HomeMonthShifted event, Emitter<HomeState> emit) {
@@ -96,10 +92,6 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     _publish(emit, state.copyWith(selectedDay: day));
   }
 
-  void _onSourcesChanged(HomeSourcesChanged event, Emitter<HomeState> emit) {
-    _publish(emit, state);
-  }
-
   void _onAccountSelected(HomeAccountSelected event, Emitter<HomeState> emit) {
     _publish(
       emit,
@@ -113,28 +105,24 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
   void _publish(Emitter<HomeState> emit, HomeState base) {
     final month = base.month;
     final inMonth = [
-      for (final item in _transactions.state.transactions)
+      for (final item in _transactionRows)
         if (item.date.year == month.year && item.date.month == month.month)
           item,
     ];
     final accountId = _activeAccountId(base.selectedAccountId);
     final transactions = _forAccount(inMonth, accountId);
     final days = daysOf(transactions);
-    final failed =
-        _transactions.state.status == TransactionsStatus.failure ||
-        _categories.state.status == CategoriesStatus.failure ||
-        _accounts.state.status == AccountsStatus.failure;
     emit(
       base.copyWith(
-        status: failed ? HomeStatus.failure : HomeStatus.success,
+        status: _failed ? HomeStatus.failure : HomeStatus.success,
         selectedAccountId: accountId,
         clearSelectedAccount: accountId == null,
         transactions: transactions,
         figures: monthFigures(transactions, month),
         days: days,
         selectedTransactions: transactionsOn(days, base.selectedDay),
-        categories: _categories.state.categories,
-        accounts: _accounts.state.accounts,
+        categories: _categoryRows,
+        accounts: _accountRows,
       ),
     );
   }
@@ -143,20 +131,12 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     if (accountId == null) {
       return null;
     }
-    for (final account in _accounts.state.accounts) {
+    for (final account in _accountRows) {
       if (account.id == accountId && !account.archived) {
         return accountId;
       }
     }
     return null;
-  }
-
-  @override
-  Future<void> close() {
-    for (final subscription in _subscriptions) {
-      subscription.cancel();
-    }
-    return super.close();
   }
 }
 

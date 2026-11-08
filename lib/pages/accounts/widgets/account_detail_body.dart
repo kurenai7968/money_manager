@@ -3,16 +3,10 @@ import 'package:go_router/go_router.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:money_manager/core/extensions/context_extension.dart';
 import 'package:money_manager/core/utils/money_format.dart';
-import 'package:money_manager/models/category_defaults.dart';
 import 'package:money_manager/models/ledger_kinds.dart';
 import 'package:money_manager/pages/accounts/bloc/account_detail_bloc.dart';
-import 'package:money_manager/pages/accounts/bloc/accounts_bloc.dart';
-import 'package:money_manager/pages/accounts/bloc/accounts_event.dart';
-import 'package:money_manager/pages/categories/bloc/categories_bloc.dart';
-import 'package:money_manager/pages/categories/bloc/categories_event.dart';
+import 'package:money_manager/pages/accounts/bloc/account_detail_event.dart';
 import 'package:money_manager/pages/route_reload.dart';
-import 'package:money_manager/pages/transactions/bloc/transactions_bloc.dart';
-import 'package:money_manager/pages/transactions/bloc/transactions_event.dart';
 import 'package:money_manager/routes/app_routes.dart';
 import 'package:money_manager/themes/app_themes.dart';
 import 'package:money_manager/widgets/transaction_item.dart';
@@ -30,9 +24,7 @@ class _AccountDetailBodyState extends State<AccountDetailBody>
     with RouteReload {
   @override
   void reloadForRoute() {
-    context.read<AccountsBloc>().add(const AccountsStarted());
-    context.read<TransactionsBloc>().add(const TransactionsStarted());
-    context.read<CategoriesBloc>().add(CategoriesStarted(defaultCategories()));
+    context.read<AccountDetailBloc>().add(const AccountDetailStarted());
   }
 
   @override

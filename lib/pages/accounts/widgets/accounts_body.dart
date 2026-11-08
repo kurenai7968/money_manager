@@ -4,13 +4,10 @@ import 'package:money_manager/core/extensions/context_extension.dart';
 import 'package:money_manager/core/utils/money_format.dart';
 import 'package:money_manager/pages/accounts/bloc/accounts_bloc.dart';
 import 'package:money_manager/pages/accounts/bloc/accounts_event.dart';
-import 'package:money_manager/pages/accounts/bloc/accounts_list_bloc.dart';
 import 'package:money_manager/pages/accounts/bloc/accounts_state.dart';
 import 'package:money_manager/pages/accounts/widgets/account_section_label.dart';
 import 'package:money_manager/pages/accounts/widgets/account_sliver.dart';
 import 'package:money_manager/pages/route_reload.dart';
-import 'package:money_manager/pages/transactions/bloc/transactions_bloc.dart';
-import 'package:money_manager/pages/transactions/bloc/transactions_event.dart';
 import 'package:money_manager/themes/app_themes.dart';
 
 class AccountsBody extends StatefulWidget {
@@ -24,7 +21,6 @@ class _AccountsBodyState extends State<AccountsBody> with RouteReload {
   @override
   void reloadForRoute() {
     context.read<AccountsBloc>().add(const AccountsStarted());
-    context.read<TransactionsBloc>().add(const TransactionsStarted());
   }
 
   @override
@@ -38,8 +34,7 @@ class _AccountsBodyState extends State<AccountsBody> with RouteReload {
             ..showSnackBar(SnackBar(content: Text(l10n.archiveBlocked)));
         }
       },
-      builder: (context, _) {
-        final overview = context.watch<AccountsListBloc>().state;
+      builder: (context, overview) {
         if (overview.assets.isEmpty && overview.liabilities.isEmpty) {
           return Center(child: Text(l10n.emptyAccounts));
         }

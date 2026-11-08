@@ -1,19 +1,12 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:money_manager/blocs/app_setting_bloc/app_setting_bloc.dart';
-import 'package:money_manager/models/category_defaults.dart';
-import 'package:money_manager/pages/accounts/bloc/accounts_bloc.dart';
-import 'package:money_manager/pages/accounts/bloc/accounts_event.dart';
-import 'package:money_manager/pages/categories/bloc/categories_bloc.dart';
-import 'package:money_manager/pages/categories/bloc/categories_event.dart';
 import 'package:money_manager/pages/home/bloc/home_bloc.dart';
 import 'package:money_manager/pages/home/bloc/home_event.dart';
 import 'package:money_manager/pages/home/bloc/home_state.dart';
 import 'package:money_manager/pages/home/widgets/home_calendar_view.dart';
 import 'package:money_manager/pages/home/widgets/home_summary_view.dart';
 import 'package:money_manager/pages/route_reload.dart';
-import 'package:money_manager/pages/transactions/bloc/transactions_bloc.dart';
-import 'package:money_manager/pages/transactions/bloc/transactions_event.dart';
 
 class HomeBody extends StatefulWidget {
   const HomeBody({super.key});
@@ -25,9 +18,7 @@ class HomeBody extends StatefulWidget {
 class _HomeBodyState extends State<HomeBody> with RouteReload {
   @override
   void reloadForRoute() {
-    context.read<TransactionsBloc>().add(const TransactionsStarted());
-    context.read<CategoriesBloc>().add(CategoriesStarted(defaultCategories()));
-    context.read<AccountsBloc>().add(const AccountsStarted());
+    context.read<HomeBloc>().add(const HomeStarted());
   }
 
   @override

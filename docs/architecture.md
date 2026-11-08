@@ -59,7 +59,7 @@ lib/
 
 ## Data flow
 
-`App` is a `StatelessWidget`. `AppProviders` constructs `AccountRepositoryImpl`, `CategoryRepositoryImpl`, `TransactionRepositoryImpl`, and `AppSettingRepositoryImpl`, then provides those repositories and `AppSettingBloc`. It does not take repository arguments. Each implementation is named `[Name]RepositoryImpl` and takes named constructor arguments (`database` for SQLite, `store` for settings). `MaterialApp` reads language and `appThemeMode` from `AppSettingBloc` through a `BlocBuilder` whose `buildWhen` watches `appThemeMode` and `locale`, so that bloc stays above the router. A page creates the other blocs it uses and dispatches their start events. When an ancestor already provides one of those blocs, the page uses that instance. A page that stays mounted reloads those blocs when the route changes, so a save on another route shows up after returning.
+`App` is a `StatelessWidget`. `AppProviders` constructs `AccountRepositoryImpl`, `CategoryRepositoryImpl`, `TransactionRepositoryImpl`, and `AppSettingRepositoryImpl`, then provides those repositories and `AppSettingBloc`. It does not take repository arguments. Each implementation is named `[Name]RepositoryImpl` and takes named constructor arguments (`database` for SQLite, `store` for settings). `MaterialApp` reads language and `appThemeMode` from `AppSettingBloc` through a `BlocBuilder` whose `buildWhen` watches `appThemeMode` and `locale`, so that bloc stays above the router. `AppSettingBloc` is the only bloc provided above the router. A page creates one bloc and dispatches its start event. That bloc calls repositories. Widgets on the page read and dispatch only that bloc. They may also read `AppSettingBloc` for language, theme, or the first weekday. A page that stays mounted reloads its own bloc when the route changes, so a save on another route shows up after returning.
 
 A page dispatches a bloc event. The bloc calls a repository. The repository reads and writes SQLite through `database/sqlite`, and key-value settings through `database/shared_preferences`. It throws exceptions from `core/errors/`. The bloc catches those exceptions and emits an error status. The repository persists entities with `fromJson` and `toJson`, then converts them with the mapping extensions in `core/mapping/`. Callers receive models. Other layers do not import `sqflite` or `shared_preferences`.
 
@@ -145,7 +145,7 @@ The tab bar is Home, Analysis, Accounts, and Settings, with the record button in
 
 ## Widgets
 
-`[feature]_page.dart` only creates the page blocs and a scaffold. The app bar and the body are widgets in `pages/[feature_name]/widgets/`:
+`[feature]_page.dart` creates that page's one bloc and a scaffold. It does not nest another feature bloc. The app bar and the body are widgets in `pages/[feature_name]/widgets/`:
 
 ```dart
 BlocProvider(
@@ -154,7 +154,7 @@ BlocProvider(
 )
 ```
 
-A page that needs more than one bloc nests those providers the same way. `SettingsPage` does not create `AppSettingBloc`. The bloc for that screen holds the decisions shared by the app bar and the body: selected month, selected day, summary or calendar, the home account (one account or all), analysis kind, and the record draft. Widgets read that state and send events. They format text, paint, and lay out children. A widget keeps a controller only for a text field or a tab bar.
+`SettingsPage` does not create `AppSettingBloc`. The bloc for that screen holds the decisions shared by the app bar and the body: selected month, selected day, summary or calendar, the home account (one account or all), analysis kind, and the record draft. Widgets read that state and send events. They format text, paint, and lay out children. A widget keeps a controller only for a text field or a tab bar.
 
 Split the rest of a screen into small widgets by responsibility, section, or interaction. Keep widgets used by one feature in `pages/[feature_name]/widgets/`. Move a widget to `lib/widgets/` only when more than one feature uses it and it has no feature-specific presentation logic.
 
@@ -164,7 +164,7 @@ An account's opening balance appears in the account history and the home list as
 
 A widget dispatches one event for the field the user changed. `AppSettingBloc` handles `AppSettingLanguageChanged`, `AppSettingThemeModeChanged`, and `AppSettingFirstDayOfWeekChanged`. Each handler copies the current `AppSettingModel` and saves that copy. The widget does not send a replacement model.
 
-A screen bloc may subscribe to another bloc and emit the figures and lists that screen shows. That includes which transactions fall in the month, month totals, day nets, analysis rollups, asset and liability groups, net worth, account history, and whether a record or form can be saved. The bloc calls the pure functions in `core/utils/`. Widgets display the emitted state and do not derive those figures.
+A page bloc calls repositories and emits the figures and lists that screen shows. It does not take another bloc, subscribe to another bloc, or add another bloc's events. That includes which transactions fall in the month, month totals, day nets, analysis rollups, asset and liability groups, net worth, account history, and whether a record or form can be saved. The bloc calls the pure functions in `core/utils/`. Widgets display the emitted state and do not derive those figures.
 
 Follow the [bloc library naming conventions](https://bloclibrary.dev/naming-conventions/).
 
