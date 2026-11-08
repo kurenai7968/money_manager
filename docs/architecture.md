@@ -6,8 +6,6 @@ synced_commit: bab577133619c34d9b18d9284e23757c5bad1612
 
 Use a maintainable layered architecture. Keep code testable, and do not add abstraction until a task needs it.
 
-The navigation shell, ledger, home, analysis, and settings are implemented. New feature code follows the sections below.
-
 ## Tech stack
 
 - Framework: Flutter (stable). Language: Dart.
@@ -63,21 +61,15 @@ lib/
 
 `App` is a `StatelessWidget`. `AppProviders` constructs `AccountRepositoryImpl`, `CategoryRepositoryImpl`, `TransactionRepositoryImpl`, and `AppSettingRepositoryImpl`, then provides those repositories and `AppSettingBloc`. It does not take repository arguments. Each implementation is named `[Name]RepositoryImpl` and takes named constructor arguments (`database` for SQLite, `store` for settings). `MaterialApp` reads language and `appThemeMode` from `AppSettingBloc` through a `BlocBuilder` whose `buildWhen` watches `appThemeMode` and `locale`, so that bloc stays above the router. A page creates the other blocs it uses and dispatches their start events. When an ancestor already provides one of those blocs, the page uses that instance. A page that stays mounted reloads those blocs when the route changes, so a save on another route shows up after returning.
 
-A screen bloc may subscribe to another bloc and emit the figures and lists that screen shows. The widget does not derive those figures.
-
-A page dispatches a bloc event. The bloc calls a repository. The repository reads and writes SQLite through `database/sqlite`, and key-value settings through `database/shared_preferences`. It throws exceptions from `core/errors/`. The bloc catches those exceptions and emits an error status. The repository persists entities with `fromJson` and `toJson`, then converts them with the mapping extensions in `core/mapping/`. Callers receive models. UI models contain no JSON serialization. Other layers do not import `sqflite` or `shared_preferences`.
-
-Saving an account keeps one transaction aligned with its opening balance. A positive balance stores an income of that amount. A negative balance stores an expense of the absolute amount. A zero balance deletes that transaction. The user edits that transaction on the record page. Saving it writes the signed amount back to the account opening balance: income is positive, expense is negative. Deleting it, changing it into a transfer, or moving it to another account sets the original opening balance to zero. An account that already has a non-zero opening balance and no matching transaction gets one when accounts load. A stored opening row is read as income.
+A page dispatches a bloc event. The bloc calls a repository. The repository reads and writes SQLite through `database/sqlite`, and key-value settings through `database/shared_preferences`. It throws exceptions from `core/errors/`. The bloc catches those exceptions and emits an error status. The repository persists entities with `fromJson` and `toJson`, then converts them with the mapping extensions in `core/mapping/`. Callers receive models. Other layers do not import `sqflite` or `shared_preferences`.
 
 ## Models
 
-The class name ends in `Model`. Mapping lives in `core/mapping/[name]_mapping.dart`. That file imports both types. The model file and the entity file do not import each other. Only a repository imports the mapping file.
+The class name ends in `Model`. Mapping lives in `core/mapping/[name]_mapping.dart`. That file imports both types. The model file and the entity file do not import each other. Only a repository imports the mapping file. UI models contain no JSON serialization.
 
 - `extension EntityNameMapping on EntityName` provides `ModelName toModel()`
 - `extension ModelNameMapping on ModelName` provides `EntityName toEntity()`
 - Entities and models both implement `copyWith`
-
-Visual design is recorded in `DESIGN.md`.
 
 ### AccountModel
 
@@ -118,7 +110,7 @@ Expense and income keep separate lists. A transfer has no category. A category t
 
 - `id`
 - `type`: `expense`, `income`, or `transfer`
-- `amount`, greater than zero
+- `amount`, greater than zero. Amounts are numbers.
 - `date`
 - `note`, optional
 - `accountId` for an expense or income
@@ -129,11 +121,11 @@ Expense and income keep separate lists. A transfer has no category. A category t
 
 An expense decreases its account. An income increases its account. A transfer moves the same amount between its two accounts, so net worth stays the same. Paying a credit card is a transfer from the funding account to the card. Changing type clears a category that belongs to the other kind.
 
-An account's opening balance is an income or an expense on that account. The stored amount is greater than zero. A positive opening balance is an income. A negative opening balance is an expense. Balance still starts from `openingBalance` and does not apply this transaction again. For a credit account, `openingBalance` remains the amount owed.
+An account's opening balance is one income or expense on that account. A positive balance stores an income of that amount. A negative balance stores an expense of the absolute amount. A zero balance deletes that transaction. The user edits that transaction on the record page. Saving it writes the signed amount back to the account opening balance: income is positive, expense is negative. Deleting it, changing it into a transfer, or moving it to another account sets the original opening balance to zero. An account that already has a non-zero opening balance and no matching transaction gets one when accounts load. A stored opening row is read as income. Balance still starts from `openingBalance` and does not apply this transaction again. Monthly balance includes it as income or expense. For a credit account, `openingBalance` remains the amount owed.
 
 ### Settings
 
-`AppSettingModel` stores `languageCode`, `countryCode`, `appThemeMode`, and `firstDayOfWeek`. `appThemeMode` is `AppThemeMode`: `system`, `light`, or `dark`. The JSON field name stays `appearance`. The first day of the week is `FirstDayOfWeek`, Monday through Sunday. The default is Monday. The stored value is the weekday name. Amounts are stored as numbers.
+`AppSettingModel` stores `languageCode`, `countryCode`, `appThemeMode`, and `firstDayOfWeek`. `appThemeMode` is `AppThemeMode`: `system`, `light`, or `dark`. The JSON field name stays `appearance`. The first day of the week is `FirstDayOfWeek`, Monday through Sunday. The default is Monday. The stored value is the weekday name.
 
 ### Month
 
@@ -162,7 +154,7 @@ BlocProvider(
 )
 ```
 
-A page that needs more than one bloc nests those providers the same way. `SettingsPage` does not create `AppSettingBloc`. The bloc for that screen holds the decisions shared by the app bar and the body: selected month, selected day, summary or calendar, the home account (one account or all), analysis kind, and the record draft. Widgets read the bloc state and send events. They format text, paint, and lay out children. A widget keeps a controller only for a text field or a tab bar.
+A page that needs more than one bloc nests those providers the same way. `SettingsPage` does not create `AppSettingBloc`. The bloc for that screen holds the decisions shared by the app bar and the body: selected month, selected day, summary or calendar, the home account (one account or all), analysis kind, and the record draft. Widgets read that state and send events. They format text, paint, and lay out children. A widget keeps a controller only for a text field or a tab bar.
 
 Split the rest of a screen into small widgets by responsibility, section, or interaction. Keep widgets used by one feature in `pages/[feature_name]/widgets/`. Move a widget to `lib/widgets/` only when more than one feature uses it and it has no feature-specific presentation logic.
 
@@ -170,11 +162,9 @@ An account's opening balance appears in the account history and the home list as
 
 ## BLoC
 
-The page widget provides each feature bloc it uses, as in Widgets. `AppSettingBloc` is the exception and is created in `AppProviders`.
-
 A widget dispatches one event for the field the user changed. `AppSettingBloc` handles `AppSettingLanguageChanged`, `AppSettingThemeModeChanged`, and `AppSettingFirstDayOfWeekChanged`. Each handler copies the current `AppSettingModel` and saves that copy. The widget does not send a replacement model.
 
-Screen rules live in the bloc. That includes which transactions fall in the month, month totals, day nets, analysis rollups, asset and liability groups, net worth, account history, and whether a record or form can be saved. The bloc calls the pure functions in `core/utils/`. Widgets display the emitted state.
+A screen bloc may subscribe to another bloc and emit the figures and lists that screen shows. That includes which transactions fall in the month, month totals, day nets, analysis rollups, asset and liability groups, net worth, account history, and whether a record or form can be saved. The bloc calls the pure functions in `core/utils/`. Widgets display the emitted state and do not derive those figures.
 
 Follow the [bloc library naming conventions](https://bloclibrary.dev/naming-conventions/).
 
@@ -189,11 +179,3 @@ Follow the [bloc library naming conventions](https://bloclibrary.dev/naming-conv
 - Declare fields before the constructor.
 - Do not hardcode user-facing strings. Use `context.l10n.key` through a `ContextExtension`.
 - Define `GoRouter` routes with an enum such as `AppRoutes`. Do not hardcode path strings.
-- Repositories throw custom exceptions from `core/errors/`. Blocs catch them and emit an error state.
-- A stored transaction amount is greater than zero.
-- An account's opening balance is one income or expense transaction on that account. A positive amount is income and a negative amount is expense. The record page can edit that transaction. Account balance counts the amount once. Monthly balance includes it as income or expense.
-- Monthly balance is income minus expense. Transfers stay out of it.
-- A transfer keeps net worth unchanged and uses two different accounts.
-- An account is archived only at a zero balance. A category with transactions is archived, not deleted.
-- Name a repository implementation `[Name]RepositoryImpl` and pass its dependencies as named constructor arguments.
-- Dispatch one bloc event per changed field. The bloc copies the current model and saves it.

@@ -50,3 +50,4 @@ Ids are five digits, starting at `00001`. The next id is one greater than the hi
 - 00040 Split the SQLite database files
 - 00041 Move account table into sqlite/tables
 - 00042 Move the remaining table files
+- 00043 Trim the architecture
