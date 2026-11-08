@@ -1,7 +1,7 @@
 import 'package:money_manager/core/errors/app_exception.dart';
 import 'package:money_manager/core/mapping/transaction_mapping.dart';
 import 'package:money_manager/database/sqlite/app_database.dart';
-import 'package:money_manager/database/sqlite/transaction_table.dart';
+import 'package:money_manager/database/sqlite/tables/transaction_table.dart';
 import 'package:money_manager/entities/transaction_entity.dart';
 import 'package:money_manager/models/transaction_model.dart';
 
@@ -43,8 +43,8 @@ class TransactionRepositoryImpl implements TransactionRepository {
 
   @override
   Future<void> delete(String id) {
-    return guard('Transaction could not be deleted.', () {
-      return _database.delete(
+    return guard('Transaction could not be deleted.', () async {
+      await _database.delete(
         TransactionTable.tableName,
         where: '${TransactionTable.id} = ?',
         whereArgs: [id],

@@ -1,27 +1,27 @@
 import 'package:flutter/foundation.dart';
 import 'package:money_manager/app_config.dart';
 import 'package:money_manager/core/errors/app_exception.dart';
-import 'package:money_manager/database/sqlite/account_table.dart';
-import 'package:money_manager/database/sqlite/category_table.dart';
-import 'package:money_manager/database/sqlite/transaction_table.dart';
+import 'package:money_manager/database/sqlite/sql_executor.dart';
+import 'package:money_manager/database/sqlite/tables/account_table.dart';
+import 'package:money_manager/database/sqlite/tables/category_table.dart';
+import 'package:money_manager/database/sqlite/tables/transaction_table.dart';
 import 'package:path/path.dart' as path;
 import 'package:path_provider/path_provider.dart';
 import 'package:sqflite/sqflite.dart';
 
-abstract interface class SqlExecutor {
-  Future<void> update(
-    String table,
-    Map<String, Object?> values, {
-    String? where,
-    List<Object?>? whereArgs,
-  });
-}
+export 'sql_executor.dart';
 
-class AppDatabase implements SqlExecutor {
+part 'sqlite_executor.dart';
+part 'sql_transaction.dart';
+
+class AppDatabase with _SqlExecutorMethods implements SqlExecutor {
   static final AppDatabase instance = AppDatabase._();
   Database? _database;
 
   AppDatabase._();
+
+  @override
+  DatabaseExecutor get _executor => _db;
 
   Future<void> initialize({String? path}) async {
     if (_database != null) return;
@@ -53,78 +53,12 @@ class AppDatabase implements SqlExecutor {
     return database;
   }
 
-  Future<List<Map<String, Object?>>> query(
-    String table, {
-    String? orderBy,
-    String? where,
-    List<Object?>? whereArgs,
-  }) {
-    return _db.query(
-      table,
-      orderBy: orderBy,
-      where: where,
-      whereArgs: whereArgs,
-    );
-  }
-
-  Future<void> insert(String table, Map<String, dynamic> values) {
-    return _db.insert(
-      table,
-      Map<String, Object?>.from(values),
-      conflictAlgorithm: ConflictAlgorithm.replace,
-    );
-  }
-
-  @override
-  Future<void> update(
-    String table,
-    Map<String, Object?> values, {
-    String? where,
-    List<Object?>? whereArgs,
-  }) async {
-    await _db.update(table, values, where: where, whereArgs: whereArgs);
-  }
-
-  Future<void> delete(
-    String table, {
-    String? where,
-    List<Object?>? whereArgs,
-  }) async {
-    await _db.delete(table, where: where, whereArgs: whereArgs);
-  }
-
-  Future<int> count(String sql, [List<Object?>? arguments]) async {
-    final value = Sqflite.firstIntValue(await _db.rawQuery(sql, arguments));
-    return value ?? 0;
-  }
-
-  Future<void> transaction(Future<void> Function(SqlExecutor executor) action) {
+  Future<T> transaction<T>(Future<T> Function(SqlExecutor executor) action) {
     return _db.transaction((txn) => action(_SqlTransaction(txn)));
   }
 
   static Future<String> _defaultPath() async {
     final directory = await getApplicationDocumentsDirectory();
     return path.join(directory.path, AppConfig.databaseName);
-  }
-}
-
-class _SqlTransaction implements SqlExecutor {
-  final Transaction _transaction;
-
-  _SqlTransaction(this._transaction);
-
-  @override
-  Future<void> update(
-    String table,
-    Map<String, Object?> values, {
-    String? where,
-    List<Object?>? whereArgs,
-  }) async {
-    await _transaction.update(
-      table,
-      values,
-      where: where,
-      whereArgs: whereArgs,
-    );
   }
 }

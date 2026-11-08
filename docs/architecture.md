@@ -42,6 +42,8 @@ lib/
 │       └── [name]_mapping.dart
 ├── database/
 │   ├── sqlite/               # sqflite connection
+│   │   └── tables/           # SQL table definitions
+│   │       └── [name]_table.dart
 │   └── shared_preferences/   # wrapper around package:shared_preferences
 ├── entities/                 # Persistence types. json_serializable, fromJson, toJson, Equatable.
 ├── models/                   # UI and business data only. No entity mapping on the class.

@@ -1,7 +1,7 @@
 import 'package:money_manager/core/errors/app_exception.dart';
 import 'package:money_manager/core/mapping/category_mapping.dart';
 import 'package:money_manager/database/sqlite/app_database.dart';
-import 'package:money_manager/database/sqlite/category_table.dart';
+import 'package:money_manager/database/sqlite/tables/category_table.dart';
 import 'package:money_manager/entities/category_entity.dart';
 import 'package:money_manager/models/category_model.dart';
 
@@ -54,8 +54,8 @@ class CategoryRepositoryImpl implements CategoryRepository {
 
   @override
   Future<void> delete(String id) {
-    return guard('Category could not be deleted.', () {
-      return _database.delete(
+    return guard('Category could not be deleted.', () async {
+      await _database.delete(
         CategoryTable.tableName,
         where: '${CategoryTable.id} = ?',
         whereArgs: [id],

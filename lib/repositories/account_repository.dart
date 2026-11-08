@@ -1,6 +1,6 @@
 import 'package:money_manager/core/errors/app_exception.dart';
 import 'package:money_manager/core/mapping/account_mapping.dart';
-import 'package:money_manager/database/sqlite/account_table.dart';
+import 'package:money_manager/database/sqlite/tables/account_table.dart';
 import 'package:money_manager/database/sqlite/app_database.dart';
 import 'package:money_manager/entities/account_entity.dart';
 import 'package:money_manager/models/account_model.dart';
@@ -54,8 +54,8 @@ class AccountRepositoryImpl implements AccountRepository {
 
   @override
   Future<void> archive(String id) {
-    return guard('Account could not be archived.', () {
-      return _database.update(
+    return guard('Account could not be archived.', () async {
+      await _database.update(
         AccountTable.tableName,
         {AccountTable.archived: 1},
         where: '${AccountTable.id} = ?',

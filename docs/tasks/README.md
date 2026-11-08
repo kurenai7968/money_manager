@@ -46,3 +46,7 @@ Ids are five digits, starting at `00001`. The next id is one greater than the hi
 - 00036 Document localization delegates
 - 00037 SQL column constants
 - 00038 Shared guard and app config
+- 00039 Complete the SQLite executor
+- 00040 Split the SQLite database files
+- 00041 Move account table into sqlite/tables
+- 00042 Move the remaining table files
