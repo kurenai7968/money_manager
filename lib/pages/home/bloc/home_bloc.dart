@@ -1,34 +1,24 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:money_manager/core/utils/ledger_balance.dart';
-import 'package:money_manager/core/utils/ledger_commands.dart';
-import 'package:money_manager/core/utils/queued_bloc.dart';
+import 'package:money_manager/pages/home/models/home_figures.dart';
+import 'package:money_manager/services/ledger_service.dart';
 import 'package:money_manager/models/account_model.dart';
 import 'package:money_manager/models/category_model.dart';
 import 'package:money_manager/models/transaction_model.dart';
 import 'package:money_manager/pages/home/bloc/home_event.dart';
 import 'package:money_manager/pages/home/bloc/home_state.dart';
-import 'package:money_manager/repositories/account_repository.dart';
-import 'package:money_manager/repositories/category_repository.dart';
-import 'package:money_manager/repositories/transaction_repository.dart';
 
-class HomeBloc extends Bloc<HomeEvent, HomeState>
-    with QueuedBloc<HomeEvent, HomeState> {
-  final AccountRepository _accounts;
-  final TransactionRepository _transactions;
-  final CategoryRepository _categories;
+class HomeBloc extends Bloc<HomeEvent, HomeState> {
+  final LedgerService _ledger;
   final DateTime Function() _now;
   var _failed = false;
   List<AccountModel> _accountRows = const [];
   List<TransactionModel> _transactionRows = const [];
   List<CategoryModel> _categoryRows = const [];
 
-  HomeBloc({
-    required this._accounts,
-    required this._transactions,
-    required this._categories,
-    DateTime Function()? now,
-  }) : _now = now ?? DateTime.now,
-       super(_initial(now ?? DateTime.now)) {
+  HomeBloc({required LedgerService ledger, DateTime Function()? now})
+    : _ledger = ledger,
+      _now = now ?? DateTime.now,
+      super(_initial(now ?? DateTime.now)) {
     on<HomeStarted>(_onStarted);
     on<HomeMonthShifted>(_onMonthShifted);
     on<HomeViewToggled>(_onViewToggled);
@@ -51,10 +41,10 @@ class HomeBloc extends Bloc<HomeEvent, HomeState>
 
   Future<void> _load() async {
     try {
-      final loaded = await loadAccounts(_accounts, _transactions);
+      final loaded = await _ledger.loadAccounts();
       _accountRows = loaded.accounts;
       _transactionRows = loaded.transactions;
-      _categoryRows = await loadCategories(_categories);
+      _categoryRows = await _ledger.loadCategories();
       _failed = false;
     } catch (_) {
       _failed = true;

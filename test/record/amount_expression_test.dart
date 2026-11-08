@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:money_manager/core/utils/amount_expression.dart';
+import 'package:money_manager/pages/record/models/amount_expression.dart';
 
 void main() {
   test('adds left to right and shows only the current number', () {

@@ -1,20 +1,17 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:money_manager/core/utils/id.dart';
 import 'package:money_manager/core/utils/ledger_balance.dart';
-import 'package:money_manager/core/utils/ledger_commands.dart';
-import 'package:money_manager/core/utils/queued_bloc.dart';
+import 'package:money_manager/services/ledger_service.dart';
 import 'package:money_manager/core/utils/money_format.dart';
 import 'package:money_manager/models/account_model.dart';
 import 'package:money_manager/models/transaction_model.dart';
 import 'package:money_manager/pages/accounts/bloc/account_form_event.dart';
 import 'package:money_manager/pages/accounts/bloc/account_form_state.dart';
 import 'package:money_manager/repositories/account_repository.dart';
-import 'package:money_manager/repositories/transaction_repository.dart';
 
-class AccountFormBloc extends Bloc<AccountFormEvent, AccountFormState>
-    with QueuedBloc<AccountFormEvent, AccountFormState> {
+class AccountFormBloc extends Bloc<AccountFormEvent, AccountFormState> {
   final AccountRepository _accounts;
-  final TransactionRepository _transactions;
+  final LedgerService _ledger;
   var _prepared = false;
   String? _languageCode;
   String? _languageEn;
@@ -26,9 +23,9 @@ class AccountFormBloc extends Bloc<AccountFormEvent, AccountFormState>
 
   AccountFormBloc({
     required AccountRepository accounts,
-    required TransactionRepository transactions,
+    required LedgerService ledger,
   }) : _accounts = accounts,
-       _transactions = transactions,
+       _ledger = ledger,
        super(AccountFormState(accountId: createId())) {
     on<AccountFormStarted>(_onStarted);
     on<AccountFormTypeSelected>(_onTypeSelected);
@@ -51,7 +48,7 @@ class AccountFormBloc extends Bloc<AccountFormEvent, AccountFormState>
       return;
     }
     try {
-      final loaded = await loadAccounts(_accounts, _transactions);
+      final loaded = await _ledger.loadAccounts();
       _accountRows = loaded.accounts;
       _transactionRows = loaded.transactions;
     } catch (_) {
@@ -117,7 +114,7 @@ class AccountFormBloc extends Bloc<AccountFormEvent, AccountFormState>
     }
     try {
       await _accounts.save(account);
-      await syncOpeningTransactions(_transactions, [account]);
+      await _ledger.syncOpeningTransactions([account]);
       emit(
         state.copyWith(
           status: AccountFormStatus.success,

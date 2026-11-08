@@ -1,6 +1,6 @@
 import 'package:bloc_test/bloc_test.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:money_manager/core/utils/amount_expression.dart';
+import 'package:money_manager/pages/record/models/amount_expression.dart';
 import 'package:money_manager/models/account_model.dart';
 import 'package:money_manager/models/category_model.dart';
 import 'package:money_manager/models/ledger_kinds.dart';
@@ -8,6 +8,7 @@ import 'package:money_manager/models/transaction_model.dart';
 import 'package:money_manager/pages/record/bloc/record_bloc.dart';
 import 'package:money_manager/pages/record/bloc/record_event.dart';
 import 'package:money_manager/pages/record/bloc/record_state.dart';
+import 'package:money_manager/services/ledger_service.dart';
 
 import '../support/memory_account_repository.dart';
 import '../support/memory_category_repository.dart';
@@ -64,9 +65,11 @@ void main() {
 
   RecordBloc buildBloc() {
     return RecordBloc(
-      transactions: transactionRepo,
-      accounts: accountRepo,
-      categories: categoryRepo,
+      ledger: LedgerServiceImpl(
+        accounts: accountRepo,
+        categories: categoryRepo,
+        transactions: transactionRepo,
+      ),
       now: () => DateTime(2026, 10, 15),
     );
   }

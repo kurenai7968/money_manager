@@ -6,6 +6,7 @@ import 'package:money_manager/models/transaction_model.dart';
 import 'package:money_manager/pages/home/bloc/home_bloc.dart';
 import 'package:money_manager/pages/home/bloc/home_event.dart';
 import 'package:money_manager/pages/home/bloc/home_state.dart';
+import 'package:money_manager/services/ledger_service.dart';
 import 'package:money_manager/repositories/transaction_repository.dart';
 
 import '../support/memory_account_repository.dart';
@@ -45,11 +46,13 @@ void main() {
       );
   });
 
-  HomeBloc buildBloc() {
+  HomeBloc buildBloc({TransactionRepository? transactions}) {
     return HomeBloc(
-      accounts: accountRepo,
-      transactions: transactionsRepo,
-      categories: categoryRepo,
+      ledger: LedgerServiceImpl(
+        accounts: accountRepo,
+        categories: categoryRepo,
+        transactions: transactions ?? transactionsRepo,
+      ),
       now: now,
     );
   }
@@ -72,9 +75,13 @@ void main() {
   blocTest<HomeBloc, HomeState>(
     'clears the selected day when the month is not the current one',
     build: buildBloc,
-    act: (bloc) => bloc
-      ..add(const HomeStarted())
-      ..add(const HomeMonthShifted(1)),
+    act: (bloc) async {
+      bloc.add(const HomeStarted());
+      await bloc.stream.firstWhere(
+        (state) => state.status == HomeStatus.success,
+      );
+      bloc.add(const HomeMonthShifted(1));
+    },
     expect: () => [
       isA<HomeState>().having(
         (state) => state.selectedDay,
@@ -90,12 +97,7 @@ void main() {
 
   blocTest<HomeBloc, HomeState>(
     'emits failure when the ledger cannot be read',
-    build: () => HomeBloc(
-      accounts: accountRepo,
-      transactions: _FailingTransactions(),
-      categories: categoryRepo,
-      now: now,
-    ),
+    build: () => buildBloc(transactions: _FailingTransactions()),
     act: (bloc) => bloc.add(const HomeStarted()),
     expect: () => [
       isA<HomeState>()
@@ -108,7 +110,7 @@ void main() {
   blocTest<HomeBloc, HomeState>(
     'limits the month to one account and can return to all',
     build: buildBloc,
-    act: (bloc) {
+    act: (bloc) async {
       accountRepo.accounts.add(_account('cash', 0));
       accountRepo.accounts.add(_account('bank', 1, type: AccountType.bank));
       transactionsRepo.transactions.add(
@@ -121,8 +123,11 @@ void main() {
           categoryId: 'salary',
         ),
       );
+      bloc.add(const HomeStarted());
+      await bloc.stream.firstWhere(
+        (state) => state.status == HomeStatus.success,
+      );
       bloc
-        ..add(const HomeStarted())
         ..add(const HomeAccountSelected('bank'))
         ..add(const HomeAccountSelected('cash'))
         ..add(const HomeAccountSelected(null));
@@ -155,8 +160,11 @@ void main() {
     build: buildBloc,
     act: (bloc) async {
       accountRepo.accounts.add(_account('cash', 0));
+      bloc.add(const HomeStarted());
+      await bloc.stream.firstWhere(
+        (state) => state.status == HomeStatus.success,
+      );
       bloc
-        ..add(const HomeStarted())
         ..add(const HomeAccountSelected('missing'))
         ..add(const HomeAccountSelected('cash'));
       await bloc.stream.firstWhere(

@@ -1,5 +1,5 @@
 import 'package:material_ui/material_ui.dart';
-import 'package:money_manager/pages/accounts/bloc/accounts_state.dart';
+import 'package:money_manager/pages/accounts/models/account_line.dart';
 import 'package:money_manager/pages/accounts/widgets/account_row.dart';
 import 'package:money_manager/widgets/ledger_reorder.dart';
 

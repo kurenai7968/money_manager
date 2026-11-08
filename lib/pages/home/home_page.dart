@@ -11,11 +11,8 @@ class HomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (context) => HomeBloc(
-        accounts: context.read(),
-        transactions: context.read(),
-        categories: context.read(),
-      )..add(const HomeStarted()),
+      create: (context) =>
+          HomeBloc(ledger: context.read())..add(const HomeStarted()),
       child: const Scaffold(appBar: HomeAppBar(), body: HomeBody()),
     );
   }

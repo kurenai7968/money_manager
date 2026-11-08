@@ -1,32 +1,19 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:money_manager/core/utils/ledger_balance.dart';
-import 'package:money_manager/core/utils/ledger_commands.dart';
-import 'package:money_manager/core/utils/queued_bloc.dart';
+import 'package:money_manager/services/ledger_service.dart';
 import 'package:money_manager/models/account_model.dart';
 import 'package:money_manager/models/category_model.dart';
 import 'package:money_manager/models/transaction_model.dart';
 import 'package:money_manager/pages/accounts/bloc/account_detail_event.dart';
 import 'package:money_manager/pages/accounts/bloc/account_detail_state.dart';
-import 'package:money_manager/repositories/account_repository.dart';
-import 'package:money_manager/repositories/category_repository.dart';
-import 'package:money_manager/repositories/transaction_repository.dart';
 
-class AccountDetailBloc extends Bloc<AccountDetailEvent, AccountDetailState>
-    with QueuedBloc<AccountDetailEvent, AccountDetailState> {
+class AccountDetailBloc extends Bloc<AccountDetailEvent, AccountDetailState> {
   final String accountId;
-  final AccountRepository _accounts;
-  final TransactionRepository _transactions;
-  final CategoryRepository _categories;
+  final LedgerService _ledger;
 
-  AccountDetailBloc({
-    required this.accountId,
-    required AccountRepository accounts,
-    required TransactionRepository transactions,
-    required CategoryRepository categories,
-  }) : _accounts = accounts,
-       _transactions = transactions,
-       _categories = categories,
-       super(const AccountDetailState()) {
+  AccountDetailBloc({required this.accountId, required LedgerService ledger})
+    : _ledger = ledger,
+      super(const AccountDetailState()) {
     on<AccountDetailStarted>(_onStarted);
   }
 
@@ -35,8 +22,8 @@ class AccountDetailBloc extends Bloc<AccountDetailEvent, AccountDetailState>
     Emitter<AccountDetailState> emit,
   ) async {
     try {
-      final loaded = await loadAccounts(_accounts, _transactions);
-      final categories = await loadCategories(_categories);
+      final loaded = await _ledger.loadAccounts();
+      final categories = await _ledger.loadCategories();
       _publish(
         emit,
         accounts: loaded.accounts,

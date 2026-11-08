@@ -4,12 +4,14 @@ import 'package:money_manager/core/utils/ledger_balance.dart';
 import 'package:money_manager/models/account_model.dart';
 import 'package:money_manager/models/ledger_kinds.dart';
 import 'package:money_manager/models/transaction_model.dart';
-import 'package:money_manager/repositories/account_repository.dart';
 import 'package:money_manager/pages/accounts/bloc/accounts_bloc.dart';
 import 'package:money_manager/pages/accounts/bloc/accounts_event.dart';
 import 'package:money_manager/pages/accounts/bloc/accounts_state.dart';
+import 'package:money_manager/repositories/account_repository.dart';
+import 'package:money_manager/services/ledger_service.dart';
 
 import '../support/memory_account_repository.dart';
+import '../support/memory_category_repository.dart';
 import '../support/memory_transaction_repository.dart';
 
 void main() {
@@ -21,6 +23,19 @@ void main() {
     transactions = MemoryTransactionRepository();
   });
 
+  AccountsBloc buildBloc({AccountRepository? accounts}) {
+    final accountRepo = accounts ?? repository;
+    return AccountsBloc(
+      accounts: accountRepo,
+      transactions: transactions,
+      ledger: LedgerServiceImpl(
+        accounts: accountRepo,
+        categories: MemoryCategoryRepository(),
+        transactions: transactions,
+      ),
+    );
+  }
+
   const cash = AccountModel(
     id: 'cash',
     name: 'Cash',
@@ -31,7 +46,7 @@ void main() {
 
   blocTest<AccountsBloc, AccountsState>(
     'seeds a cash account when the store is empty',
-    build: () => AccountsBloc(repository, transactions),
+    build: () => buildBloc(),
     act: (bloc) => bloc.add(const AccountsStarted()),
     verify: (bloc) {
       final account = bloc.state.accounts.single;
@@ -47,7 +62,7 @@ void main() {
 
   blocTest<AccountsBloc, AccountsState>(
     'rejects an empty name',
-    build: () => AccountsBloc(repository, transactions),
+    build: () => buildBloc(),
     act: (bloc) => bloc.add(
       const AccountSavePressed(
         AccountModel(
@@ -69,7 +84,7 @@ void main() {
 
   blocTest<AccountsBloc, AccountsState>(
     'saves an account',
-    build: () => AccountsBloc(repository, transactions),
+    build: () => buildBloc(),
     act: (bloc) => bloc.add(const AccountSavePressed(cash)),
     expect: () => [
       isA<AccountsState>()
@@ -90,7 +105,7 @@ void main() {
 
   blocTest<AccountsBloc, AccountsState>(
     'updates the opening transaction to the saved balance',
-    build: () => AccountsBloc(repository, transactions),
+    build: () => buildBloc(),
     setUp: () {
       transactions.transactions.add(
         TransactionModel(
@@ -118,7 +133,7 @@ void main() {
 
   blocTest<AccountsBloc, AccountsState>(
     'removes the opening transaction when the balance is zero',
-    build: () => AccountsBloc(repository, transactions),
+    build: () => buildBloc(),
     setUp: () {
       transactions.transactions.add(
         TransactionModel(
@@ -140,7 +155,7 @@ void main() {
 
   blocTest<AccountsBloc, AccountsState>(
     'adds an opening transaction for an existing balance',
-    build: () => AccountsBloc(repository, transactions),
+    build: () => buildBloc(),
     setUp: () {
       repository.accounts.add(cash);
     },
@@ -157,7 +172,7 @@ void main() {
 
   blocTest<AccountsBloc, AccountsState>(
     'saves a negative opening balance as an expense',
-    build: () => AccountsBloc(repository, transactions),
+    build: () => buildBloc(),
     setUp: () {
       transactions.transactions.add(
         TransactionModel(
@@ -186,7 +201,7 @@ void main() {
 
   blocTest<AccountsBloc, AccountsState>(
     'blocks archiving an account that still has a balance',
-    build: () => AccountsBloc(repository, transactions),
+    build: () => buildBloc(),
     act: (bloc) =>
         bloc.add(const AccountArchivePressed(cash, balanceMinor: 1500)),
     expect: () => const [
@@ -199,7 +214,7 @@ void main() {
 
   blocTest<AccountsBloc, AccountsState>(
     'archives an account at zero',
-    build: () => AccountsBloc(repository, transactions),
+    build: () => buildBloc(),
     setUp: () {
       repository.accounts.add(cash.copyWith(openingBalanceMinor: 0));
     },
@@ -217,7 +232,7 @@ void main() {
 
   blocTest<AccountsBloc, AccountsState>(
     'groups assets and liabilities and counts net worth once',
-    build: () => AccountsBloc(repository, transactions),
+    build: () => buildBloc(),
     setUp: () {
       repository.accounts.addAll(const [
         AccountModel(
@@ -271,7 +286,7 @@ void main() {
 
   blocTest<AccountsBloc, AccountsState>(
     'emits failure when accounts cannot be read',
-    build: () => AccountsBloc(_FailingAccounts(), transactions),
+    build: () => buildBloc(accounts: _FailingAccounts()),
     act: (bloc) => bloc.add(const AccountsStarted()),
     expect: () => [
       isA<AccountsState>().having(

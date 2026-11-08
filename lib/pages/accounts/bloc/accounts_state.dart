@@ -3,20 +3,11 @@ import 'package:money_manager/core/utils/ledger_balance.dart';
 import 'package:money_manager/models/account_model.dart';
 import 'package:money_manager/models/ledger_kinds.dart';
 import 'package:money_manager/models/transaction_model.dart';
+import 'package:money_manager/pages/accounts/models/account_line.dart';
 
 enum AccountsStatus { initial, loading, success, failure }
 
 enum AccountsError { none, saveFailed, archiveBlocked, nameRequired }
-
-class AccountLine extends Equatable {
-  final AccountModel account;
-  final int balanceMinor;
-
-  const AccountLine({required this.account, required this.balanceMinor});
-
-  @override
-  List<Object?> get props => [account, balanceMinor];
-}
 
 class AccountsState extends Equatable {
   final AccountsStatus status;

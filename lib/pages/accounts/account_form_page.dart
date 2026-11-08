@@ -17,16 +17,14 @@ class AccountFormPage extends StatelessWidget {
     final locale = Localizations.localeOf(context).toString();
     return BlocProvider(
       create: (context) =>
-          AccountFormBloc(
-            accounts: context.read(),
-            transactions: context.read(),
-          )..add(
-            AccountFormStarted(
-              accountId: accountId,
-              languageCode: languageCode,
-              locale: locale,
+          AccountFormBloc(accounts: context.read(), ledger: context.read())
+            ..add(
+              AccountFormStarted(
+                accountId: accountId,
+                languageCode: languageCode,
+                locale: locale,
+              ),
             ),
-          ),
       child: Scaffold(
         appBar: AccountFormAppBar(editing: accountId != null),
         body: AccountFormBody(accountId: accountId),

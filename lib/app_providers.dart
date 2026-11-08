@@ -7,6 +7,7 @@ import 'package:money_manager/repositories/account_repository.dart';
 import 'package:money_manager/repositories/app_setting_repository.dart';
 import 'package:money_manager/repositories/category_repository.dart';
 import 'package:money_manager/repositories/transaction_repository.dart';
+import 'package:money_manager/services/ledger_service.dart';
 
 class AppProviders extends StatelessWidget {
   final Widget child;
@@ -31,6 +32,13 @@ class AppProviders extends StatelessWidget {
         RepositoryProvider<TransactionRepository>(
           create: (_) =>
               TransactionRepositoryImpl(database: AppDatabase.instance),
+        ),
+        RepositoryProvider<LedgerService>(
+          create: (context) => LedgerServiceImpl(
+            accounts: context.read(),
+            categories: context.read(),
+            transactions: context.read(),
+          ),
         ),
       ],
       child: BlocProvider(

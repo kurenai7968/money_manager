@@ -11,9 +11,11 @@ class AccountsPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (context) =>
-          AccountsBloc(context.read(), context.read())
-            ..add(const AccountsStarted()),
+      create: (context) => AccountsBloc(
+        accounts: context.read(),
+        transactions: context.read(),
+        ledger: context.read(),
+      )..add(const AccountsStarted()),
       child: const Scaffold(appBar: AccountsAppBar(), body: AccountsBody()),
     );
   }

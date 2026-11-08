@@ -1,6 +1,6 @@
 import 'package:material_ui/material_ui.dart';
 import 'package:money_manager/core/extensions/context_extension.dart';
-import 'package:money_manager/core/utils/ledger_balance.dart';
+import 'package:money_manager/pages/home/models/home_figures.dart';
 import 'package:money_manager/core/utils/money_format.dart';
 import 'package:money_manager/models/account_model.dart';
 import 'package:money_manager/models/category_model.dart';

@@ -4,8 +4,6 @@ Ids are five digits, starting at `00001`. The next id is one greater than the hi
 
 ## In progress
 
-(none)
-
 ## Archive
 
 - 00001 Document the ledger domain
@@ -52,3 +50,5 @@ Ids are five digits, starting at `00001`. The next id is one greater than the hi
 - 00042 Move the remaining table files
 - 00043 Trim the architecture
 - 00044 Page uses only its own bloc
+- 00045 Page models and ledger repository
+- 00046 Ledger service

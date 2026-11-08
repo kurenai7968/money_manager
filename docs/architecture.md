@@ -46,8 +46,11 @@ lib/
 ├── entities/                 # Persistence types. json_serializable, fromJson, toJson, Equatable.
 ├── models/                   # UI and business data only. No entity mapping on the class.
 ├── repositories/             # One interface and one [Name]RepositoryImpl per data source
+├── services/                 # Operations that use more than one repository
+│   └── ledger_service.dart   # LedgerService and LedgerServiceImpl
 ├── pages/
 │   ├── [feature_name]/
+│   │   ├── models/           # Types used only by this feature
 │   │   ├── bloc/             # Feature-specific bloc
 │   │   ├── widgets/          # App bar, body, and other widgets for this feature
 │   │   └── [feature]_page.dart  # BlocProvider and Scaffold only
@@ -63,9 +66,13 @@ lib/
 
 A page dispatches a bloc event. The bloc calls a repository. The repository reads and writes SQLite through `database/sqlite`, and key-value settings through `database/shared_preferences`. It throws exceptions from `core/errors/`. The bloc catches those exceptions and emits an error status. The repository persists entities with `fromJson` and `toJson`, then converts them with the mapping extensions in `core/mapping/`. Callers receive models. Other layers do not import `sqflite` or `shared_preferences`.
 
+`LedgerService` composes the account, category, and transaction repositories. It loads accounts with the default account and opening rows, loads categories with the defaults, and saves or deletes a transaction while keeping that account's opening balance in step. `AppProviders` provides `LedgerServiceImpl`. That implementation takes the three repositories as named arguments. A page bloc calls `LedgerService` for those operations and the table repository for a single-table write.
+
 ## Models
 
-The class name ends in `Model`. Mapping lives in `core/mapping/[name]_mapping.dart`. That file imports both types. The model file and the entity file do not import each other. Only a repository imports the mapping file. UI models contain no JSON serialization.
+Types used by one feature live in `pages/[feature_name]/models/`. `MonthFigures` and `DayLedger` belong to home. `AnalysisRollup` and `AnalysisTotal` belong to analysis. `AmountExpression` and `AmountOperator` belong to record. `AccountLine` belongs to accounts. `lib/models/` keeps the shared account, category, transaction, and setting models. The `Model` suffix applies to those shared models.
+
+The class name of a shared model ends in `Model`. Mapping lives in `core/mapping/[name]_mapping.dart`. That file imports both types. The model file and the entity file do not import each other. Only a repository imports the mapping file. UI models contain no JSON serialization.
 
 - `extension EntityNameMapping on EntityName` provides `ModelName toModel()`
 - `extension ModelNameMapping on ModelName` provides `EntityName toEntity()`
@@ -164,7 +171,7 @@ An account's opening balance appears in the account history and the home list as
 
 A widget dispatches one event for the field the user changed. `AppSettingBloc` handles `AppSettingLanguageChanged`, `AppSettingThemeModeChanged`, and `AppSettingFirstDayOfWeekChanged`. Each handler copies the current `AppSettingModel` and saves that copy. The widget does not send a replacement model.
 
-A page bloc calls repositories and emits the figures and lists that screen shows. It does not take another bloc, subscribe to another bloc, or add another bloc's events. That includes which transactions fall in the month, month totals, day nets, analysis rollups, asset and liability groups, net worth, account history, and whether a record or form can be saved. The bloc calls the pure functions in `core/utils/`. Widgets display the emitted state and do not derive those figures.
+A page bloc calls a service or a repository and emits the figures and lists that screen shows. It does not take another bloc, subscribe to another bloc, or add another bloc's events. That includes which transactions fall in the month, month totals, day nets, analysis rollups, asset and liability groups, net worth, account history, and whether a record or form can be saved. The bloc calls the pure functions next to those page models, and the shared balance functions in `core/utils/`. Widgets display the emitted state and do not derive those figures.
 
 Follow the [bloc library naming conventions](https://bloclibrary.dev/naming-conventions/).
 

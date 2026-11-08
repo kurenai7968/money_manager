@@ -1,18 +1,23 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:money_manager/core/utils/ledger_commands.dart';
-import 'package:money_manager/core/utils/queued_bloc.dart';
 import 'package:money_manager/pages/accounts/bloc/accounts_event.dart';
 import 'package:money_manager/pages/accounts/bloc/accounts_state.dart';
 import 'package:money_manager/repositories/account_repository.dart';
+import 'package:money_manager/services/ledger_service.dart';
 import 'package:money_manager/repositories/transaction_repository.dart';
 
-class AccountsBloc extends Bloc<AccountsEvent, AccountsState>
-    with QueuedBloc<AccountsEvent, AccountsState> {
+class AccountsBloc extends Bloc<AccountsEvent, AccountsState> {
   final AccountRepository _repository;
   final TransactionRepository _transactions;
+  final LedgerService _ledger;
 
-  AccountsBloc(this._repository, this._transactions)
-    : super(const AccountsState()) {
+  AccountsBloc({
+    required AccountRepository accounts,
+    required TransactionRepository transactions,
+    required LedgerService ledger,
+  }) : _repository = accounts,
+       _transactions = transactions,
+       _ledger = ledger,
+       super(const AccountsState()) {
     on<AccountsStarted>(_onAccountsStarted);
     on<AccountSavePressed>(_onAccountSavePressed);
     on<AccountArchivePressed>(_onAccountArchivePressed);
@@ -27,7 +32,7 @@ class AccountsBloc extends Bloc<AccountsEvent, AccountsState>
       state.copyWith(status: AccountsStatus.loading, error: AccountsError.none),
     );
     try {
-      final loaded = await loadAccounts(_repository, _transactions);
+      final loaded = await _ledger.loadAccounts();
       emit(
         state.copyWith(
           status: AccountsStatus.success,
@@ -60,7 +65,7 @@ class AccountsBloc extends Bloc<AccountsEvent, AccountsState>
     }
     try {
       await _repository.save(event.account);
-      await syncOpeningTransactions(_transactions, [event.account]);
+      await _ledger.syncOpeningTransactions([event.account]);
       final accounts = await _repository.getAll();
       final transactions = await _transactions.getAll();
       emit(

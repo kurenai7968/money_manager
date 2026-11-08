@@ -8,6 +8,7 @@ import 'package:money_manager/pages/accounts/bloc/account_detail_bloc.dart';
 import 'package:money_manager/pages/accounts/bloc/account_detail_event.dart';
 import 'package:money_manager/pages/accounts/bloc/account_detail_state.dart';
 import 'package:money_manager/repositories/account_repository.dart';
+import 'package:money_manager/services/ledger_service.dart';
 
 import '../support/memory_account_repository.dart';
 import '../support/memory_category_repository.dart';
@@ -58,14 +59,20 @@ void main() {
     categoryRepo = MemoryCategoryRepository();
   });
 
+  AccountDetailBloc buildBloc(String accountId) {
+    return AccountDetailBloc(
+      accountId: accountId,
+      ledger: LedgerServiceImpl(
+        accounts: accountRepo,
+        categories: categoryRepo,
+        transactions: transactionRepo,
+      ),
+    );
+  }
+
   blocTest<AccountDetailBloc, AccountDetailState>(
     'shows the account history and one balance',
-    build: () => AccountDetailBloc(
-      accountId: 'cash',
-      accounts: accountRepo,
-      transactions: transactionRepo,
-      categories: categoryRepo,
-    ),
+    build: () => buildBloc('cash'),
     act: (bloc) => bloc.add(const AccountDetailStarted()),
     verify: (bloc) {
       expect(bloc.state.history.map((item) => item.id), ['lunch', 'move']);
@@ -82,12 +89,7 @@ void main() {
 
   blocTest<AccountDetailBloc, AccountDetailState>(
     'has no account when the id is missing',
-    build: () => AccountDetailBloc(
-      accountId: 'missing',
-      accounts: accountRepo,
-      transactions: transactionRepo,
-      categories: categoryRepo,
-    ),
+    build: () => buildBloc('missing'),
     act: (bloc) => bloc.add(const AccountDetailStarted()),
     expect: () => [
       isA<AccountDetailState>()
@@ -101,12 +103,7 @@ void main() {
     setUp: () {
       accountRepo = _FailingAccounts();
     },
-    build: () => AccountDetailBloc(
-      accountId: 'cash',
-      accounts: accountRepo,
-      transactions: transactionRepo,
-      categories: categoryRepo,
-    ),
+    build: () => buildBloc('cash'),
     act: (bloc) => bloc.add(const AccountDetailStarted()),
     expect: () => [
       isA<AccountDetailState>()

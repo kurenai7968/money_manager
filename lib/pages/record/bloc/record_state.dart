@@ -1,5 +1,5 @@
 import 'package:equatable/equatable.dart';
-import 'package:money_manager/core/utils/amount_expression.dart';
+import 'package:money_manager/pages/record/models/amount_expression.dart';
 import 'package:money_manager/models/account_model.dart';
 import 'package:money_manager/models/category_model.dart';
 import 'package:money_manager/models/ledger_kinds.dart';

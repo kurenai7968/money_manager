@@ -23,18 +23,14 @@ class RecordPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (context) =>
-          RecordBloc(
-            transactions: context.read(),
-            accounts: context.read(),
-            categories: context.read(),
-          )..add(
-            RecordStarted(
-              transactionId: transactionId,
-              initialType: initialType,
-              initialAccountId: initialAccountId,
-            ),
+      create: (context) => RecordBloc(ledger: context.read())
+        ..add(
+          RecordStarted(
+            transactionId: transactionId,
+            initialType: initialType,
+            initialAccountId: initialAccountId,
           ),
+        ),
       child: BlocListener<RecordBloc, RecordState>(
         listenWhen: (previous, current) =>
             current.closePage && !previous.closePage,

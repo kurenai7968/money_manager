@@ -1,6 +1,6 @@
 import 'package:material_ui/material_ui.dart';
 import 'package:money_manager/core/extensions/context_extension.dart';
-import 'package:money_manager/core/utils/amount_expression.dart';
+import 'package:money_manager/pages/record/models/amount_expression.dart';
 import 'package:money_manager/themes/app_themes.dart';
 
 class RecordKeypad extends StatelessWidget {

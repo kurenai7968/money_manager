@@ -7,6 +7,7 @@ import 'package:money_manager/models/transaction_model.dart';
 import 'package:money_manager/pages/analysis/bloc/analysis_bloc.dart';
 import 'package:money_manager/pages/analysis/bloc/analysis_event.dart';
 import 'package:money_manager/pages/analysis/bloc/analysis_state.dart';
+import 'package:money_manager/services/ledger_service.dart';
 import 'package:money_manager/repositories/transaction_repository.dart';
 
 import '../support/memory_account_repository.dart';
@@ -76,11 +77,13 @@ void main() {
     accountRepo = MemoryAccountRepository()..accounts.add(_cash);
   });
 
-  AnalysisBloc buildBloc() {
+  AnalysisBloc buildBloc({TransactionRepository? transactions}) {
     return AnalysisBloc(
-      accounts: accountRepo,
-      transactions: transactionsRepo,
-      categories: categoryRepo,
+      ledger: LedgerServiceImpl(
+        accounts: accountRepo,
+        categories: categoryRepo,
+        transactions: transactions ?? transactionsRepo,
+      ),
       now: () => DateTime(2026, 10, 15),
     );
   }
@@ -88,9 +91,13 @@ void main() {
   blocTest<AnalysisBloc, AnalysisState>(
     'compares expense with last month and ignores transfers',
     build: buildBloc,
-    act: (bloc) => bloc
-      ..add(const AnalysisStarted())
-      ..add(const AnalysisKindSelected(CategoryKind.income)),
+    act: (bloc) async {
+      bloc.add(const AnalysisStarted());
+      await bloc.stream.firstWhere(
+        (state) => state.status == AnalysisStatus.success,
+      );
+      bloc.add(const AnalysisKindSelected(CategoryKind.income));
+    },
     expect: () => [
       isA<AnalysisState>()
           .having((state) => state.rollup.current, 'current', 400)
@@ -110,12 +117,7 @@ void main() {
 
   blocTest<AnalysisBloc, AnalysisState>(
     'emits an empty rollup when transactions cannot be read',
-    build: () => AnalysisBloc(
-      accounts: accountRepo,
-      transactions: _FailingTransactions(),
-      categories: categoryRepo,
-      now: () => DateTime(2026, 10, 15),
-    ),
+    build: () => buildBloc(transactions: _FailingTransactions()),
     act: (bloc) => bloc.add(const AnalysisStarted()),
     expect: () => [
       isA<AnalysisState>()

@@ -6,8 +6,10 @@ import 'package:money_manager/models/transaction_model.dart';
 import 'package:money_manager/pages/accounts/bloc/account_form_bloc.dart';
 import 'package:money_manager/pages/accounts/bloc/account_form_event.dart';
 import 'package:money_manager/pages/accounts/bloc/account_form_state.dart';
+import 'package:money_manager/services/ledger_service.dart';
 
 import '../support/memory_account_repository.dart';
+import '../support/memory_category_repository.dart';
 import '../support/memory_transaction_repository.dart';
 
 void main() {
@@ -31,7 +33,11 @@ void main() {
   AccountFormBloc buildBloc() {
     return AccountFormBloc(
       accounts: accountRepo,
-      transactions: transactionRepo,
+      ledger: LedgerServiceImpl(
+        accounts: accountRepo,
+        categories: MemoryCategoryRepository(),
+        transactions: transactionRepo,
+      ),
     );
   }
 
