@@ -53,3 +53,4 @@ Ids are five digits, starting at `00001`. The next id is one greater than the hi
 - 00045 Page models and ledger repository
 - 00046 Ledger service
 - 00047 Rename bloc started events
+- 00048 Account book balance query

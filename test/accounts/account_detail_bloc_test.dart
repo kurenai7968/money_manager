@@ -1,6 +1,5 @@
 import 'package:bloc_test/bloc_test.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:money_manager/core/utils/ledger_balance.dart';
 import 'package:money_manager/models/account_model.dart';
 import 'package:money_manager/models/ledger_kinds.dart';
 import 'package:money_manager/models/transaction_model.dart';
@@ -8,7 +7,7 @@ import 'package:money_manager/pages/accounts/bloc/account_detail_bloc.dart';
 import 'package:money_manager/pages/accounts/bloc/account_detail_event.dart';
 import 'package:money_manager/pages/accounts/bloc/account_detail_state.dart';
 import 'package:money_manager/repositories/account_repository.dart';
-import 'package:money_manager/services/ledger_service.dart';
+import 'package:money_manager/services/account_book_service.dart';
 
 import '../support/memory_account_repository.dart';
 import '../support/memory_category_repository.dart';
@@ -28,7 +27,9 @@ void main() {
   late MemoryCategoryRepository categoryRepo;
 
   setUp(() {
-    accountRepo = MemoryAccountRepository()..accounts.add(cash);
+    accountRepo = MemoryAccountRepository()
+      ..accounts.add(cash)
+      ..balanceById['cash'] = -1200;
     transactionRepo = MemoryTransactionRepository()
       ..transactions.addAll([
         TransactionModel(
@@ -62,7 +63,7 @@ void main() {
   AccountDetailBloc buildBloc(String accountId) {
     return AccountDetailBloc(
       accountId: accountId,
-      ledger: LedgerServiceImpl(
+      accountBook: AccountBookServiceImpl(
         accounts: accountRepo,
         categories: categoryRepo,
         transactions: transactionRepo,
@@ -76,7 +77,7 @@ void main() {
     act: (bloc) => bloc.add(const AccountDetailInitialized()),
     verify: (bloc) {
       expect(bloc.state.history.map((item) => item.id), ['lunch', 'move']);
-      expect(bloc.state.balanceMinor, balanceOf(cash, bloc.state.history));
+      expect(bloc.state.balanceMinor, -1200);
     },
     expect: () => [
       isA<AccountDetailState>().having(
@@ -123,6 +124,9 @@ class _FailingAccounts implements AccountRepository {
 
   @override
   Future<List<AccountModel>> getAll() async => throw StateError('unavailable');
+
+  @override
+  Future<AccountBalances> balances() async => throw StateError('unavailable');
 
   @override
   Future<bool> isEmpty() async => throw StateError('unavailable');

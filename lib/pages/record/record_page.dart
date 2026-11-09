@@ -23,7 +23,7 @@ class RecordPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (context) => RecordBloc(ledger: context.read())
+      create: (context) => RecordBloc(accountBook: context.read())
         ..add(
           RecordInitialized(
             transactionId: transactionId,

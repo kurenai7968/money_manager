@@ -1,6 +1,5 @@
 import 'package:bloc_test/bloc_test.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:money_manager/core/utils/ledger_balance.dart';
 import 'package:money_manager/models/account_model.dart';
 import 'package:money_manager/models/ledger_kinds.dart';
 import 'package:money_manager/models/transaction_model.dart';
@@ -8,7 +7,7 @@ import 'package:money_manager/pages/accounts/bloc/accounts_bloc.dart';
 import 'package:money_manager/pages/accounts/bloc/accounts_event.dart';
 import 'package:money_manager/pages/accounts/bloc/accounts_state.dart';
 import 'package:money_manager/repositories/account_repository.dart';
-import 'package:money_manager/services/ledger_service.dart';
+import 'package:money_manager/services/account_book_service.dart';
 
 import '../support/memory_account_repository.dart';
 import '../support/memory_category_repository.dart';
@@ -27,8 +26,7 @@ void main() {
     final accountRepo = accounts ?? repository;
     return AccountsBloc(
       accounts: accountRepo,
-      transactions: transactions,
-      ledger: LedgerServiceImpl(
+      accountBook: AccountBookServiceImpl(
         accounts: accountRepo,
         categories: MemoryCategoryRepository(),
         transactions: transactions,
@@ -258,29 +256,14 @@ void main() {
           archived: true,
         ),
       ]);
-      transactions.transactions.add(
-        TransactionModel(
-          id: 'lunch',
-          type: TransactionType.expense,
-          amountMinor: 2000,
-          date: DateTime(2026, 10, 1),
-          accountId: 'cash',
-          categoryId: 'food',
-        ),
-      );
+      repository.balanceById['cash'] = 8000;
     },
     act: (bloc) => bloc.add(const AccountsInitialized()),
     verify: (bloc) {
       expect(bloc.state.assets.map((line) => line.account.id), ['cash']);
       expect(bloc.state.assets.single.balanceMinor, 8000);
       expect(bloc.state.liabilities.single.account.id, 'card');
-      expect(
-        bloc.state.netWorth,
-        netWorthOf(
-          repository.accounts.where((item) => !item.archived),
-          transactions.transactions,
-        ),
-      );
+      expect(bloc.state.netWorth, 5000);
     },
   );
 
@@ -331,6 +314,9 @@ class _FailingAccounts implements AccountRepository {
 
   @override
   Future<List<AccountModel>> getAll() async => throw StateError('unavailable');
+
+  @override
+  Future<AccountBalances> balances() async => throw StateError('unavailable');
 
   @override
   Future<bool> isEmpty() async => throw StateError('unavailable');

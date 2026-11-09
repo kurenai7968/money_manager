@@ -6,7 +6,7 @@ import 'package:money_manager/models/transaction_model.dart';
 import 'package:money_manager/pages/home/bloc/home_bloc.dart';
 import 'package:money_manager/pages/home/bloc/home_event.dart';
 import 'package:money_manager/pages/home/bloc/home_state.dart';
-import 'package:money_manager/services/ledger_service.dart';
+import 'package:money_manager/services/account_book_service.dart';
 import 'package:money_manager/repositories/transaction_repository.dart';
 
 import '../support/memory_account_repository.dart';
@@ -48,7 +48,7 @@ void main() {
 
   HomeBloc buildBloc({TransactionRepository? transactions}) {
     return HomeBloc(
-      ledger: LedgerServiceImpl(
+      accountBook: AccountBookServiceImpl(
         accounts: accountRepo,
         categories: categoryRepo,
         transactions: transactions ?? transactionsRepo,

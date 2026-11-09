@@ -1,6 +1,6 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:money_manager/pages/home/models/home_figures.dart';
-import 'package:money_manager/services/ledger_service.dart';
+import 'package:money_manager/services/account_book_service.dart';
 import 'package:money_manager/models/account_model.dart';
 import 'package:money_manager/models/category_model.dart';
 import 'package:money_manager/models/transaction_model.dart';
@@ -8,15 +8,15 @@ import 'package:money_manager/pages/home/bloc/home_event.dart';
 import 'package:money_manager/pages/home/bloc/home_state.dart';
 
 class HomeBloc extends Bloc<HomeEvent, HomeState> {
-  final LedgerService _ledger;
+  final AccountBookService _accountBook;
   final DateTime Function() _now;
   var _failed = false;
   List<AccountModel> _accountRows = const [];
   List<TransactionModel> _transactionRows = const [];
   List<CategoryModel> _categoryRows = const [];
 
-  HomeBloc({required LedgerService ledger, DateTime Function()? now})
-    : _ledger = ledger,
+  HomeBloc({required AccountBookService accountBook, DateTime Function()? now})
+    : _accountBook = accountBook,
       _now = now ?? DateTime.now,
       super(_initial(now ?? DateTime.now)) {
     on<HomeInitialized>(_onInitialized);
@@ -44,10 +44,10 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
 
   Future<void> _load() async {
     try {
-      final loaded = await _ledger.loadAccounts();
+      final loaded = await _accountBook.loadAccounts();
       _accountRows = loaded.accounts;
       _transactionRows = loaded.transactions;
-      _categoryRows = await _ledger.loadCategories();
+      _categoryRows = await _accountBook.loadCategories();
       _failed = false;
     } catch (_) {
       _failed = true;

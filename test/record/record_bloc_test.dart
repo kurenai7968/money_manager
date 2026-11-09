@@ -8,7 +8,7 @@ import 'package:money_manager/models/transaction_model.dart';
 import 'package:money_manager/pages/record/bloc/record_bloc.dart';
 import 'package:money_manager/pages/record/bloc/record_event.dart';
 import 'package:money_manager/pages/record/bloc/record_state.dart';
-import 'package:money_manager/services/ledger_service.dart';
+import 'package:money_manager/services/account_book_service.dart';
 
 import '../support/memory_account_repository.dart';
 import '../support/memory_category_repository.dart';
@@ -65,7 +65,7 @@ void main() {
 
   RecordBloc buildBloc() {
     return RecordBloc(
-      ledger: LedgerServiceImpl(
+      accountBook: AccountBookServiceImpl(
         accounts: accountRepo,
         categories: categoryRepo,
         transactions: transactionRepo,

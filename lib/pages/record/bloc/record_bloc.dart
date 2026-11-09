@@ -1,7 +1,7 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:money_manager/pages/record/models/amount_expression.dart';
 import 'package:money_manager/core/utils/id.dart';
-import 'package:money_manager/services/ledger_service.dart';
+import 'package:money_manager/services/account_book_service.dart';
 import 'package:money_manager/models/account_model.dart';
 import 'package:money_manager/models/category_model.dart';
 import 'package:money_manager/models/ledger_kinds.dart';
@@ -10,7 +10,7 @@ import 'package:money_manager/pages/record/bloc/record_event.dart';
 import 'package:money_manager/pages/record/bloc/record_state.dart';
 
 class RecordBloc extends Bloc<RecordEvent, RecordState> {
-  final LedgerService _ledger;
+  final AccountBookService _accountBook;
   final DateTime Function() _now;
   String? _transactionId;
   TransactionType? _initialType;
@@ -22,10 +22,12 @@ class RecordBloc extends Bloc<RecordEvent, RecordState> {
   List<TransactionModel> _transactionRows = const [];
   List<CategoryModel> _categoryRows = const [];
 
-  RecordBloc({required LedgerService ledger, DateTime Function()? now})
-    : _ledger = ledger,
-      _now = now ?? DateTime.now,
-      super(RecordState(date: (now ?? DateTime.now)())) {
+  RecordBloc({
+    required AccountBookService accountBook,
+    DateTime Function()? now,
+  }) : _accountBook = accountBook,
+       _now = now ?? DateTime.now,
+       super(RecordState(date: (now ?? DateTime.now)())) {
     on<RecordInitialized>(_onInitialized);
     on<RecordTypeSelected>(_onTypeSelected);
     on<RecordDateSelected>(_onDateSelected);
@@ -53,10 +55,10 @@ class RecordBloc extends Bloc<RecordEvent, RecordState> {
     _initialType = event.initialType;
     _initialAccountId = event.initialAccountId;
     try {
-      final loaded = await _ledger.loadAccounts();
+      final loaded = await _accountBook.loadAccounts();
       _accountRows = loaded.accounts;
       _transactionRows = loaded.transactions;
-      _categoryRows = await _ledger.loadCategories();
+      _categoryRows = await _accountBook.loadCategories();
     } catch (_) {
       _accountRows = const [];
       _transactionRows = const [];
@@ -231,7 +233,7 @@ class RecordBloc extends Bloc<RecordEvent, RecordState> {
     _draftId ??= _transactionId ?? createId();
     final type = state.type;
     try {
-      await _ledger.saveTransaction(
+      await _accountBook.saveTransaction(
         TransactionModel(
           id: _draftId!,
           type: type,
@@ -267,7 +269,7 @@ class RecordBloc extends Bloc<RecordEvent, RecordState> {
       return;
     }
     try {
-      await _ledger.deleteTransaction(id);
+      await _accountBook.deleteTransaction(id);
       emit(
         state.copyWith(
           status: RecordStatus.success,

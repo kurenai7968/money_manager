@@ -1,54 +1,9 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:money_manager/core/utils/ledger_balance.dart';
-import 'package:money_manager/pages/home/models/home_figures.dart';
-import 'package:money_manager/models/account_model.dart';
 import 'package:money_manager/models/ledger_kinds.dart';
 import 'package:money_manager/models/transaction_model.dart';
+import 'package:money_manager/pages/home/models/home_figures.dart';
 
 void main() {
-  const cash = AccountModel(
-    id: 'cash',
-    name: 'Cash',
-    type: AccountType.cash,
-    openingBalanceMinor: 10000,
-    sortOrder: 0,
-  );
-  const card = AccountModel(
-    id: 'card',
-    name: 'Card',
-    type: AccountType.credit,
-    openingBalanceMinor: 0,
-    sortOrder: 1,
-  );
-
-  test('expense and card payment update balances', () {
-    final expense = TransactionModel(
-      id: 'meal',
-      type: TransactionType.expense,
-      amountMinor: 2000,
-      date: DateTime(2026, 10, 23),
-      accountId: 'card',
-      categoryId: 'food',
-    );
-    final payment = TransactionModel(
-      id: 'pay',
-      type: TransactionType.transfer,
-      amountMinor: 2000,
-      date: DateTime(2026, 10, 24),
-      fromAccountId: 'cash',
-      toAccountId: 'card',
-    );
-
-    expect(balanceOf(card, [expense]), 2000);
-    expect(balanceOf(cash, [payment]), 8000);
-    expect(balanceOf(card, [expense, payment]), 0);
-    expect(balancesOf([cash, card], [expense, payment]), {
-      'cash': 8000,
-      'card': 0,
-    });
-    expect(netWorthOf([cash, card], [expense, payment]), 8000);
-  });
-
   test('month balance ignores transfers', () {
     final figures = monthFigures([
       TransactionModel(
@@ -77,7 +32,7 @@ void main() {
     expect(figures.balanceMinor, 3800);
   });
 
-  test('opening income is counted once and included in the month', () {
+  test('opening income is included in the month', () {
     final opening = TransactionModel(
       id: 'opening-cash',
       type: TransactionType.income,
@@ -94,26 +49,13 @@ void main() {
       categoryId: 'food',
     );
 
-    expect(balanceOf(cash, [opening, expense]), 8000);
-    expect(
-      balanceOf(card.copyWith(openingBalanceMinor: 1200), [
-        TransactionModel(
-          id: 'opening-card',
-          type: TransactionType.income,
-          amountMinor: 1200,
-          date: DateTime(2026, 10, 1),
-          accountId: 'card',
-        ),
-      ]),
-      1200,
-    );
     final figures = monthFigures([opening, expense], DateTime(2026, 10));
     expect(figures.incomeMinor, 10000);
     expect(figures.expenseMinor, 2000);
     expect(figures.balanceMinor, 8000);
   });
 
-  test('negative opening expense is counted once', () {
+  test('negative opening expense is included in the month', () {
     final opening = TransactionModel(
       id: 'opening-cash',
       type: TransactionType.expense,
@@ -122,10 +64,6 @@ void main() {
       accountId: 'cash',
     );
 
-    expect(
-      balanceOf(cash.copyWith(openingBalanceMinor: -500), [opening]),
-      -500,
-    );
     final figures = monthFigures([opening], DateTime(2026, 10));
     expect(figures.incomeMinor, 0);
     expect(figures.expenseMinor, 500);

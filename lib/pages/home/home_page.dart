@@ -12,7 +12,7 @@ class HomePage extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocProvider(
       create: (context) =>
-          HomeBloc(ledger: context.read())..add(const HomeInitialized()),
+          HomeBloc(accountBook: context.read())..add(const HomeInitialized()),
       child: const Scaffold(appBar: HomeAppBar(), body: HomeBody()),
     );
   }

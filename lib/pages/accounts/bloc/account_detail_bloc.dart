@@ -1,6 +1,5 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:money_manager/core/utils/ledger_balance.dart';
-import 'package:money_manager/services/ledger_service.dart';
+import 'package:money_manager/services/account_book_service.dart';
 import 'package:money_manager/models/account_model.dart';
 import 'package:money_manager/models/category_model.dart';
 import 'package:money_manager/models/transaction_model.dart';
@@ -9,11 +8,13 @@ import 'package:money_manager/pages/accounts/bloc/account_detail_state.dart';
 
 class AccountDetailBloc extends Bloc<AccountDetailEvent, AccountDetailState> {
   final String accountId;
-  final LedgerService _ledger;
+  final AccountBookService _accountBook;
 
-  AccountDetailBloc({required this.accountId, required LedgerService ledger})
-    : _ledger = ledger,
-      super(const AccountDetailState()) {
+  AccountDetailBloc({
+    required this.accountId,
+    required AccountBookService accountBook,
+  }) : _accountBook = accountBook,
+       super(const AccountDetailState()) {
     on<AccountDetailInitialized>(_onInitialized);
   }
 
@@ -22,11 +23,12 @@ class AccountDetailBloc extends Bloc<AccountDetailEvent, AccountDetailState> {
     Emitter<AccountDetailState> emit,
   ) async {
     try {
-      final loaded = await _ledger.loadAccounts();
-      final categories = await _ledger.loadCategories();
+      final loaded = await _accountBook.loadAccounts();
+      final categories = await _accountBook.loadCategories();
       _publish(
         emit,
         accounts: loaded.accounts,
+        balances: loaded.balances,
         transactions: loaded.transactions,
         categories: categories,
         failed: false,
@@ -35,6 +37,7 @@ class AccountDetailBloc extends Bloc<AccountDetailEvent, AccountDetailState> {
       _publish(
         emit,
         accounts: const [],
+        balances: const {},
         transactions: const [],
         categories: const [],
         failed: true,
@@ -45,6 +48,7 @@ class AccountDetailBloc extends Bloc<AccountDetailEvent, AccountDetailState> {
   void _publish(
     Emitter<AccountDetailState> emit, {
     required List<AccountModel> accounts,
+    required Map<String, int> balances,
     required List<TransactionModel> transactions,
     required List<CategoryModel> categories,
     required bool failed,
@@ -80,7 +84,7 @@ class AccountDetailBloc extends Bloc<AccountDetailEvent, AccountDetailState> {
       AccountDetailState(
         status: status,
         account: account,
-        balanceMinor: balanceOf(account, history),
+        balanceMinor: balances[account.id] ?? account.openingBalanceMinor,
         history: history,
         categories: categories,
         accounts: accounts,

@@ -10,8 +10,15 @@ import 'package:money_manager/repositories/account_repository.dart';
 import 'package:money_manager/repositories/category_repository.dart';
 import 'package:money_manager/repositories/transaction_repository.dart';
 
-abstract interface class LedgerService {
-  Future<({List<AccountModel> accounts, List<TransactionModel> transactions})>
+abstract interface class AccountBookService {
+  Future<
+    ({
+      List<AccountModel> accounts,
+      Map<String, int> balances,
+      int netWorth,
+      List<TransactionModel> transactions,
+    })
+  >
   loadAccounts();
 
   Future<List<CategoryModel>> loadCategories();
@@ -23,27 +30,37 @@ abstract interface class LedgerService {
   Future<void> deleteTransaction(String id);
 }
 
-class LedgerServiceImpl implements LedgerService {
+class AccountBookServiceImpl implements AccountBookService {
   final AccountRepository _accounts;
   final CategoryRepository _categories;
   final TransactionRepository _transactions;
 
-  LedgerServiceImpl({
+  AccountBookServiceImpl({
     required this._accounts,
     required this._categories,
     required this._transactions,
   });
 
   @override
-  Future<({List<AccountModel> accounts, List<TransactionModel> transactions})>
+  Future<
+    ({
+      List<AccountModel> accounts,
+      Map<String, int> balances,
+      int netWorth,
+      List<TransactionModel> transactions,
+    })
+  >
   loadAccounts() async {
     if (await _accounts.isEmpty()) {
       await _accounts.save(defaultAccount());
     }
     final loaded = await _accounts.getAll();
     await syncOpeningTransactions(loaded);
+    final balances = await _accounts.balances();
     return (
-      accounts: await _accounts.getAll(),
+      accounts: balances.accounts,
+      balances: balances.balanceById,
+      netWorth: balances.netWorth,
       transactions: await _transactions.getAll(),
     );
   }

@@ -1,17 +1,15 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:money_manager/core/utils/id.dart';
-import 'package:money_manager/core/utils/ledger_balance.dart';
-import 'package:money_manager/services/ledger_service.dart';
+import 'package:money_manager/services/account_book_service.dart';
 import 'package:money_manager/core/utils/money_format.dart';
 import 'package:money_manager/models/account_model.dart';
-import 'package:money_manager/models/transaction_model.dart';
 import 'package:money_manager/pages/accounts/bloc/account_form_event.dart';
 import 'package:money_manager/pages/accounts/bloc/account_form_state.dart';
 import 'package:money_manager/repositories/account_repository.dart';
 
 class AccountFormBloc extends Bloc<AccountFormEvent, AccountFormState> {
   final AccountRepository _accounts;
-  final LedgerService _ledger;
+  final AccountBookService _accountBook;
   var _prepared = false;
   String? _languageCode;
   String? _languageEn;
@@ -19,13 +17,13 @@ class AccountFormBloc extends Bloc<AccountFormEvent, AccountFormState> {
   String? _languageZhCn;
   var _locale = 'en';
   List<AccountModel> _accountRows = const [];
-  List<TransactionModel> _transactionRows = const [];
+  Map<String, int> _balances = const {};
 
   AccountFormBloc({
     required AccountRepository accounts,
-    required LedgerService ledger,
+    required AccountBookService accountBook,
   }) : _accounts = accounts,
-       _ledger = ledger,
+       _accountBook = accountBook,
        super(AccountFormState(accountId: createId())) {
     on<AccountFormInitialized>(_onInitialized);
     on<AccountFormTypeSelected>(_onTypeSelected);
@@ -48,12 +46,12 @@ class AccountFormBloc extends Bloc<AccountFormEvent, AccountFormState> {
       return;
     }
     try {
-      final loaded = await _ledger.loadAccounts();
+      final loaded = await _accountBook.loadAccounts();
       _accountRows = loaded.accounts;
-      _transactionRows = loaded.transactions;
+      _balances = loaded.balances;
     } catch (_) {
       _accountRows = const [];
-      _transactionRows = const [];
+      _balances = const {};
     }
     _emitPrepared(emit, next);
   }
@@ -114,7 +112,7 @@ class AccountFormBloc extends Bloc<AccountFormEvent, AccountFormState> {
     }
     try {
       await _accounts.save(account);
-      await _ledger.syncOpeningTransactions([account]);
+      await _accountBook.syncOpeningTransactions([account]);
       emit(
         state.copyWith(
           status: AccountFormStatus.success,
@@ -141,7 +139,7 @@ class AccountFormBloc extends Bloc<AccountFormEvent, AccountFormState> {
     if (account == null) {
       return;
     }
-    final balance = balanceOf(account, _transactionRows);
+    final balance = _balances[account.id] ?? account.openingBalanceMinor;
     if (balance != 0) {
       emit(
         state.copyWith(

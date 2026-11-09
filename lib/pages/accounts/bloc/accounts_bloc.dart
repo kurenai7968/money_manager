@@ -2,21 +2,17 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:money_manager/pages/accounts/bloc/accounts_event.dart';
 import 'package:money_manager/pages/accounts/bloc/accounts_state.dart';
 import 'package:money_manager/repositories/account_repository.dart';
-import 'package:money_manager/services/ledger_service.dart';
-import 'package:money_manager/repositories/transaction_repository.dart';
+import 'package:money_manager/services/account_book_service.dart';
 
 class AccountsBloc extends Bloc<AccountsEvent, AccountsState> {
   final AccountRepository _repository;
-  final TransactionRepository _transactions;
-  final LedgerService _ledger;
+  final AccountBookService _accountBook;
 
   AccountsBloc({
     required AccountRepository accounts,
-    required TransactionRepository transactions,
-    required LedgerService ledger,
+    required AccountBookService accountBook,
   }) : _repository = accounts,
-       _transactions = transactions,
-       _ledger = ledger,
+       _accountBook = accountBook,
        super(const AccountsState()) {
     on<AccountsInitialized>(_onAccountsInitialized);
     on<AccountSavePressed>(_onAccountSavePressed);
@@ -31,23 +27,7 @@ class AccountsBloc extends Bloc<AccountsEvent, AccountsState> {
     emit(
       state.copyWith(status: AccountsStatus.loading, error: AccountsError.none),
     );
-    try {
-      final loaded = await _ledger.loadAccounts();
-      emit(
-        state.copyWith(
-          status: AccountsStatus.success,
-          accounts: loaded.accounts,
-          transactions: loaded.transactions,
-        ),
-      );
-    } catch (_) {
-      emit(
-        state.copyWith(
-          status: AccountsStatus.failure,
-          error: AccountsError.saveFailed,
-        ),
-      );
-    }
+    await _reload(emit);
   }
 
   Future<void> _onAccountSavePressed(
@@ -65,17 +45,7 @@ class AccountsBloc extends Bloc<AccountsEvent, AccountsState> {
     }
     try {
       await _repository.save(event.account);
-      await _ledger.syncOpeningTransactions([event.account]);
-      final accounts = await _repository.getAll();
-      final transactions = await _transactions.getAll();
-      emit(
-        state.copyWith(
-          status: AccountsStatus.success,
-          accounts: accounts,
-          transactions: transactions,
-          error: AccountsError.none,
-        ),
-      );
+      await _accountBook.syncOpeningTransactions([event.account]);
     } catch (_) {
       emit(
         state.copyWith(
@@ -83,7 +53,9 @@ class AccountsBloc extends Bloc<AccountsEvent, AccountsState> {
           error: AccountsError.saveFailed,
         ),
       );
+      return;
     }
+    await _reload(emit);
   }
 
   Future<void> _onAccountArchivePressed(
@@ -101,16 +73,6 @@ class AccountsBloc extends Bloc<AccountsEvent, AccountsState> {
     }
     try {
       await _repository.archive(event.account.id);
-      final accounts = await _repository.getAll();
-      final transactions = await _transactions.getAll();
-      emit(
-        state.copyWith(
-          status: AccountsStatus.success,
-          accounts: accounts,
-          transactions: transactions,
-          error: AccountsError.none,
-        ),
-      );
     } catch (_) {
       emit(
         state.copyWith(
@@ -118,7 +80,9 @@ class AccountsBloc extends Bloc<AccountsEvent, AccountsState> {
           error: AccountsError.saveFailed,
         ),
       );
+      return;
     }
+    await _reload(emit);
   }
 
   Future<void> _onAccountsReorderPressed(
@@ -127,13 +91,28 @@ class AccountsBloc extends Bloc<AccountsEvent, AccountsState> {
   ) async {
     try {
       await _repository.reorder(event.ids);
-      final accounts = await _repository.getAll();
-      final transactions = await _transactions.getAll();
+    } catch (_) {
+      emit(
+        state.copyWith(
+          status: AccountsStatus.failure,
+          error: AccountsError.saveFailed,
+        ),
+      );
+      return;
+    }
+    await _reload(emit);
+  }
+
+  Future<void> _reload(Emitter<AccountsState> emit) async {
+    try {
+      final loaded = await _accountBook.loadAccounts();
       emit(
         state.copyWith(
           status: AccountsStatus.success,
-          accounts: accounts,
-          transactions: transactions,
+          accounts: loaded.accounts,
+          balances: loaded.balances,
+          netWorth: loaded.netWorth,
+          error: AccountsError.none,
         ),
       );
     } catch (_) {

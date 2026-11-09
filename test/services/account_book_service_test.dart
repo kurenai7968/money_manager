@@ -2,7 +2,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:money_manager/models/account_model.dart';
 import 'package:money_manager/models/ledger_kinds.dart';
 import 'package:money_manager/models/transaction_model.dart';
-import 'package:money_manager/services/ledger_service.dart';
+import 'package:money_manager/services/account_book_service.dart';
 
 import '../support/memory_account_repository.dart';
 import '../support/memory_category_repository.dart';
@@ -11,12 +11,12 @@ import '../support/memory_transaction_repository.dart';
 void main() {
   late MemoryTransactionRepository repository;
   late MemoryAccountRepository accounts;
-  late LedgerService ledger;
+  late AccountBookService accountBook;
 
   setUp(() {
     repository = MemoryTransactionRepository();
     accounts = MemoryAccountRepository();
-    ledger = LedgerServiceImpl(
+    accountBook = AccountBookServiceImpl(
       accounts: accounts,
       categories: MemoryCategoryRepository(),
       transactions: repository,
@@ -41,13 +41,13 @@ void main() {
   );
 
   test('saves an expense', () async {
-    await ledger.saveTransaction(expense);
+    await accountBook.saveTransaction(expense);
     expect(repository.transactions.single.amountMinor, 8600);
   });
 
   test('writes the signed opening balance when that income is saved', () async {
     accounts.accounts.add(cash);
-    await ledger.saveTransaction(
+    await accountBook.saveTransaction(
       TransactionModel(
         id: 'opening-cash',
         type: TransactionType.income,
@@ -66,7 +66,7 @@ void main() {
     'writes a negative opening balance when that expense is saved',
     () async {
       accounts.accounts.add(cash);
-      await ledger.saveTransaction(
+      await accountBook.saveTransaction(
         TransactionModel(
           id: 'opening-cash',
           type: TransactionType.expense,
@@ -85,7 +85,7 @@ void main() {
     'clears the opening balance when that transaction becomes a transfer',
     () async {
       accounts.accounts.add(cash);
-      await ledger.saveTransaction(
+      await accountBook.saveTransaction(
         TransactionModel(
           id: 'opening-cash',
           type: TransactionType.transfer,
@@ -106,7 +106,7 @@ void main() {
     'clears the opening balance when that transaction moves account',
     () async {
       accounts.accounts.add(cash);
-      await ledger.saveTransaction(
+      await accountBook.saveTransaction(
         TransactionModel(
           id: 'opening-cash',
           type: TransactionType.income,
@@ -135,14 +135,14 @@ void main() {
         categoryId: 'salary',
       ),
     );
-    await ledger.deleteTransaction('opening-cash');
+    await accountBook.deleteTransaction('opening-cash');
     expect(accounts.accounts.single.openingBalanceMinor, 0);
     expect(repository.transactions, isEmpty);
   });
 
   test('deletes a transaction', () async {
     repository.transactions.add(expense);
-    await ledger.deleteTransaction('lunch');
+    await accountBook.deleteTransaction('lunch');
     expect(repository.transactions, isEmpty);
   });
 }

@@ -6,20 +6,22 @@ import 'package:money_manager/models/transaction_model.dart';
 import 'package:money_manager/pages/analysis/bloc/analysis_event.dart';
 import 'package:money_manager/pages/analysis/bloc/analysis_state.dart';
 import 'package:money_manager/pages/analysis/models/analysis_rollup.dart';
-import 'package:money_manager/services/ledger_service.dart';
+import 'package:money_manager/services/account_book_service.dart';
 
 class AnalysisBloc extends Bloc<AnalysisEvent, AnalysisState> {
-  final LedgerService _ledger;
+  final AccountBookService _accountBook;
   final DateTime Function() _now;
   var _failed = false;
   List<AccountModel> _accountRows = const [];
   List<TransactionModel> _transactionRows = const [];
   List<CategoryModel> _categoryRows = const [];
 
-  AnalysisBloc({required LedgerService ledger, DateTime Function()? now})
-    : _ledger = ledger,
-      _now = now ?? DateTime.now,
-      super(_initial(now ?? DateTime.now)) {
+  AnalysisBloc({
+    required AccountBookService accountBook,
+    DateTime Function()? now,
+  }) : _accountBook = accountBook,
+       _now = now ?? DateTime.now,
+       super(_initial(now ?? DateTime.now)) {
     on<AnalysisInitialized>(_onInitialized);
     on<AnalysisKindSelected>(_onKindSelected);
   }
@@ -43,10 +45,10 @@ class AnalysisBloc extends Bloc<AnalysisEvent, AnalysisState> {
 
   Future<void> _load() async {
     try {
-      final loaded = await _ledger.loadAccounts();
+      final loaded = await _accountBook.loadAccounts();
       _accountRows = loaded.accounts;
       _transactionRows = loaded.transactions;
-      _categoryRows = await _ledger.loadCategories();
+      _categoryRows = await _accountBook.loadCategories();
       _failed = false;
     } catch (_) {
       _failed = true;

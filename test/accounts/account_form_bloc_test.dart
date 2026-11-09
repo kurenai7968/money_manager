@@ -2,11 +2,10 @@ import 'package:bloc_test/bloc_test.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:money_manager/models/account_model.dart';
 import 'package:money_manager/models/ledger_kinds.dart';
-import 'package:money_manager/models/transaction_model.dart';
 import 'package:money_manager/pages/accounts/bloc/account_form_bloc.dart';
 import 'package:money_manager/pages/accounts/bloc/account_form_event.dart';
 import 'package:money_manager/pages/accounts/bloc/account_form_state.dart';
-import 'package:money_manager/services/ledger_service.dart';
+import 'package:money_manager/services/account_book_service.dart';
 
 import '../support/memory_account_repository.dart';
 import '../support/memory_category_repository.dart';
@@ -33,7 +32,7 @@ void main() {
   AccountFormBloc buildBloc() {
     return AccountFormBloc(
       accounts: accountRepo,
-      ledger: LedgerServiceImpl(
+      accountBook: AccountBookServiceImpl(
         accounts: accountRepo,
         categories: MemoryCategoryRepository(),
         transactions: transactionRepo,
@@ -125,16 +124,7 @@ void main() {
     'blocks archive when the balance is not zero',
     build: buildBloc,
     act: (bloc) async {
-      transactionRepo.transactions.add(
-        TransactionModel(
-          id: 'lunch',
-          type: TransactionType.expense,
-          amountMinor: 100,
-          date: DateTime(2026, 10, 1),
-          accountId: 'cash',
-          categoryId: 'food',
-        ),
-      );
+      accountRepo.balanceById['cash'] = -100;
       bloc.add(
         const AccountFormInitialized(
           accountId: 'cash',

@@ -7,7 +7,7 @@ import 'package:money_manager/models/transaction_model.dart';
 import 'package:money_manager/pages/analysis/bloc/analysis_bloc.dart';
 import 'package:money_manager/pages/analysis/bloc/analysis_event.dart';
 import 'package:money_manager/pages/analysis/bloc/analysis_state.dart';
-import 'package:money_manager/services/ledger_service.dart';
+import 'package:money_manager/services/account_book_service.dart';
 import 'package:money_manager/repositories/transaction_repository.dart';
 
 import '../support/memory_account_repository.dart';
@@ -79,7 +79,7 @@ void main() {
 
   AnalysisBloc buildBloc({TransactionRepository? transactions}) {
     return AnalysisBloc(
-      ledger: LedgerServiceImpl(
+      accountBook: AccountBookServiceImpl(
         accounts: accountRepo,
         categories: categoryRepo,
         transactions: transactions ?? transactionsRepo,

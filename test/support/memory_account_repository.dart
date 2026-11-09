@@ -1,8 +1,10 @@
 import 'package:money_manager/models/account_model.dart';
+import 'package:money_manager/models/ledger_kinds.dart';
 import 'package:money_manager/repositories/account_repository.dart';
 
 class MemoryAccountRepository implements AccountRepository {
   final List<AccountModel> accounts = [];
+  final Map<String, int> balanceById = {};
 
   @override
   Future<void> archive(String id) async {
@@ -18,6 +20,28 @@ class MemoryAccountRepository implements AccountRepository {
     final copy = [...accounts];
     copy.sort((a, b) => a.sortOrder.compareTo(b.sortOrder));
     return copy;
+  }
+
+  @override
+  Future<AccountBalances> balances() async {
+    final loaded = await getAll();
+    final balances = {
+      for (final account in loaded)
+        account.id: balanceById[account.id] ?? account.openingBalanceMinor,
+    };
+    var netWorth = 0;
+    for (final account in loaded) {
+      if (account.archived) {
+        continue;
+      }
+      final balance = balances[account.id]!;
+      netWorth += account.type == AccountType.credit ? -balance : balance;
+    }
+    return AccountBalances(
+      accounts: loaded,
+      balanceById: balances,
+      netWorth: netWorth,
+    );
   }
 
   @override
