@@ -20,7 +20,7 @@ class AnalysisBloc extends Bloc<AnalysisEvent, AnalysisState> {
     : _ledger = ledger,
       _now = now ?? DateTime.now,
       super(_initial(now ?? DateTime.now)) {
-    on<AnalysisStarted>(_onStarted);
+    on<AnalysisInitialized>(_onInitialized);
     on<AnalysisKindSelected>(_onKindSelected);
   }
 
@@ -33,8 +33,8 @@ class AnalysisBloc extends Bloc<AnalysisEvent, AnalysisState> {
     );
   }
 
-  Future<void> _onStarted(
-    AnalysisStarted event,
+  Future<void> _onInitialized(
+    AnalysisInitialized event,
     Emitter<AnalysisState> emit,
   ) async {
     await _load();

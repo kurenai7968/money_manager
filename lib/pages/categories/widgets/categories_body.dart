@@ -19,7 +19,9 @@ class CategoriesBody extends StatefulWidget {
 class _CategoriesBodyState extends State<CategoriesBody> with RouteReload {
   @override
   void reloadForRoute() {
-    context.read<CategoriesBloc>().add(CategoriesStarted(defaultCategories()));
+    context.read<CategoriesBloc>().add(
+      CategoriesInitialized(defaultCategories()),
+    );
   }
 
   @override

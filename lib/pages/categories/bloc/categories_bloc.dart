@@ -10,14 +10,14 @@ class CategoriesBloc extends Bloc<CategoriesEvent, CategoriesState> {
 
   CategoriesBloc(this._repository, {this.transactions})
     : super(const CategoriesState()) {
-    on<CategoriesStarted>(_onCategoriesStarted);
+    on<CategoriesInitialized>(_onCategoriesInitialized);
     on<CategorySavePressed>(_onCategorySavePressed);
     on<CategoryDeletePressed>(_onCategoryDeletePressed);
     on<CategoriesReorderPressed>(_onCategoriesReorderPressed);
   }
 
-  Future<void> _onCategoriesStarted(
-    CategoriesStarted event,
+  Future<void> _onCategoriesInitialized(
+    CategoriesInitialized event,
     Emitter<CategoriesState> emit,
   ) async {
     emit(

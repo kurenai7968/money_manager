@@ -25,7 +25,7 @@ class RecordPage extends StatelessWidget {
     return BlocProvider(
       create: (context) => RecordBloc(ledger: context.read())
         ..add(
-          RecordStarted(
+          RecordInitialized(
             transactionId: transactionId,
             initialType: initialType,
             initialAccountId: initialAccountId,

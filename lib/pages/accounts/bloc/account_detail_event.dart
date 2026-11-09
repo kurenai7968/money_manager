@@ -7,6 +7,6 @@ sealed class AccountDetailEvent extends Equatable {
   List<Object?> get props => [];
 }
 
-class AccountDetailStarted extends AccountDetailEvent {
-  const AccountDetailStarted();
+class AccountDetailInitialized extends AccountDetailEvent {
+  const AccountDetailInitialized();
 }

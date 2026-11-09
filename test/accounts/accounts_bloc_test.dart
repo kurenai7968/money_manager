@@ -47,7 +47,7 @@ void main() {
   blocTest<AccountsBloc, AccountsState>(
     'seeds a cash account when the store is empty',
     build: () => buildBloc(),
-    act: (bloc) => bloc.add(const AccountsStarted()),
+    act: (bloc) => bloc.add(const AccountsInitialized()),
     verify: (bloc) {
       final account = bloc.state.accounts.single;
       expect(account.type, AccountType.cash);
@@ -159,7 +159,7 @@ void main() {
     setUp: () {
       repository.accounts.add(cash);
     },
-    act: (bloc) => bloc.add(const AccountsStarted()),
+    act: (bloc) => bloc.add(const AccountsInitialized()),
     verify: (bloc) {
       expect(bloc.state.accounts.single.openingBalanceMinor, 1500);
       final opening = transactions.transactions.single;
@@ -269,7 +269,7 @@ void main() {
         ),
       );
     },
-    act: (bloc) => bloc.add(const AccountsStarted()),
+    act: (bloc) => bloc.add(const AccountsInitialized()),
     verify: (bloc) {
       expect(bloc.state.assets.map((line) => line.account.id), ['cash']);
       expect(bloc.state.assets.single.balanceMinor, 8000);
@@ -287,7 +287,7 @@ void main() {
   blocTest<AccountsBloc, AccountsState>(
     'emits failure when accounts cannot be read',
     build: () => buildBloc(accounts: _FailingAccounts()),
-    act: (bloc) => bloc.add(const AccountsStarted()),
+    act: (bloc) => bloc.add(const AccountsInitialized()),
     expect: () => [
       isA<AccountsState>().having(
         (state) => state.status,

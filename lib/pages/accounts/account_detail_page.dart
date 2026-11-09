@@ -15,7 +15,7 @@ class AccountDetailPage extends StatelessWidget {
     return BlocProvider(
       create: (context) =>
           AccountDetailBloc(accountId: accountId, ledger: context.read())
-            ..add(const AccountDetailStarted()),
+            ..add(const AccountDetailInitialized()),
       child: Scaffold(
         appBar: AccountDetailAppBar(accountId: accountId),
         body: AccountDetailBody(accountId: accountId),

@@ -9,12 +9,12 @@ sealed class RecordEvent extends Equatable {
   List<Object?> get props => [];
 }
 
-class RecordStarted extends RecordEvent {
+class RecordInitialized extends RecordEvent {
   final String? transactionId;
   final TransactionType? initialType;
   final String? initialAccountId;
 
-  const RecordStarted({
+  const RecordInitialized({
     this.transactionId,
     this.initialType,
     this.initialAccountId,

@@ -19,7 +19,7 @@ class AccountFormPage extends StatelessWidget {
       create: (context) =>
           AccountFormBloc(accounts: context.read(), ledger: context.read())
             ..add(
-              AccountFormStarted(
+              AccountFormInitialized(
                 accountId: accountId,
                 languageCode: languageCode,
                 locale: locale,

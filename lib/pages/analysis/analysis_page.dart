@@ -12,7 +12,8 @@ class AnalysisPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocProvider(
       create: (context) =>
-          AnalysisBloc(ledger: context.read())..add(const AnalysisStarted()),
+          AnalysisBloc(ledger: context.read())
+            ..add(const AnalysisInitialized()),
       child: const Scaffold(appBar: AnalysisAppBar(), body: AnalysisBody()),
     );
   }

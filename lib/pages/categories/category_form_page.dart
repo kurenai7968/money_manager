@@ -22,7 +22,7 @@ class CategoryFormPage extends StatelessWidget {
     return BlocProvider(
       create: (context) =>
           CategoriesBloc(context.read(), transactions: context.read())
-            ..add(CategoriesStarted(defaultCategories())),
+            ..add(CategoriesInitialized(defaultCategories())),
       child: Scaffold(
         appBar: CategoryFormAppBar(editing: categoryId != null),
         body: CategoryFormBody(

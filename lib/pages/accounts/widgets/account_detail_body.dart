@@ -24,7 +24,7 @@ class _AccountDetailBodyState extends State<AccountDetailBody>
     with RouteReload {
   @override
   void reloadForRoute() {
-    context.read<AccountDetailBloc>().add(const AccountDetailStarted());
+    context.read<AccountDetailBloc>().add(const AccountDetailInitialized());
   }
 
   @override

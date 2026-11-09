@@ -27,7 +27,7 @@ void main() {
   blocTest<CategoriesBloc, CategoriesState>(
     'seeds defaults when the store is empty',
     build: () => CategoriesBloc(repository),
-    act: (bloc) => bloc.add(const CategoriesStarted([food])),
+    act: (bloc) => bloc.add(const CategoriesInitialized([food])),
     verify: (bloc) {
       expect(bloc.state.categories, [food]);
     },
@@ -40,7 +40,7 @@ void main() {
       repository.categories.add(food);
     },
     act: (bloc) => bloc.add(
-      const CategoriesStarted([
+      const CategoriesInitialized([
         CategoryModel(
           id: 'other',
           name: 'Other',

@@ -8,12 +8,12 @@ sealed class AccountFormEvent extends Equatable {
   List<Object?> get props => [];
 }
 
-class AccountFormStarted extends AccountFormEvent {
+class AccountFormInitialized extends AccountFormEvent {
   final String? accountId;
   final String languageCode;
   final String locale;
 
-  const AccountFormStarted({
+  const AccountFormInitialized({
     required this.languageCode,
     required this.locale,
     this.accountId,

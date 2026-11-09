@@ -45,7 +45,7 @@ void main() {
     'rejects a blank name and an invalid amount',
     build: buildBloc,
     act: (bloc) async {
-      bloc.add(const AccountFormStarted(languageCode: 'en', locale: 'en'));
+      bloc.add(const AccountFormInitialized(languageCode: 'en', locale: 'en'));
       if (!bloc.state.prepared) {
         await bloc.stream.firstWhere((state) => state.prepared);
       }
@@ -88,7 +88,7 @@ void main() {
     'saves a new account from the form fields',
     build: buildBloc,
     act: (bloc) async {
-      bloc.add(const AccountFormStarted(languageCode: 'en', locale: 'en'));
+      bloc.add(const AccountFormInitialized(languageCode: 'en', locale: 'en'));
       if (!bloc.state.prepared) {
         await bloc.stream.firstWhere((state) => state.prepared);
       }
@@ -136,7 +136,7 @@ void main() {
         ),
       );
       bloc.add(
-        const AccountFormStarted(
+        const AccountFormInitialized(
           accountId: 'cash',
           languageCode: 'en',
           locale: 'en',

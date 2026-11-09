@@ -18,14 +18,14 @@ class AccountsBloc extends Bloc<AccountsEvent, AccountsState> {
        _transactions = transactions,
        _ledger = ledger,
        super(const AccountsState()) {
-    on<AccountsStarted>(_onAccountsStarted);
+    on<AccountsInitialized>(_onAccountsInitialized);
     on<AccountSavePressed>(_onAccountSavePressed);
     on<AccountArchivePressed>(_onAccountArchivePressed);
     on<AccountsReorderPressed>(_onAccountsReorderPressed);
   }
 
-  Future<void> _onAccountsStarted(
-    AccountsStarted event,
+  Future<void> _onAccountsInitialized(
+    AccountsInitialized event,
     Emitter<AccountsState> emit,
   ) async {
     emit(

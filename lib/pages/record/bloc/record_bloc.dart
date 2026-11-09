@@ -26,7 +26,7 @@ class RecordBloc extends Bloc<RecordEvent, RecordState> {
     : _ledger = ledger,
       _now = now ?? DateTime.now,
       super(RecordState(date: (now ?? DateTime.now)())) {
-    on<RecordStarted>(_onStarted);
+    on<RecordInitialized>(_onInitialized);
     on<RecordTypeSelected>(_onTypeSelected);
     on<RecordDateSelected>(_onDateSelected);
     on<RecordNoteChanged>(_onNoteChanged);
@@ -45,8 +45,8 @@ class RecordBloc extends Bloc<RecordEvent, RecordState> {
     on<RecordDeletePressed>(_onDelete);
   }
 
-  Future<void> _onStarted(
-    RecordStarted event,
+  Future<void> _onInitialized(
+    RecordInitialized event,
     Emitter<RecordState> emit,
   ) async {
     _transactionId = event.transactionId;

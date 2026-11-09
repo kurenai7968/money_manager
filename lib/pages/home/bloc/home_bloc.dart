@@ -19,7 +19,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     : _ledger = ledger,
       _now = now ?? DateTime.now,
       super(_initial(now ?? DateTime.now)) {
-    on<HomeStarted>(_onStarted);
+    on<HomeInitialized>(_onInitialized);
     on<HomeMonthShifted>(_onMonthShifted);
     on<HomeViewToggled>(_onViewToggled);
     on<HomeDaySelected>(_onDaySelected);
@@ -34,7 +34,10 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     );
   }
 
-  Future<void> _onStarted(HomeStarted event, Emitter<HomeState> emit) async {
+  Future<void> _onInitialized(
+    HomeInitialized event,
+    Emitter<HomeState> emit,
+  ) async {
     await _load();
     _publish(emit, state);
   }

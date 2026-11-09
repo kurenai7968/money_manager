@@ -15,7 +15,7 @@ class AccountsPage extends StatelessWidget {
         accounts: context.read(),
         transactions: context.read(),
         ledger: context.read(),
-      )..add(const AccountsStarted()),
+      )..add(const AccountsInitialized()),
       child: const Scaffold(appBar: AccountsAppBar(), body: AccountsBody()),
     );
   }

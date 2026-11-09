@@ -27,14 +27,14 @@ class AccountFormBloc extends Bloc<AccountFormEvent, AccountFormState> {
   }) : _accounts = accounts,
        _ledger = ledger,
        super(AccountFormState(accountId: createId())) {
-    on<AccountFormStarted>(_onStarted);
+    on<AccountFormInitialized>(_onInitialized);
     on<AccountFormTypeSelected>(_onTypeSelected);
     on<AccountFormSavePressed>(_onSave);
     on<AccountFormArchivePressed>(_onArchive);
   }
 
-  Future<void> _onStarted(
-    AccountFormStarted event,
+  Future<void> _onInitialized(
+    AccountFormInitialized event,
     Emitter<AccountFormState> emit,
   ) async {
     _locale = event.locale;

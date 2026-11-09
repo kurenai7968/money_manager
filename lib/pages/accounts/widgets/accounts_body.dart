@@ -20,7 +20,7 @@ class AccountsBody extends StatefulWidget {
 class _AccountsBodyState extends State<AccountsBody> with RouteReload {
   @override
   void reloadForRoute() {
-    context.read<AccountsBloc>().add(const AccountsStarted());
+    context.read<AccountsBloc>().add(const AccountsInitialized());
   }
 
   @override

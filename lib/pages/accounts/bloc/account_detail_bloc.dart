@@ -14,11 +14,11 @@ class AccountDetailBloc extends Bloc<AccountDetailEvent, AccountDetailState> {
   AccountDetailBloc({required this.accountId, required LedgerService ledger})
     : _ledger = ledger,
       super(const AccountDetailState()) {
-    on<AccountDetailStarted>(_onStarted);
+    on<AccountDetailInitialized>(_onInitialized);
   }
 
-  Future<void> _onStarted(
-    AccountDetailStarted event,
+  Future<void> _onInitialized(
+    AccountDetailInitialized event,
     Emitter<AccountDetailState> emit,
   ) async {
     try {

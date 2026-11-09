@@ -78,7 +78,7 @@ void main() {
     'rejects an empty amount, then saves the keypad result',
     build: buildBloc,
     act: (bloc) async {
-      bloc.add(const RecordStarted());
+      bloc.add(const RecordInitialized());
       if (bloc.state.accountId == null) {
         await bloc.stream.firstWhere((state) => state.accountId != null);
       }
@@ -117,7 +117,7 @@ void main() {
     'rejects a transfer that uses one account',
     build: buildBloc,
     act: (bloc) async {
-      bloc.add(const RecordStarted(initialType: TransactionType.transfer));
+      bloc.add(const RecordInitialized(initialType: TransactionType.transfer));
       if (bloc.state.type != TransactionType.transfer) {
         await bloc.stream.firstWhere(
           (state) => state.type == TransactionType.transfer,
@@ -145,7 +145,7 @@ void main() {
     'loads an existing transaction and evaluates the expression',
     build: buildBloc,
     act: (bloc) async {
-      bloc.add(const RecordStarted(transactionId: 'lunch'));
+      bloc.add(const RecordInitialized(transactionId: 'lunch'));
       if (bloc.state.note != 'Lunch') {
         await bloc.stream.firstWhere((state) => state.note == 'Lunch');
       }

@@ -92,7 +92,7 @@ void main() {
     'compares expense with last month and ignores transfers',
     build: buildBloc,
     act: (bloc) async {
-      bloc.add(const AnalysisStarted());
+      bloc.add(const AnalysisInitialized());
       await bloc.stream.firstWhere(
         (state) => state.status == AnalysisStatus.success,
       );
@@ -118,7 +118,7 @@ void main() {
   blocTest<AnalysisBloc, AnalysisState>(
     'emits an empty rollup when transactions cannot be read',
     build: () => buildBloc(transactions: _FailingTransactions()),
-    act: (bloc) => bloc.add(const AnalysisStarted()),
+    act: (bloc) => bloc.add(const AnalysisInitialized()),
     expect: () => [
       isA<AnalysisState>()
           .having((state) => state.status, 'status', AnalysisStatus.failure)

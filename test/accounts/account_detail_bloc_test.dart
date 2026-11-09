@@ -73,7 +73,7 @@ void main() {
   blocTest<AccountDetailBloc, AccountDetailState>(
     'shows the account history and one balance',
     build: () => buildBloc('cash'),
-    act: (bloc) => bloc.add(const AccountDetailStarted()),
+    act: (bloc) => bloc.add(const AccountDetailInitialized()),
     verify: (bloc) {
       expect(bloc.state.history.map((item) => item.id), ['lunch', 'move']);
       expect(bloc.state.balanceMinor, balanceOf(cash, bloc.state.history));
@@ -90,7 +90,7 @@ void main() {
   blocTest<AccountDetailBloc, AccountDetailState>(
     'has no account when the id is missing',
     build: () => buildBloc('missing'),
-    act: (bloc) => bloc.add(const AccountDetailStarted()),
+    act: (bloc) => bloc.add(const AccountDetailInitialized()),
     expect: () => [
       isA<AccountDetailState>()
           .having((state) => state.account, 'account', isNull)
@@ -104,7 +104,7 @@ void main() {
       accountRepo = _FailingAccounts();
     },
     build: () => buildBloc('cash'),
-    act: (bloc) => bloc.add(const AccountDetailStarted()),
+    act: (bloc) => bloc.add(const AccountDetailInitialized()),
     expect: () => [
       isA<AccountDetailState>()
           .having(

@@ -9,10 +9,10 @@ sealed class CategoriesEvent extends Equatable {
   List<Object?> get props => [];
 }
 
-class CategoriesStarted extends CategoriesEvent {
+class CategoriesInitialized extends CategoriesEvent {
   final List<CategoryModel> defaults;
 
-  const CategoriesStarted(this.defaults);
+  const CategoriesInitialized(this.defaults);
 
   @override
   List<Object?> get props => [defaults];

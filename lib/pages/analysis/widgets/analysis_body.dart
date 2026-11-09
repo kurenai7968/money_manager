@@ -22,7 +22,7 @@ class AnalysisBody extends StatefulWidget {
 class _AnalysisBodyState extends State<AnalysisBody> with RouteReload {
   @override
   void reloadForRoute() {
-    context.read<AnalysisBloc>().add(const AnalysisStarted());
+    context.read<AnalysisBloc>().add(const AnalysisInitialized());
   }
 
   @override

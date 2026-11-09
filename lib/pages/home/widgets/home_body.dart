@@ -18,7 +18,7 @@ class HomeBody extends StatefulWidget {
 class _HomeBodyState extends State<HomeBody> with RouteReload {
   @override
   void reloadForRoute() {
-    context.read<HomeBloc>().add(const HomeStarted());
+    context.read<HomeBloc>().add(const HomeInitialized());
   }
 
   @override

@@ -60,7 +60,7 @@ void main() {
   blocTest<HomeBloc, HomeState>(
     'totals the open month and ignores transfers',
     build: buildBloc,
-    act: (bloc) => bloc.add(const HomeStarted()),
+    act: (bloc) => bloc.add(const HomeInitialized()),
     expect: () => [
       isA<HomeState>()
           .having((state) => state.status, 'status', HomeStatus.success)
@@ -76,7 +76,7 @@ void main() {
     'clears the selected day when the month is not the current one',
     build: buildBloc,
     act: (bloc) async {
-      bloc.add(const HomeStarted());
+      bloc.add(const HomeInitialized());
       await bloc.stream.firstWhere(
         (state) => state.status == HomeStatus.success,
       );
@@ -98,7 +98,7 @@ void main() {
   blocTest<HomeBloc, HomeState>(
     'emits failure when the ledger cannot be read',
     build: () => buildBloc(transactions: _FailingTransactions()),
-    act: (bloc) => bloc.add(const HomeStarted()),
+    act: (bloc) => bloc.add(const HomeInitialized()),
     expect: () => [
       isA<HomeState>()
           .having((state) => state.status, 'status', HomeStatus.failure)
@@ -123,7 +123,7 @@ void main() {
           categoryId: 'salary',
         ),
       );
-      bloc.add(const HomeStarted());
+      bloc.add(const HomeInitialized());
       await bloc.stream.firstWhere(
         (state) => state.status == HomeStatus.success,
       );
@@ -160,7 +160,7 @@ void main() {
     build: buildBloc,
     act: (bloc) async {
       accountRepo.accounts.add(_account('cash', 0));
-      bloc.add(const HomeStarted());
+      bloc.add(const HomeInitialized());
       await bloc.stream.firstWhere(
         (state) => state.status == HomeStatus.success,
       );
@@ -173,7 +173,7 @@ void main() {
       accountRepo.accounts[0] = accountRepo.accounts[0].copyWith(
         archived: true,
       );
-      bloc.add(const HomeStarted());
+      bloc.add(const HomeInitialized());
     },
     expect: () => [
       isA<HomeState>().having(

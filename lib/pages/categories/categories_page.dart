@@ -15,7 +15,7 @@ class CategoriesPage extends StatelessWidget {
     return BlocProvider(
       create: (context) =>
           CategoriesBloc(context.read(), transactions: context.read())
-            ..add(CategoriesStarted(defaultCategories())),
+            ..add(CategoriesInitialized(defaultCategories())),
       child: const CategoriesFrame(
         child: Scaffold(appBar: CategoriesAppBar(), body: CategoriesBody()),
       ),

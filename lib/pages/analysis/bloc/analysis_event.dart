@@ -8,8 +8,8 @@ sealed class AnalysisEvent extends Equatable {
   List<Object?> get props => [];
 }
 
-class AnalysisStarted extends AnalysisEvent {
-  const AnalysisStarted();
+class AnalysisInitialized extends AnalysisEvent {
+  const AnalysisInitialized();
 }
 
 class AnalysisKindSelected extends AnalysisEvent {

@@ -46,8 +46,7 @@ lib/
 ├── entities/                 # Persistence types. json_serializable, fromJson, toJson, Equatable.
 ├── models/                   # UI and business data only. No entity mapping on the class.
 ├── repositories/             # One interface and one [Name]RepositoryImpl per data source
-├── services/                 # Operations that use more than one repository
-│   └── ledger_service.dart   # LedgerService and LedgerServiceImpl
+├── services/                 # Operations that use more than one repository, One interface and one [Name]ServiceImpl
 ├── pages/
 │   ├── [feature_name]/
 │   │   ├── models/           # Types used only by this feature
@@ -156,7 +155,7 @@ The tab bar is Home, Analysis, Accounts, and Settings, with the record button in
 
 ```dart
 BlocProvider(
-  create: (context) => XxxBloc(context.read())..add(const XxxStarted()),
+  create: (context) => XxxBloc(context.read())..add(const XxxInitialized()),
   child: const Scaffold(appBar: XxxAppBar(), body: XxxBody()),
 )
 ```
