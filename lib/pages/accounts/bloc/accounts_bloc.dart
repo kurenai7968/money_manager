@@ -1,4 +1,5 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:money_manager/models/account_book_model.dart';
 import 'package:money_manager/pages/accounts/bloc/accounts_event.dart';
 import 'package:money_manager/pages/accounts/bloc/accounts_state.dart';
 import 'package:money_manager/repositories/account_repository.dart';
@@ -109,9 +110,9 @@ class AccountsBloc extends Bloc<AccountsEvent, AccountsState> {
       emit(
         state.copyWith(
           status: AccountsStatus.success,
-          accounts: loaded.accounts,
-          balances: loaded.balances,
-          netWorth: loaded.netWorth,
+          accounts: [for (final book in loaded) book.account],
+          balances: {for (final book in loaded) book.account.id: book.balance},
+          netWorth: accountBookNetWorth(loaded),
           error: AccountsError.none,
         ),
       );

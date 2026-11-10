@@ -2,6 +2,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:money_manager/pages/record/models/amount_expression.dart';
 import 'package:money_manager/core/utils/id.dart';
 import 'package:money_manager/services/account_book_service.dart';
+import 'package:money_manager/models/account_book_model.dart';
 import 'package:money_manager/models/account_model.dart';
 import 'package:money_manager/models/category_model.dart';
 import 'package:money_manager/models/ledger_kinds.dart';
@@ -56,8 +57,8 @@ class RecordBloc extends Bloc<RecordEvent, RecordState> {
     _initialAccountId = event.initialAccountId;
     try {
       final loaded = await _accountBook.loadAccounts();
-      _accountRows = loaded.accounts;
-      _transactionRows = loaded.transactions;
+      _accountRows = [for (final book in loaded) book.account];
+      _transactionRows = transactionsOnce(loaded);
       _categoryRows = await _accountBook.loadCategories();
     } catch (_) {
       _accountRows = const [];

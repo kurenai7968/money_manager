@@ -47,8 +47,8 @@ class AccountFormBloc extends Bloc<AccountFormEvent, AccountFormState> {
     }
     try {
       final loaded = await _accountBook.loadAccounts();
-      _accountRows = loaded.accounts;
-      _balances = loaded.balances;
+      _accountRows = [for (final book in loaded) book.account];
+      _balances = {for (final book in loaded) book.account.id: book.balance};
     } catch (_) {
       _accountRows = const [];
       _balances = const {};

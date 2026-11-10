@@ -60,7 +60,10 @@ void main() {
   blocTest<HomeBloc, HomeState>(
     'totals the open month and ignores transfers',
     build: buildBloc,
-    act: (bloc) => bloc.add(const HomeInitialized()),
+    act: (bloc) {
+      accountRepo.accounts.add(_account('cash', 0));
+      bloc.add(const HomeInitialized());
+    },
     expect: () => [
       isA<HomeState>()
           .having((state) => state.status, 'status', HomeStatus.success)

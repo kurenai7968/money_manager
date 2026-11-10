@@ -1,5 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:material_ui/material_ui.dart';
+import 'package:money_manager/models/account_model.dart';
 import 'package:money_manager/models/ledger_kinds.dart';
 import 'package:money_manager/models/transaction_model.dart';
 import 'package:table_calendar/table_calendar.dart';
@@ -17,6 +18,15 @@ void main() {
     final now = DateTime.now();
     await pumpApp(
       tester,
+      accounts: const [
+        AccountModel(
+          id: 'cash',
+          name: 'Cash',
+          type: AccountType.cash,
+          openingBalanceMinor: 0,
+          sortOrder: 0,
+        ),
+      ],
       transactions: [
         TransactionModel(
           id: 'lunch',
@@ -24,6 +34,7 @@ void main() {
           amountMinor: 20,
           date: DateTime(now.year, now.month, now.day),
           note: 'Lunch',
+          accountId: 'cash',
         ),
       ],
     );

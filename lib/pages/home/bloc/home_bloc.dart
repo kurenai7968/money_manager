@@ -1,4 +1,5 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:money_manager/models/account_book_model.dart';
 import 'package:money_manager/pages/home/models/home_figures.dart';
 import 'package:money_manager/services/account_book_service.dart';
 import 'package:money_manager/models/account_model.dart';
@@ -45,8 +46,8 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
   Future<void> _load() async {
     try {
       final loaded = await _accountBook.loadAccounts();
-      _accountRows = loaded.accounts;
-      _transactionRows = loaded.transactions;
+      _accountRows = [for (final book in loaded) book.account];
+      _transactionRows = transactionsOnce(loaded);
       _categoryRows = await _accountBook.loadCategories();
       _failed = false;
     } catch (_) {

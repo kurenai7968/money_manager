@@ -1,4 +1,5 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:money_manager/models/account_book_model.dart';
 import 'package:money_manager/models/account_model.dart';
 import 'package:money_manager/models/category_model.dart';
 import 'package:money_manager/models/ledger_kinds.dart';
@@ -16,12 +17,9 @@ class AnalysisBloc extends Bloc<AnalysisEvent, AnalysisState> {
   List<TransactionModel> _transactionRows = const [];
   List<CategoryModel> _categoryRows = const [];
 
-  AnalysisBloc({
-    required AccountBookService accountBook,
-    DateTime Function()? now,
-  }) : _accountBook = accountBook,
-       _now = now ?? DateTime.now,
-       super(_initial(now ?? DateTime.now)) {
+  AnalysisBloc({required this._accountBook, DateTime Function()? now})
+    : _now = now ?? DateTime.now,
+      super(_initial(now ?? DateTime.now)) {
     on<AnalysisInitialized>(_onInitialized);
     on<AnalysisKindSelected>(_onKindSelected);
   }
@@ -46,8 +44,8 @@ class AnalysisBloc extends Bloc<AnalysisEvent, AnalysisState> {
   Future<void> _load() async {
     try {
       final loaded = await _accountBook.loadAccounts();
-      _accountRows = loaded.accounts;
-      _transactionRows = loaded.transactions;
+      _accountRows = [for (final book in loaded) book.account];
+      _transactionRows = transactionsOnce(loaded);
       _categoryRows = await _accountBook.loadCategories();
       _failed = false;
     } catch (_) {

@@ -1,5 +1,6 @@
 import 'package:money_manager/core/utils/id.dart';
 import 'package:money_manager/core/utils/opening_transaction.dart';
+import 'package:money_manager/models/account_book_model.dart';
 import 'package:money_manager/models/account_defaults.dart';
 import 'package:money_manager/models/account_model.dart';
 import 'package:money_manager/models/category_defaults.dart';
@@ -11,15 +12,7 @@ import 'package:money_manager/repositories/category_repository.dart';
 import 'package:money_manager/repositories/transaction_repository.dart';
 
 abstract interface class AccountBookService {
-  Future<
-    ({
-      List<AccountModel> accounts,
-      Map<String, int> balances,
-      int netWorth,
-      List<TransactionModel> transactions,
-    })
-  >
-  loadAccounts();
+  Future<List<AccountBookModel>> loadAccounts();
 
   Future<List<CategoryModel>> loadCategories();
 
@@ -42,27 +35,29 @@ class AccountBookServiceImpl implements AccountBookService {
   });
 
   @override
-  Future<
-    ({
-      List<AccountModel> accounts,
-      Map<String, int> balances,
-      int netWorth,
-      List<TransactionModel> transactions,
-    })
-  >
-  loadAccounts() async {
+  Future<List<AccountBookModel>> loadAccounts() async {
     if (await _accounts.isEmpty()) {
       await _accounts.save(defaultAccount());
     }
     final loaded = await _accounts.getAll();
     await syncOpeningTransactions(loaded);
     final balances = await _accounts.balances();
-    return (
-      accounts: balances.accounts,
-      balances: balances.balanceById,
-      netWorth: balances.netWorth,
-      transactions: await _transactions.getAll(),
-    );
+    final transactions = await _transactions.getAll();
+    return [
+      for (final account in balances.accounts)
+        AccountBookModel(
+          account: account,
+          balance:
+              balances.balanceById[account.id] ?? account.openingBalanceMinor,
+          transactions: [
+            for (final item in transactions)
+              if (item.accountId == account.id ||
+                  item.fromAccountId == account.id ||
+                  item.toAccountId == account.id)
+                item,
+          ],
+        ),
+    ];
   }
 
   @override
