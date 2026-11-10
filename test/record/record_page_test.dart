@@ -13,7 +13,7 @@ void main() {
   testWidgets('Expense records the selected category and can be edited', (
     tester,
   ) async {
-    await pumpLedger(tester);
+    await pumpAccountBook(tester);
 
     await openRecord(tester);
     expect(selectedCategory('Food'), findsOneWidget);
@@ -99,7 +99,7 @@ void main() {
   testWidgets('Income uses an income category and increases the account', (
     tester,
   ) async {
-    await pumpLedger(tester);
+    await pumpAccountBook(tester);
     await openRecord(tester);
 
     await tester.tap(find.text('Income'));
@@ -122,7 +122,7 @@ void main() {
   });
 
   testWidgets('Transfer moves the amount between two accounts', (tester) async {
-    await pumpLedger(tester);
+    await pumpAccountBook(tester);
     await openTab(tester, 'Accounts');
     await tester.tap(find.text('Add'));
     await tester.pumpAndSettle();
@@ -169,7 +169,7 @@ void main() {
   });
 
   testWidgets('Check explains a missing amount', (tester) async {
-    await pumpLedger(tester, size: const Size(320, 568));
+    await pumpAccountBook(tester, size: const Size(320, 568));
     await openRecord(tester);
 
     await commit(tester);
@@ -193,7 +193,7 @@ void main() {
   testWidgets('Traditional Chinese record page names the selected category', (
     tester,
   ) async {
-    await pumpLedger(tester, locale: const Locale('zh'));
+    await pumpAccountBook(tester, locale: const Locale('zh'));
     await tester.tap(find.byTooltip('記一筆'));
     await tester.pumpAndSettle();
 
@@ -216,7 +216,7 @@ void main() {
   });
 
   testWidgets('Equals finishes a calculation before save', (tester) async {
-    await pumpLedger(tester);
+    await pumpAccountBook(tester);
     await openRecord(tester);
 
     await tapKey(tester, '8');
@@ -236,7 +236,7 @@ void main() {
   });
 
   testWidgets('Divide by zero keeps the equals key', (tester) async {
-    await pumpLedger(tester);
+    await pumpAccountBook(tester);
     await openRecord(tester);
     await tapKey(tester, '8');
     await tapKey(tester, '÷');
@@ -250,7 +250,7 @@ void main() {
   testWidgets('Commit key is taller than wide and category gaps match', (
     tester,
   ) async {
-    await pumpLedger(tester);
+    await pumpAccountBook(tester);
     await openRecord(tester);
 
     final button = tester.getSize(find.byType(FilledButton));
@@ -274,7 +274,7 @@ void main() {
   testWidgets('Keypad presses leave the category grid in place', (
     tester,
   ) async {
-    await pumpLedger(tester);
+    await pumpAccountBook(tester);
     await openRecord(tester);
     final builds = RecordCategoryGrid.debugBuildCount;
     await tapKey(tester, '1');
@@ -286,7 +286,7 @@ void main() {
   testWidgets('Record page lays out at a larger text scale', (tester) async {
     tester.platformDispatcher.textScaleFactorTestValue = 1.3;
     addTearDown(tester.platformDispatcher.clearTextScaleFactorTestValue);
-    await pumpLedger(tester, size: const Size(360, 640));
+    await pumpAccountBook(tester, size: const Size(360, 640));
     await openRecord(tester);
     expect(selectedCategory('Food'), findsOneWidget);
     expect(tester.takeException(), isNull);
@@ -299,7 +299,7 @@ void main() {
     tester.platformDispatcher.platformBrightnessTestValue = Brightness.dark;
     addTearDown(tester.platformDispatcher.clearTextScaleFactorTestValue);
     addTearDown(tester.platformDispatcher.clearPlatformBrightnessTestValue);
-    await pumpLedger(tester, size: const Size(320, 568));
+    await pumpAccountBook(tester, size: const Size(320, 568));
     await openRecord(tester);
     expect(selectedCategory('Food'), findsOneWidget);
     expect(find.byTooltip('Save'), findsOneWidget);
@@ -307,7 +307,7 @@ void main() {
   });
 
   testWidgets('Record date picker uses TableCalendar', (tester) async {
-    await pumpLedger(tester);
+    await pumpAccountBook(tester);
     await openRecord(tester);
     final now = DateTime.now();
     await tester.tap(find.text(DateFormat.MMMd('en').format(now)));
@@ -349,7 +349,7 @@ Finder selectedCategory(String label) {
   });
 }
 
-Future<void> pumpLedger(
+Future<void> pumpAccountBook(
   WidgetTester tester, {
   Locale locale = const Locale('en'),
   Size size = const Size(390, 844),

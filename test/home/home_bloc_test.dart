@@ -1,7 +1,7 @@
 import 'package:bloc_test/bloc_test.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:money_manager/models/account_model.dart';
-import 'package:money_manager/models/ledger_kinds.dart';
+import 'package:money_manager/models/account_book_kinds.dart';
 import 'package:money_manager/models/transaction_model.dart';
 import 'package:money_manager/pages/home/bloc/home_bloc.dart';
 import 'package:money_manager/pages/home/bloc/home_event.dart';
@@ -99,7 +99,7 @@ void main() {
   );
 
   blocTest<HomeBloc, HomeState>(
-    'emits failure when the ledger cannot be read',
+    'emits failure when the account book cannot be read',
     build: () => buildBloc(transactions: _FailingTransactions()),
     act: (bloc) => bloc.add(const HomeInitialized()),
     expect: () => [

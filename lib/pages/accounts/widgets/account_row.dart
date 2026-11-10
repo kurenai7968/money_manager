@@ -3,10 +3,10 @@ import 'package:go_router/go_router.dart';
 import 'package:money_manager/core/extensions/context_extension.dart';
 import 'package:money_manager/core/utils/money_format.dart';
 import 'package:money_manager/models/account_model.dart';
-import 'package:money_manager/models/ledger_kinds.dart';
+import 'package:money_manager/models/account_book_kinds.dart';
 import 'package:money_manager/routes/app_routes.dart';
 import 'package:money_manager/themes/app_themes.dart';
-import 'package:money_manager/themes/ledger_palette.dart';
+import 'package:money_manager/themes/account_book_palette.dart';
 
 class AccountRow extends StatelessWidget {
   final AccountModel account;
@@ -27,10 +27,10 @@ class AccountRow extends StatelessWidget {
     final scheme = Theme.of(context).colorScheme;
     final isCredit = account.type == AccountType.credit;
     final color = switch (account.type) {
-      AccountType.bank => LedgerPalette.blue,
-      AccountType.cash => LedgerPalette.coral,
-      AccountType.savings => LedgerPalette.teal,
-      AccountType.credit => LedgerPalette.slate,
+      AccountType.bank => AccountBookPalette.blue,
+      AccountType.cash => AccountBookPalette.coral,
+      AccountType.savings => AccountBookPalette.teal,
+      AccountType.credit => AccountBookPalette.slate,
     };
     return ListTile(
       onTap: () => context.push(AppRoutes.account(account.id)),

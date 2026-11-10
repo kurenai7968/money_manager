@@ -1,7 +1,7 @@
 import 'package:bloc_test/bloc_test.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:money_manager/models/category_model.dart';
-import 'package:money_manager/models/ledger_kinds.dart';
+import 'package:money_manager/models/account_book_kinds.dart';
 import 'package:money_manager/pages/categories/bloc/categories_bloc.dart';
 import 'package:money_manager/pages/categories/bloc/categories_event.dart';
 import 'package:money_manager/pages/categories/bloc/categories_state.dart';

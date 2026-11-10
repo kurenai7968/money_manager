@@ -2,7 +2,7 @@ import 'package:flutter/widgets.dart';
 import 'package:money_manager/core/utils/id.dart';
 import 'package:money_manager/l10n/app_localizations.dart';
 import 'package:money_manager/models/category_model.dart';
-import 'package:money_manager/models/ledger_kinds.dart';
+import 'package:money_manager/models/account_book_kinds.dart';
 
 List<CategoryModel> defaultCategories() {
   final en = lookupAppLocalizations(const Locale('en'));

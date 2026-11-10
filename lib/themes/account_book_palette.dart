@@ -1,6 +1,6 @@
 import 'package:material_ui/material_ui.dart';
 
-abstract final class LedgerPalette {
+abstract final class AccountBookPalette {
   static const coral = Color(0xFFC2410C);
   static const blue = Color(0xFF1D4ED8);
   static const amber = Color(0xFFB45309);

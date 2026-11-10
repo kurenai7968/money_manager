@@ -3,7 +3,7 @@ import 'package:money_manager/core/extensions/context_extension.dart';
 import 'package:money_manager/core/utils/cached_date_format.dart';
 import 'package:money_manager/models/enums/first_day_of_week.dart';
 import 'package:money_manager/themes/app_themes.dart';
-import 'package:money_manager/widgets/ledger_calendar.dart';
+import 'package:money_manager/widgets/account_book_calendar.dart';
 
 class RecordDateDialog extends StatefulWidget {
   final DateTime initial;
@@ -29,8 +29,8 @@ class _RecordDateDialogState extends State<RecordDateDialog> {
 
   void _shiftMonth(int delta) {
     final next = DateTime(_focused.year, _focused.month + delta);
-    if (next.isBefore(LedgerCalendar.firstDay) ||
-        next.isAfter(LedgerCalendar.lastDay)) {
+    if (next.isBefore(AccountBookCalendar.firstDay) ||
+        next.isAfter(AccountBookCalendar.lastDay)) {
       return;
     }
     setState(() => _focused = next);
@@ -85,8 +85,8 @@ class _RecordDateDialogState extends State<RecordDateDialog> {
                 ],
               ),
               SizedBox(
-                height: LedgerCalendar.extent(context, header: false),
-                child: LedgerCalendar(
+                height: AccountBookCalendar.extent(context, header: false),
+                child: AccountBookCalendar(
                   focusedDay: _focused,
                   selectedDay: _day,
                   firstDayOfWeek: widget.firstDayOfWeek,

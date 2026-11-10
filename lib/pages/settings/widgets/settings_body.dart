@@ -94,7 +94,7 @@ class SettingsBody extends StatelessWidget {
                 },
               ),
             ),
-            SettingsSection(l10n.ledger),
+            SettingsSection(l10n.accountBook),
             ListTile(
               title: Text(l10n.categories),
               subtitle: Text(l10n.expenseAndIncome),

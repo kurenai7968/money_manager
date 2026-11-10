@@ -1,6 +1,6 @@
 import 'package:money_manager/entities/account_entity.dart';
 import 'package:money_manager/models/account_model.dart';
-import 'package:money_manager/models/ledger_kinds.dart';
+import 'package:money_manager/models/account_book_kinds.dart';
 
 extension AccountEntityMapping on AccountEntity {
   AccountModel toModel() {

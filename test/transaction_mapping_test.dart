@@ -1,7 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:money_manager/core/mapping/transaction_mapping.dart';
 import 'package:money_manager/entities/transaction_entity.dart';
-import 'package:money_manager/models/ledger_kinds.dart';
+import 'package:money_manager/models/account_book_kinds.dart';
 
 void main() {
   test('reads a stored opening row as income', () {

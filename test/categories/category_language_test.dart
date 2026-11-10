@@ -3,7 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:money_manager/core/extensions/context_extension.dart';
 import 'package:money_manager/models/category_defaults.dart';
 import 'package:money_manager/models/category_model.dart';
-import 'package:money_manager/models/ledger_kinds.dart';
+import 'package:money_manager/models/account_book_kinds.dart';
 
 void main() {
   test('initial categories store every language and no name', () {

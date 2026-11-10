@@ -3,7 +3,7 @@ import 'package:material_ui/material_ui.dart';
 import 'package:money_manager/l10n/app_localizations.dart';
 import 'package:money_manager/models/enums/first_day_of_week.dart';
 import 'package:money_manager/themes/app_themes.dart';
-import 'package:money_manager/widgets/ledger_calendar.dart';
+import 'package:money_manager/widgets/account_book_calendar.dart';
 
 const _delegates = [
   AppLocalizations.delegate,
@@ -24,8 +24,8 @@ void main() {
           body: Builder(
             builder: (context) {
               return SizedBox(
-                height: LedgerCalendar.extent(context, header: false),
-                child: LedgerCalendar(
+                height: AccountBookCalendar.extent(context, header: false),
+                child: AccountBookCalendar(
                   focusedDay: DateTime(2026, 11, 2),
                   selectedDay: DateTime(2026, 11, 2),
                   firstDayOfWeek: FirstDayOfWeek.monday,
@@ -79,8 +79,8 @@ void main() {
           body: Builder(
             builder: (context) {
               return SizedBox(
-                height: LedgerCalendar.extent(context, header: false),
-                child: LedgerCalendar(
+                height: AccountBookCalendar.extent(context, header: false),
+                child: AccountBookCalendar(
                   focusedDay: DateTime(2026, 11, 2),
                   selectedDay: DateTime(2026, 11, 2),
                   firstDayOfWeek: FirstDayOfWeek.monday,
@@ -107,8 +107,8 @@ void main() {
           body: Builder(
             builder: (context) {
               return SizedBox(
-                height: LedgerCalendar.extent(context, header: false),
-                child: LedgerCalendar(
+                height: AccountBookCalendar.extent(context, header: false),
+                child: AccountBookCalendar(
                   focusedDay: DateTime(2026, 11, 2),
                   selectedDay: DateTime(2026, 11, 2),
                   firstDayOfWeek: FirstDayOfWeek.monday,

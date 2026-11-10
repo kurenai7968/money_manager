@@ -217,7 +217,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get general => '一般';
 
   @override
-  String get ledger => '帳本';
+  String get accountBook => '帳本';
 
   @override
   String get language => '語言';
@@ -489,7 +489,7 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get general => '一般';
 
   @override
-  String get ledger => '账本';
+  String get accountBook => '账本';
 
   @override
   String get language => '语言';

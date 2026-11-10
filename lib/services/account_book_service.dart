@@ -5,7 +5,7 @@ import 'package:money_manager/models/account_defaults.dart';
 import 'package:money_manager/models/account_model.dart';
 import 'package:money_manager/models/category_defaults.dart';
 import 'package:money_manager/models/category_model.dart';
-import 'package:money_manager/models/ledger_kinds.dart';
+import 'package:money_manager/models/account_book_kinds.dart';
 import 'package:money_manager/models/transaction_model.dart';
 import 'package:money_manager/repositories/account_repository.dart';
 import 'package:money_manager/repositories/category_repository.dart';

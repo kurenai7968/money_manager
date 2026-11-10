@@ -4,13 +4,13 @@ import 'package:material_ui/material_ui.dart';
 import 'package:money_manager/core/extensions/context_extension.dart';
 import 'package:money_manager/core/utils/id.dart';
 import 'package:money_manager/models/category_model.dart';
-import 'package:money_manager/models/ledger_kinds.dart';
+import 'package:money_manager/models/account_book_kinds.dart';
 import 'package:money_manager/pages/categories/bloc/categories_bloc.dart';
 import 'package:money_manager/pages/categories/bloc/categories_event.dart';
 import 'package:money_manager/pages/categories/bloc/categories_state.dart';
 import 'package:money_manager/pages/categories/widgets/category_icon_choice.dart';
 import 'package:money_manager/themes/app_themes.dart';
-import 'package:money_manager/themes/ledger_palette.dart';
+import 'package:money_manager/themes/account_book_palette.dart';
 import 'package:money_manager/widgets/confirm_delete_dialog.dart';
 
 class CategoryFormBody extends StatefulWidget {
@@ -133,11 +133,11 @@ class _CategoryFormBodyState extends State<CategoryFormBody> {
             spacing: AppSpacing.s,
             runSpacing: AppSpacing.s,
             children: [
-              for (final key in LedgerPalette.iconKeys)
+              for (final key in AccountBookPalette.iconKeys)
                 CategoryIconChoice(
                   iconKey: key,
                   selected: key == _icon,
-                  color: LedgerPalette.color(_color),
+                  color: AccountBookPalette.color(_color),
                   onPressed: () => setState(() => _icon = key),
                 ),
             ],
@@ -148,13 +148,13 @@ class _CategoryFormBodyState extends State<CategoryFormBody> {
           Wrap(
             spacing: AppSpacing.m,
             children: [
-              for (final key in LedgerPalette.colorKeys)
+              for (final key in AccountBookPalette.colorKeys)
                 IconButton(
                   tooltip: key,
                   onPressed: () => setState(() => _color = key),
                   icon: Icon(
                     key == _color ? Icons.circle : Icons.circle_outlined,
-                    color: LedgerPalette.color(key),
+                    color: AccountBookPalette.color(key),
                   ),
                 ),
             ],

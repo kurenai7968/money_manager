@@ -4,7 +4,7 @@ import 'package:money_manager/models/enums/first_day_of_week.dart';
 import 'package:money_manager/themes/app_themes.dart';
 import 'package:table_calendar/table_calendar.dart';
 
-class LedgerCalendar extends StatelessWidget {
+class AccountBookCalendar extends StatelessWidget {
   static final firstDay = DateTime(2000);
   static final lastDay = DateTime(2100, 12, 31);
   final DateTime focusedDay;
@@ -16,7 +16,7 @@ class LedgerCalendar extends StatelessWidget {
   final bool headerVisible;
   final bool enableSwipe;
 
-  const LedgerCalendar({
+  const AccountBookCalendar({
     required this.focusedDay,
     required this.selectedDay,
     required this.firstDayOfWeek,

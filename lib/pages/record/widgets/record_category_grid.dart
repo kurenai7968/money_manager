@@ -3,7 +3,7 @@ import 'package:material_ui/material_ui.dart';
 import 'package:money_manager/core/extensions/context_extension.dart';
 import 'package:money_manager/models/category_model.dart';
 import 'package:money_manager/themes/app_themes.dart';
-import 'package:money_manager/themes/ledger_palette.dart';
+import 'package:money_manager/themes/account_book_palette.dart';
 
 class RecordCategoryGrid extends StatelessWidget {
   final List<CategoryModel> categories;
@@ -62,7 +62,7 @@ class RecordCategoryGrid extends StatelessWidget {
                 final category = categories[index];
                 final selected = category.id == selectedId;
                 final label = category.labelFor(context.categoryLanguageCode);
-                final color = LedgerPalette.color(category.color);
+                final color = AccountBookPalette.color(category.color);
                 final scheme = Theme.of(context).colorScheme;
                 return Semantics(
                   button: true,
@@ -105,7 +105,7 @@ class RecordCategoryGrid extends StatelessWidget {
                                   child: CircleAvatar(
                                     backgroundColor: color,
                                     child: Icon(
-                                      LedgerPalette.icon(category.icon),
+                                      AccountBookPalette.icon(category.icon),
                                       color: scheme.onPrimary,
                                       size: 20,
                                     ),

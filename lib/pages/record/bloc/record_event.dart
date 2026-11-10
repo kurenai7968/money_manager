@@ -1,6 +1,6 @@
 import 'package:equatable/equatable.dart';
 import 'package:money_manager/pages/record/models/amount_expression.dart';
-import 'package:money_manager/models/ledger_kinds.dart';
+import 'package:money_manager/models/account_book_kinds.dart';
 
 sealed class RecordEvent extends Equatable {
   const RecordEvent();

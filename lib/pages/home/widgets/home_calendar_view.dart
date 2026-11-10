@@ -6,8 +6,8 @@ import 'package:money_manager/models/category_model.dart';
 import 'package:money_manager/models/enums/first_day_of_week.dart';
 import 'package:money_manager/models/transaction_model.dart';
 import 'package:money_manager/themes/app_themes.dart';
-import 'package:money_manager/themes/ledger_palette.dart';
-import 'package:money_manager/widgets/ledger_calendar.dart';
+import 'package:money_manager/themes/account_book_palette.dart';
+import 'package:money_manager/widgets/account_book_calendar.dart';
 import 'package:money_manager/widgets/transaction_item.dart';
 
 class HomeCalendarView extends StatelessWidget {
@@ -49,8 +49,8 @@ class HomeCalendarView extends StatelessWidget {
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: AppSpacing.l),
           child: SizedBox(
-            height: LedgerCalendar.extent(context, header: false),
-            child: LedgerCalendar(
+            height: AccountBookCalendar.extent(context, header: false),
+            child: AccountBookCalendar(
               focusedDay: focused,
               selectedDay: selected,
               firstDayOfWeek: firstDayOfWeek,
@@ -67,7 +67,7 @@ class HomeCalendarView extends StatelessWidget {
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                    color: net > 0 ? LedgerPalette.green : scheme.primary,
+                    color: net > 0 ? AccountBookPalette.green : scheme.primary,
                   ),
                 );
               },

@@ -1,7 +1,7 @@
 import 'package:material_ui/material_ui.dart';
 import 'package:money_manager/pages/accounts/models/account_line.dart';
 import 'package:money_manager/pages/accounts/widgets/account_row.dart';
-import 'package:money_manager/widgets/ledger_reorder.dart';
+import 'package:money_manager/widgets/account_book_reorder.dart';
 
 class AccountSliver extends StatefulWidget {
   final List<AccountLine> lines;
@@ -30,7 +30,7 @@ class _AccountSliverState extends State<AccountSliver> {
   Widget build(BuildContext context) {
     return SliverReorderableList(
       itemCount: _lines.length,
-      proxyDecorator: ledgerReorderProxy,
+      proxyDecorator: accountBookReorderProxy,
       onReorderItem: _reorder,
       itemBuilder: (context, index) {
         final line = _lines[index];

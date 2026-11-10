@@ -1,6 +1,6 @@
 import 'package:material_ui/material_ui.dart';
 import 'package:money_manager/themes/app_themes.dart';
-import 'package:money_manager/widgets/ledger_sheet.dart';
+import 'package:money_manager/widgets/account_book_sheet.dart';
 
 Future<void> showSettingsChoice<T>(
   BuildContext context, {
@@ -9,7 +9,7 @@ Future<void> showSettingsChoice<T>(
   required T selected,
   required ValueChanged<T> onSelected,
 }) async {
-  await showLedgerSheet<void>(
+  await showAccountBookSheet<void>(
     context: context,
     builder: (context) {
       return SafeArea(

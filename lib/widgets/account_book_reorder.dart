@@ -1,7 +1,7 @@
 import 'package:material_ui/material_ui.dart';
 
 /// Dragged row uses the page background, so the row does not flash another color.
-Widget ledgerReorderProxy(Widget child, int _, Animation<double> _) {
+Widget accountBookReorderProxy(Widget child, int _, Animation<double> _) {
   return Builder(
     builder: (context) {
       return Material(

@@ -10,7 +10,7 @@ import 'package:money_manager/pages/analysis/widgets/analysis_month_bars.dart';
 import 'package:money_manager/pages/analysis/widgets/analysis_total_row.dart';
 import 'package:money_manager/pages/route_reload.dart';
 import 'package:money_manager/themes/app_themes.dart';
-import 'package:money_manager/themes/ledger_palette.dart';
+import 'package:money_manager/themes/account_book_palette.dart';
 
 class AnalysisBody extends StatefulWidget {
   const AnalysisBody({super.key});
@@ -64,7 +64,7 @@ class _AnalysisBodyState extends State<AnalysisBody> with RouteReload {
         Text(l10n.categories, style: Theme.of(context).textTheme.titleMedium),
         for (final entry in rollup.byCategory)
           AnalysisTotalRow(
-            color: LedgerPalette.color(
+            color: AccountBookPalette.color(
               _category(state.categories, entry.id)?.color ?? 'slate',
             ),
             title:

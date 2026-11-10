@@ -3,7 +3,7 @@ import 'package:money_manager/core/extensions/context_extension.dart';
 import 'package:money_manager/models/account_model.dart';
 import 'package:money_manager/pages/record/widgets/record_account_sheet.dart';
 import 'package:money_manager/themes/app_themes.dart';
-import 'package:money_manager/widgets/ledger_sheet.dart';
+import 'package:money_manager/widgets/account_book_sheet.dart';
 
 class RecordTransferFields extends StatelessWidget {
   final List<AccountModel> accounts;
@@ -63,7 +63,7 @@ class RecordTransferFields extends StatelessWidget {
     ValueChanged<String> onSelected,
     String? selectedId,
   ) async {
-    final selected = await showLedgerSheet<String>(
+    final selected = await showAccountBookSheet<String>(
       context: context,
       maxHeightFactor: 0.5,
       builder: (context) =>

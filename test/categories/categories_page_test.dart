@@ -5,13 +5,13 @@ import 'package:go_router/go_router.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:money_manager/l10n/app_localizations.dart';
 import 'package:money_manager/models/category_model.dart';
-import 'package:money_manager/models/ledger_kinds.dart';
+import 'package:money_manager/models/account_book_kinds.dart';
 import 'package:money_manager/pages/categories/categories_page.dart';
 import 'package:money_manager/pages/categories/category_form_page.dart';
 import 'package:money_manager/repositories/category_repository.dart';
 import 'package:money_manager/repositories/transaction_repository.dart';
 import 'package:money_manager/routes/app_routes.dart';
-import 'package:money_manager/themes/ledger_palette.dart';
+import 'package:money_manager/themes/account_book_palette.dart';
 
 import '../support/memory_category_repository.dart';
 import '../support/memory_transaction_repository.dart';
@@ -161,7 +161,7 @@ void main() {
     await tester.tap(find.byTooltip('shopping'));
     await tester.pump();
     expect(_iconSelected(tester, 'shopping'), isTrue);
-    expect(_iconFill(tester, 'shopping'), LedgerPalette.coral);
+    expect(_iconFill(tester, 'shopping'), AccountBookPalette.coral);
     expect(_iconFill(tester, 'other'), Colors.transparent);
 
     await tester.tap(find.text('Save'));

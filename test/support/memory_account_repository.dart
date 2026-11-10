@@ -1,5 +1,5 @@
 import 'package:money_manager/models/account_model.dart';
-import 'package:money_manager/models/ledger_kinds.dart';
+import 'package:money_manager/models/account_book_kinds.dart';
 import 'package:money_manager/repositories/account_repository.dart';
 
 class MemoryAccountRepository implements AccountRepository {

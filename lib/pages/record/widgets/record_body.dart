@@ -3,7 +3,7 @@ import 'package:material_ui/material_ui.dart';
 import 'package:money_manager/core/extensions/context_extension.dart';
 import 'package:money_manager/pages/record/models/amount_expression.dart';
 import 'package:money_manager/l10n/app_localizations.dart';
-import 'package:money_manager/models/ledger_kinds.dart';
+import 'package:money_manager/models/account_book_kinds.dart';
 import 'package:money_manager/pages/record/bloc/record_bloc.dart';
 import 'package:money_manager/pages/record/bloc/record_event.dart';
 import 'package:money_manager/pages/record/bloc/record_state.dart';
@@ -13,7 +13,7 @@ import 'package:money_manager/pages/record/widgets/record_keypad.dart';
 import 'package:money_manager/pages/record/widgets/record_note_dialog.dart';
 import 'package:money_manager/pages/record/widgets/record_transfer_fields.dart';
 import 'package:money_manager/themes/app_themes.dart';
-import 'package:money_manager/widgets/ledger_sheet.dart';
+import 'package:money_manager/widgets/account_book_sheet.dart';
 
 class RecordBody extends StatelessWidget {
   const RecordBody({super.key});
@@ -178,7 +178,7 @@ class _RecordMeta extends StatelessWidget {
   }
 
   Future<void> _pickAccount(BuildContext context, RecordState state) async {
-    final selected = await showLedgerSheet<String>(
+    final selected = await showAccountBookSheet<String>(
       context: context,
       maxHeightFactor: 0.5,
       builder: (context) {

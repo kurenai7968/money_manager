@@ -1,5 +1,5 @@
 import 'package:equatable/equatable.dart';
-import 'package:money_manager/models/ledger_kinds.dart';
+import 'package:money_manager/models/account_book_kinds.dart';
 
 class CategoryModel extends Equatable {
   final String id;

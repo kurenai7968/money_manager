@@ -1,7 +1,7 @@
 import 'dart:math' as math;
 
 import 'package:material_ui/material_ui.dart';
-import 'package:money_manager/themes/ledger_palette.dart';
+import 'package:money_manager/themes/account_book_palette.dart';
 
 class HomeMonthDonut extends StatelessWidget {
   final int income;
@@ -28,7 +28,7 @@ class HomeMonthDonut extends StatelessWidget {
           painter: _DonutPainter(
             income: income,
             expense: expense,
-            incomeColor: LedgerPalette.green,
+            incomeColor: AccountBookPalette.green,
             expenseColor: scheme.primary,
             trackColor: scheme.outline,
           ),

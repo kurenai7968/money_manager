@@ -513,11 +513,11 @@ abstract class AppLocalizations {
   /// **'General'**
   String get general;
 
-  /// No description provided for @ledger.
+  /// No description provided for @accountBook.
   ///
   /// In en, this message translates to:
-  /// **'Ledger'**
-  String get ledger;
+  /// **'Account book'**
+  String get accountBook;
 
   /// No description provided for @language.
   ///

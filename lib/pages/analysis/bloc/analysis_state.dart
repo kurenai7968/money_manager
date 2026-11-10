@@ -2,7 +2,7 @@ import 'package:equatable/equatable.dart';
 import 'package:money_manager/pages/analysis/models/analysis_rollup.dart';
 import 'package:money_manager/models/account_model.dart';
 import 'package:money_manager/models/category_model.dart';
-import 'package:money_manager/models/ledger_kinds.dart';
+import 'package:money_manager/models/account_book_kinds.dart';
 
 enum AnalysisStatus { initial, success, failure }
 

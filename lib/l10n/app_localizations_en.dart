@@ -217,7 +217,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get general => 'General';
 
   @override
-  String get ledger => 'Ledger';
+  String get accountBook => 'Account book';
 
   @override
   String get language => 'Language';

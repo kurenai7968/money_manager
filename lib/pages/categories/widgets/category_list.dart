@@ -7,8 +7,8 @@ import 'package:money_manager/pages/categories/bloc/categories_bloc.dart';
 import 'package:money_manager/pages/categories/bloc/categories_event.dart';
 import 'package:money_manager/routes/app_routes.dart';
 import 'package:money_manager/themes/app_themes.dart';
-import 'package:money_manager/themes/ledger_palette.dart';
-import 'package:money_manager/widgets/ledger_reorder.dart';
+import 'package:money_manager/themes/account_book_palette.dart';
+import 'package:money_manager/widgets/account_book_reorder.dart';
 
 class CategoryList extends StatefulWidget {
   final List<CategoryModel> categories;
@@ -36,7 +36,7 @@ class _CategoryListState extends State<CategoryList> {
   Widget build(BuildContext context) {
     return ReorderableListView.builder(
       buildDefaultDragHandles: false,
-      proxyDecorator: ledgerReorderProxy,
+      proxyDecorator: accountBookReorderProxy,
       padding: const EdgeInsets.symmetric(vertical: AppSpacing.s),
       itemCount: _categories.length,
       onReorderItem: _reorder,
@@ -46,9 +46,9 @@ class _CategoryListState extends State<CategoryList> {
           key: ValueKey(category.id),
           onTap: () => context.push(AppRoutes.editCategory(category.id)),
           leading: CircleAvatar(
-            backgroundColor: LedgerPalette.color(category.color),
+            backgroundColor: AccountBookPalette.color(category.color),
             child: Icon(
-              LedgerPalette.icon(category.icon),
+              AccountBookPalette.icon(category.icon),
               color: Theme.of(context).colorScheme.onPrimary,
             ),
           ),

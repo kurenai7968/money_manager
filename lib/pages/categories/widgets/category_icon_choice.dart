@@ -1,5 +1,5 @@
 import 'package:material_ui/material_ui.dart';
-import 'package:money_manager/themes/ledger_palette.dart';
+import 'package:money_manager/themes/account_book_palette.dart';
 
 class CategoryIconChoice extends StatelessWidget {
   final String iconKey;
@@ -27,7 +27,7 @@ class CategoryIconChoice extends StatelessWidget {
         foregroundColor: foreground,
       ),
       onPressed: onPressed,
-      icon: Icon(LedgerPalette.icon(iconKey), color: foreground),
+      icon: Icon(AccountBookPalette.icon(iconKey), color: foreground),
     );
   }
 }

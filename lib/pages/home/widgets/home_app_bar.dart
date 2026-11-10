@@ -7,7 +7,7 @@ import 'package:money_manager/pages/home/bloc/home_event.dart';
 import 'package:money_manager/pages/home/bloc/home_state.dart';
 import 'package:money_manager/pages/home/widgets/home_account_sheet.dart';
 import 'package:money_manager/themes/app_themes.dart';
-import 'package:money_manager/widgets/ledger_sheet.dart';
+import 'package:money_manager/widgets/account_book_sheet.dart';
 
 class HomeAppBar extends StatelessWidget implements PreferredSizeWidget {
   const HomeAppBar({super.key});
@@ -61,7 +61,7 @@ class HomeAppBar extends StatelessWidget implements PreferredSizeWidget {
   }
 
   Future<void> _pickAccount(BuildContext context, HomeState state) async {
-    final picked = await showLedgerSheet<HomeAccountPick>(
+    final picked = await showAccountBookSheet<HomeAccountPick>(
       context: context,
       maxHeightFactor: 0.5,
       builder: (context) {

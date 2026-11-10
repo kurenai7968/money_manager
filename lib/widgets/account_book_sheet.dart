@@ -1,6 +1,6 @@
 import 'package:material_ui/material_ui.dart';
 
-Future<T?> showLedgerSheet<T>({
+Future<T?> showAccountBookSheet<T>({
   required BuildContext context,
   required WidgetBuilder builder,
   double? maxHeightFactor,

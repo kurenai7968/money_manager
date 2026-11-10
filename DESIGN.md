@@ -1,6 +1,6 @@
 # Design
 
-Personal ledger for one person. Phone first. Utility register.
+Personal account book for one person. Phone first. Utility register.
 
 - Style: Minimal and clean. Off-white and near-black, one neutral sans, weight-led hierarchy. Hairlines, no shadows.
 - Primary theme: Light. Settings can follow the system, or force light or dark. Dark is derived after light is right.
@@ -18,7 +18,7 @@ Personal ledger for one person. Phone first. Utility register.
 
 ## Decisions
 
-- 2026-10-23: Light editorial ledger and persimmon accent. Superseded the same day.
+- 2026-10-23: Light editorial account book and persimmon accent. Superseded the same day.
 - 2026-10-23: Style is Minimal and clean. Monochrome. Serif and persimmon are out.
 - 2026-10-23: Home is one page. The app bar has one action. Its icon is the other mode: calendar opens the calendar, bars return to the summary. The month stays in the title.
 - 2026-11-06: The home app bar keeps the month as the centered title and the action that switches summary and calendar. A leading control selects one account or all accounts. All is the default. The control opens a sheet.

@@ -1,6 +1,6 @@
 import 'package:flutter/widgets.dart';
 import 'package:go_router/go_router.dart';
-import 'package:money_manager/models/ledger_kinds.dart';
+import 'package:money_manager/models/account_book_kinds.dart';
 import 'package:money_manager/pages/pages.dart';
 import 'package:money_manager/routes/app_routes.dart';
 import 'package:money_manager/widgets/app_shell.dart';

@@ -4,10 +4,10 @@ import 'package:material_ui/material_ui.dart';
 import 'package:money_manager/l10n/app_localizations.dart';
 import 'package:money_manager/models/account_model.dart';
 import 'package:money_manager/models/category_model.dart';
-import 'package:money_manager/models/ledger_kinds.dart';
+import 'package:money_manager/models/account_book_kinds.dart';
 import 'package:money_manager/models/transaction_model.dart';
 import 'package:money_manager/themes/app_themes.dart';
-import 'package:money_manager/themes/ledger_palette.dart';
+import 'package:money_manager/themes/account_book_palette.dart';
 import 'package:money_manager/widgets/app_tab_bar.dart';
 import 'package:money_manager/widgets/transaction_item.dart';
 
@@ -67,10 +67,10 @@ void main() {
     expect(find.text('-88'), findsOneWidget);
     expect(find.text('Cash'), findsOneWidget);
     expect(find.byIcon(Icons.restaurant_outlined), findsOneWidget);
-    expect(_noteTagColor(tester), LedgerPalette.green);
+    expect(_noteTagColor(tester), AccountBookPalette.green);
     expect(
       tester.widget<Text>(find.text('-88')).style?.color,
-      LedgerPalette.coral,
+      AccountBookPalette.coral,
     );
     expect(tester.widget<InkWell>(find.byType(InkWell)).onTap, isNotNull);
   });

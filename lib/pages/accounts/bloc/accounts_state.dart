@@ -1,6 +1,6 @@
 import 'package:equatable/equatable.dart';
 import 'package:money_manager/models/account_model.dart';
-import 'package:money_manager/models/ledger_kinds.dart';
+import 'package:money_manager/models/account_book_kinds.dart';
 import 'package:money_manager/pages/accounts/models/account_line.dart';
 
 enum AccountsStatus { initial, loading, success, failure }

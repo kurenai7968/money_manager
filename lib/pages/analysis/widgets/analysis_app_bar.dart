@@ -1,10 +1,10 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:money_manager/core/extensions/context_extension.dart';
-import 'package:money_manager/models/ledger_kinds.dart';
+import 'package:money_manager/models/account_book_kinds.dart';
 import 'package:money_manager/pages/analysis/bloc/analysis_bloc.dart';
 import 'package:money_manager/pages/analysis/bloc/analysis_event.dart';
-import 'package:money_manager/themes/ledger_palette.dart';
+import 'package:money_manager/themes/account_book_palette.dart';
 
 class AnalysisAppBar extends StatelessWidget implements PreferredSizeWidget {
   const AnalysisAppBar({super.key});
@@ -44,7 +44,7 @@ class AnalysisAppBar extends StatelessWidget implements PreferredSizeWidget {
                 l10n.income,
                 style: TextStyle(
                   color: state.kind == CategoryKind.income
-                      ? LedgerPalette.green
+                      ? AccountBookPalette.green
                       : Theme.of(context).colorScheme.onSurfaceVariant,
                 ),
               ),
