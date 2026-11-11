@@ -4,6 +4,7 @@ import 'package:material_ui/material_ui.dart';
 import 'package:money_manager/core/extensions/context_extension.dart';
 import 'package:money_manager/pages/accounts/bloc/account_detail_bloc.dart';
 import 'package:money_manager/routes/app_routes.dart';
+import 'package:money_manager/widgets/base_app_bar.dart';
 
 class AccountDetailAppBar extends StatelessWidget
     implements PreferredSizeWidget {
@@ -21,7 +22,7 @@ class AccountDetailAppBar extends StatelessWidget
     final title = account == null
         ? l10n.accounts
         : account.labelFor(context.categoryLanguageCode);
-    return AppBar(
+    return BaseAppBar(
       title: Text(title),
       actions: [
         if (account != null)

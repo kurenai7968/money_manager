@@ -5,6 +5,7 @@ import 'package:money_manager/models/account_book_kinds.dart';
 import 'package:money_manager/pages/analysis/bloc/analysis_bloc.dart';
 import 'package:money_manager/pages/analysis/bloc/analysis_event.dart';
 import 'package:money_manager/themes/account_book_palette.dart';
+import 'package:money_manager/widgets/base_app_bar.dart';
 
 class AnalysisAppBar extends StatelessWidget implements PreferredSizeWidget {
   const AnalysisAppBar({super.key});
@@ -16,7 +17,7 @@ class AnalysisAppBar extends StatelessWidget implements PreferredSizeWidget {
   Widget build(BuildContext context) {
     final state = context.watch<AnalysisBloc>().state;
     final l10n = context.l10n;
-    return AppBar(
+    return BaseAppBar(
       title: Text(l10n.analysis),
       bottom: PreferredSize(
         preferredSize: const Size.fromHeight(48),

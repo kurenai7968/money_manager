@@ -9,6 +9,7 @@ import 'package:money_manager/pages/home/models/home_account_pick.dart';
 import 'package:money_manager/pages/home/widgets/home_account_sheet.dart';
 import 'package:money_manager/themes/app_themes.dart';
 import 'package:money_manager/widgets/account_book_sheet.dart';
+import 'package:money_manager/widgets/base_app_bar.dart';
 
 class HomeAppBar extends StatelessWidget implements PreferredSizeWidget {
   const HomeAppBar({super.key});
@@ -23,7 +24,7 @@ class HomeAppBar extends StatelessWidget implements PreferredSizeWidget {
     final showingSummary = state.view == HomeView.summary;
     final locale = Localizations.localeOf(context).toString();
     final monthLabel = cachedYearMonth(locale).format(state.month);
-    return AppBar(
+    return BaseAppBar(
       leadingWidth: 120,
       leading: _HomeAccountButton(
         label: _accountLabel(context, state),

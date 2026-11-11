@@ -1,5 +1,6 @@
 import 'package:material_ui/material_ui.dart';
 import 'package:money_manager/core/extensions/context_extension.dart';
+import 'package:money_manager/widgets/base_app_bar.dart';
 
 class AccountFormAppBar extends StatelessWidget implements PreferredSizeWidget {
   final bool editing;
@@ -12,6 +13,8 @@ class AccountFormAppBar extends StatelessWidget implements PreferredSizeWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = context.l10n;
-    return AppBar(title: Text(editing ? l10n.editAccount : l10n.newAccount));
+    return BaseAppBar(
+      title: Text(editing ? l10n.editAccount : l10n.newAccount),
+    );
   }
 }

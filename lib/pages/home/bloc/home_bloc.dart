@@ -1,12 +1,12 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:money_manager/models/account_book_model.dart';
-import 'package:money_manager/pages/home/models/home_figures.dart';
-import 'package:money_manager/services/account_book_service.dart';
 import 'package:money_manager/models/account_model.dart';
 import 'package:money_manager/models/category_model.dart';
 import 'package:money_manager/models/transaction_model.dart';
 import 'package:money_manager/pages/home/bloc/home_event.dart';
 import 'package:money_manager/pages/home/bloc/home_state.dart';
+import 'package:money_manager/pages/home/models/home_figures.dart';
+import 'package:money_manager/services/account_book_service.dart';
 
 class HomeBloc extends Bloc<HomeEvent, HomeState> {
   final AccountBookService _accountBook;
@@ -16,9 +16,8 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
   List<TransactionModel> _transactionRows = const [];
   List<CategoryModel> _categoryRows = const [];
 
-  HomeBloc({required AccountBookService accountBook, DateTime Function()? now})
-    : _accountBook = accountBook,
-      _now = now ?? DateTime.now,
+  HomeBloc({required this._accountBook, DateTime Function()? now})
+    : _now = now ?? DateTime.now,
       super(_initial(now ?? DateTime.now)) {
     on<HomeInitialized>(_onInitialized);
     on<HomeMonthShifted>(_onMonthShifted);

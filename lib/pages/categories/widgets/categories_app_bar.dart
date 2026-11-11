@@ -4,6 +4,7 @@ import 'package:money_manager/core/extensions/context_extension.dart';
 import 'package:money_manager/models/account_book_kinds.dart';
 import 'package:money_manager/pages/categories/widgets/categories_frame.dart';
 import 'package:money_manager/routes/app_routes.dart';
+import 'package:money_manager/widgets/base_app_bar.dart';
 
 class CategoriesAppBar extends StatelessWidget implements PreferredSizeWidget {
   const CategoriesAppBar({super.key});
@@ -16,7 +17,7 @@ class CategoriesAppBar extends StatelessWidget implements PreferredSizeWidget {
   Widget build(BuildContext context) {
     final frame = CategoriesFrame.of(context);
     final l10n = context.l10n;
-    return AppBar(
+    return BaseAppBar(
       title: Text(l10n.categories),
       actions: [
         TextButton(

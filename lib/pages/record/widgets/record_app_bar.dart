@@ -8,6 +8,7 @@ import 'package:money_manager/models/account_book_kinds.dart';
 import 'package:money_manager/pages/record/bloc/record_bloc.dart';
 import 'package:money_manager/pages/record/bloc/record_event.dart';
 import 'package:money_manager/pages/record/widgets/record_date_dialog.dart';
+import 'package:money_manager/widgets/base_app_bar.dart';
 import 'package:money_manager/widgets/confirm_delete_dialog.dart';
 
 class RecordAppBar extends StatelessWidget implements PreferredSizeWidget {
@@ -21,7 +22,7 @@ class RecordAppBar extends StatelessWidget implements PreferredSizeWidget {
     final state = context.watch<RecordBloc>().state;
     final l10n = context.l10n;
     final locale = Localizations.localeOf(context).toString();
-    return AppBar(
+    return BaseAppBar(
       title: TextButton(
         onPressed: () => _pickDate(context),
         child: Text(
