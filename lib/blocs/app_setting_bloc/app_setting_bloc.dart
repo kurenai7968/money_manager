@@ -40,44 +40,45 @@ class AppSettingBloc extends Bloc<AppSettingEvent, AppSettingState> {
   Future<void> _onAppSettingLanguageChanged(
     AppSettingLanguageChanged event,
     Emitter<AppSettingState> emit,
-  ) async {
-    final updatedSetting = state.appSetting.copyWith(
-      languageCode: event.languageCode,
-      countryCode: event.countryCode,
+  ) {
+    return _appSettingUpdate(
+      appSettingRepository.updateLanguage(
+        event.languageCode,
+        event.countryCode,
+      ),
+      emit,
     );
-    await _appSettingUpdate(updatedSetting, emit);
   }
 
   Future<void> _onAppSettingThemeModeChanged(
     AppSettingThemeModeChanged event,
     Emitter<AppSettingState> emit,
-  ) async {
-    final updatedSetting = state.appSetting.copyWith(
-      appThemeMode: event.appThemeMode,
+  ) {
+    return _appSettingUpdate(
+      appSettingRepository.updateThemeMode(event.appThemeMode),
+      emit,
     );
-    await _appSettingUpdate(updatedSetting, emit);
   }
 
   Future<void> _onAppSettingFirstDayOfWeekChanged(
     AppSettingFirstDayOfWeekChanged event,
     Emitter<AppSettingState> emit,
-  ) async {
-    final updatedSetting = state.appSetting.copyWith(
-      firstDayOfWeek: event.firstDayOfWeek,
+  ) {
+    return _appSettingUpdate(
+      appSettingRepository.updateFirstDayOfWeek(event.firstDayOfWeek),
+      emit,
     );
-    await _appSettingUpdate(updatedSetting, emit);
   }
 
   Future<void> _appSettingUpdate(
-    AppSettingModel updatedSetting,
+    Future<AppSettingModel> updatedSetting,
     Emitter<AppSettingState> emit,
   ) async {
     try {
-      await appSettingRepository.updateAppSetting(updatedSetting);
       emit(
         state.copyWith(
           status: AppSettingStatus.success,
-          appSetting: updatedSetting,
+          appSetting: await updatedSetting,
         ),
       );
     } on AppException {

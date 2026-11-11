@@ -23,11 +23,34 @@ class _MemoryAppSettingRepository implements AppSettingRepository {
   }
 
   @override
-  Future<void> updateAppSetting(AppSettingModel appSetting) async {
+  Future<AppSettingModel> updateLanguage(
+    String languageCode,
+    String countryCode,
+  ) {
+    return _write(
+      appSetting.copyWith(
+        languageCode: languageCode,
+        countryCode: countryCode,
+      ),
+    );
+  }
+
+  @override
+  Future<AppSettingModel> updateThemeMode(AppThemeMode appThemeMode) {
+    return _write(appSetting.copyWith(appThemeMode: appThemeMode));
+  }
+
+  @override
+  Future<AppSettingModel> updateFirstDayOfWeek(FirstDayOfWeek firstDayOfWeek) {
+    return _write(appSetting.copyWith(firstDayOfWeek: firstDayOfWeek));
+  }
+
+  Future<AppSettingModel> _write(AppSettingModel next) async {
     if (failWrites) {
       throw const CacheException('write failed');
     }
-    this.appSetting = appSetting;
+    appSetting = next;
+    return appSetting;
   }
 }
 

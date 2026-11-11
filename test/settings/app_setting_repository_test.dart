@@ -33,7 +33,9 @@ void main() {
       firstDayOfWeek: FirstDayOfWeek.wednesday,
     );
 
-    await repository.updateAppSetting(setting);
+    await repository.updateLanguage(setting.languageCode, setting.countryCode);
+    await repository.updateThemeMode(setting.appThemeMode);
+    await repository.updateFirstDayOfWeek(setting.firstDayOfWeek);
 
     expect(jsonDecode(preferences.getString(AppConfig.appSettingKey)!), {
       'language_code': 'zh',
@@ -53,14 +55,11 @@ void main() {
   });
 
   test('stores an empty language when the app follows the system', () async {
-    await repository.updateAppSetting(
-      const AppSettingModel(languageCode: 'en'),
-    );
+    await repository.updateLanguage('en', '');
     expect((await repository.getAppSetting()).locale, const Locale('en'));
 
-    await repository.updateAppSetting(
-      const AppSettingModel(appThemeMode: AppThemeMode.light),
-    );
+    await repository.updateLanguage('', '');
+    await repository.updateThemeMode(AppThemeMode.light);
 
     final loaded = await repository.getAppSetting();
     expect(loaded.languageCode, isEmpty);

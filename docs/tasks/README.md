@@ -57,3 +57,4 @@ Ids are five digits, starting at `00001`. The next id is one greater than the hi
 - 00049 Account book load model
 - 00050 One account book row per account
 - 00051 Rename Ledger names to AccountBook
+- 00052 Emit failure when an app setting save fails
