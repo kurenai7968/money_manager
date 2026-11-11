@@ -5,20 +5,9 @@ import 'package:money_manager/database/sqlite/tables/account_table.dart';
 import 'package:money_manager/database/sqlite/tables/transaction_table.dart';
 import 'package:money_manager/database/sqlite/app_database.dart';
 import 'package:money_manager/entities/account_entity.dart';
+import 'package:money_manager/models/account_balances.dart';
 import 'package:money_manager/models/account_model.dart';
 import 'package:money_manager/models/account_book_kinds.dart';
-
-class AccountBalances {
-  final List<AccountModel> accounts;
-  final Map<String, int> balanceById;
-  final int netWorth;
-
-  const AccountBalances({
-    required this.accounts,
-    required this.balanceById,
-    required this.netWorth,
-  });
-}
 
 abstract interface class AccountRepository {
   Future<List<AccountModel>> getAll();

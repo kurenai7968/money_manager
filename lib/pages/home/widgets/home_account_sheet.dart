@@ -1,13 +1,8 @@
 import 'package:material_ui/material_ui.dart';
 import 'package:money_manager/core/extensions/context_extension.dart';
 import 'package:money_manager/models/account_model.dart';
+import 'package:money_manager/pages/home/models/home_account_pick.dart';
 import 'package:money_manager/themes/app_themes.dart';
-
-class HomeAccountPick {
-  final String? accountId;
-
-  const HomeAccountPick(this.accountId);
-}
 
 class HomeAccountSheet extends StatelessWidget {
   final List<AccountModel> accounts;
