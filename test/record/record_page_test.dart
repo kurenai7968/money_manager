@@ -46,6 +46,7 @@ void main() {
     await tapKey(tester, '8');
     expect(find.text('18'), findsOneWidget);
     await commit(tester);
+    await reopenApp(tester);
 
     expect(find.text('Lunch'), findsOneWidget);
     expect(find.text('-18'), findsWidgets);
@@ -66,6 +67,7 @@ void main() {
     await tapKey(tester, '←');
     await tapKey(tester, '7');
     await commit(tester);
+    await reopenApp(tester);
 
     expect(find.text('-7'), findsWidgets);
     await tester.ensureVisible(find.text('Lunch'));
@@ -91,6 +93,7 @@ void main() {
       ),
     );
     await tester.pumpAndSettle();
+    await reopenApp(tester);
     expect(find.text('No transactions this month'), findsOneWidget);
     expect(find.text('Lunch'), findsNothing);
     expect(tester.takeException(), isNull);
@@ -114,6 +117,7 @@ void main() {
     await tapKey(tester, '4');
     await tapKey(tester, '0');
     await commit(tester);
+    await reopenApp(tester);
 
     expect(find.text('Salary'), findsOneWidget);
     expect(find.text('+40'), findsOneWidget);
@@ -160,6 +164,7 @@ void main() {
     await tapKey(tester, '2');
     await tapKey(tester, '0');
     await commit(tester);
+    await reopenApp(tester);
     expect(find.text('Transfer'), findsWidgets);
     expect(find.text('20'), findsOneWidget);
 
@@ -184,6 +189,7 @@ void main() {
     expect(find.text('999,999'), findsOneWidget);
 
     await commit(tester);
+    await reopenApp(tester);
     expect(find.text('Choose a category'), findsNothing);
     expect(find.text('Food'), findsWidgets);
     expect(find.text('-999,999'), findsWidgets);
@@ -210,6 +216,7 @@ void main() {
     await tester.pump();
     await tester.tap(find.byTooltip('儲存'));
     await tester.pumpAndSettle();
+    await reopenApp(tester);
 
     expect(find.text('飲食'), findsWidgets);
     expect(find.text('-8'), findsWidgets);
@@ -232,6 +239,7 @@ void main() {
     expect(find.byTooltip('Save'), findsOneWidget);
 
     await commit(tester);
+    await reopenApp(tester);
     expect(find.text('-10'), findsWidgets);
   });
 

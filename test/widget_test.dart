@@ -101,6 +101,9 @@ void main() {
     await tester.enterText(find.byType(TextField).first, 'Wallet');
     await tester.tap(find.text('Save'));
     await tester.pumpAndSettle();
+    await reopenApp(tester);
+    await tester.tap(find.text('Accounts'));
+    await tester.pumpAndSettle();
 
     expect(find.text('Wallet'), findsOneWidget);
   });

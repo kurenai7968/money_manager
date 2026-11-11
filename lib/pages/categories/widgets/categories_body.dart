@@ -1,28 +1,13 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:material_ui/material_ui.dart';
-import 'package:money_manager/models/category_defaults.dart';
 import 'package:money_manager/models/account_book_kinds.dart';
 import 'package:money_manager/pages/categories/bloc/categories_bloc.dart';
-import 'package:money_manager/pages/categories/bloc/categories_event.dart';
 import 'package:money_manager/pages/categories/bloc/categories_state.dart';
 import 'package:money_manager/pages/categories/widgets/categories_frame.dart';
 import 'package:money_manager/pages/categories/widgets/category_list.dart';
-import 'package:money_manager/pages/route_reload.dart';
 
-class CategoriesBody extends StatefulWidget {
+class CategoriesBody extends StatelessWidget {
   const CategoriesBody({super.key});
-
-  @override
-  State<CategoriesBody> createState() => _CategoriesBodyState();
-}
-
-class _CategoriesBodyState extends State<CategoriesBody> with RouteReload {
-  @override
-  void reloadForRoute() {
-    context.read<CategoriesBloc>().add(
-      CategoriesInitialized(defaultCategories()),
-    );
-  }
 
   @override
   Widget build(BuildContext context) {

@@ -1,4 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:money_manager/app.dart';
 import 'package:money_manager/database/sqlite/app_database.dart';
 import 'package:money_manager/models/account_model.dart';
@@ -38,6 +39,13 @@ Future<void> pumpApp(
   }
   AppRouter.reset();
   await tester.pumpWidget(const App());
+}
+
+Future<void> reopenApp(WidgetTester tester) async {
+  await tester.pumpWidget(const SizedBox.shrink());
+  AppRouter.reset();
+  await tester.pumpWidget(const App());
+  await tester.pumpAndSettle();
 }
 
 Future<List<AccountModel>> loadAccounts() {

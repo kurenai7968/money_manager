@@ -7,21 +7,10 @@ import 'package:money_manager/pages/accounts/bloc/accounts_event.dart';
 import 'package:money_manager/pages/accounts/bloc/accounts_state.dart';
 import 'package:money_manager/pages/accounts/widgets/account_section_label.dart';
 import 'package:money_manager/pages/accounts/widgets/account_sliver.dart';
-import 'package:money_manager/pages/route_reload.dart';
 import 'package:money_manager/themes/app_themes.dart';
 
-class AccountsBody extends StatefulWidget {
+class AccountsBody extends StatelessWidget {
   const AccountsBody({super.key});
-
-  @override
-  State<AccountsBody> createState() => _AccountsBodyState();
-}
-
-class _AccountsBodyState extends State<AccountsBody> with RouteReload {
-  @override
-  void reloadForRoute() {
-    context.read<AccountsBloc>().add(const AccountsInitialized());
-  }
 
   @override
   Widget build(BuildContext context) {

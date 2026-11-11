@@ -6,20 +6,9 @@ import 'package:money_manager/pages/home/bloc/home_event.dart';
 import 'package:money_manager/pages/home/bloc/home_state.dart';
 import 'package:money_manager/pages/home/widgets/home_calendar_view.dart';
 import 'package:money_manager/pages/home/widgets/home_summary_view.dart';
-import 'package:money_manager/pages/route_reload.dart';
 
-class HomeBody extends StatefulWidget {
+class HomeBody extends StatelessWidget {
   const HomeBody({super.key});
-
-  @override
-  State<HomeBody> createState() => _HomeBodyState();
-}
-
-class _HomeBodyState extends State<HomeBody> with RouteReload {
-  @override
-  void reloadForRoute() {
-    context.read<HomeBloc>().add(const HomeInitialized());
-  }
 
   @override
   Widget build(BuildContext context) {

@@ -5,25 +5,13 @@ import 'package:money_manager/core/utils/money_format.dart';
 import 'package:money_manager/models/account_model.dart';
 import 'package:money_manager/models/category_model.dart';
 import 'package:money_manager/pages/analysis/bloc/analysis_bloc.dart';
-import 'package:money_manager/pages/analysis/bloc/analysis_event.dart';
 import 'package:money_manager/pages/analysis/widgets/analysis_month_bars.dart';
 import 'package:money_manager/pages/analysis/widgets/analysis_total_row.dart';
-import 'package:money_manager/pages/route_reload.dart';
 import 'package:money_manager/themes/app_themes.dart';
 import 'package:money_manager/themes/account_book_palette.dart';
 
-class AnalysisBody extends StatefulWidget {
+class AnalysisBody extends StatelessWidget {
   const AnalysisBody({super.key});
-
-  @override
-  State<AnalysisBody> createState() => _AnalysisBodyState();
-}
-
-class _AnalysisBodyState extends State<AnalysisBody> with RouteReload {
-  @override
-  void reloadForRoute() {
-    context.read<AnalysisBloc>().add(const AnalysisInitialized());
-  }
 
   @override
   Widget build(BuildContext context) {

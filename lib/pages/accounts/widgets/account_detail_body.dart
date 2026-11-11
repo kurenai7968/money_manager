@@ -5,27 +5,14 @@ import 'package:money_manager/core/extensions/context_extension.dart';
 import 'package:money_manager/core/utils/money_format.dart';
 import 'package:money_manager/models/account_book_kinds.dart';
 import 'package:money_manager/pages/accounts/bloc/account_detail_bloc.dart';
-import 'package:money_manager/pages/accounts/bloc/account_detail_event.dart';
-import 'package:money_manager/pages/route_reload.dart';
 import 'package:money_manager/routes/app_routes.dart';
 import 'package:money_manager/themes/app_themes.dart';
 import 'package:money_manager/widgets/transaction_item.dart';
 
-class AccountDetailBody extends StatefulWidget {
+class AccountDetailBody extends StatelessWidget {
   final String accountId;
 
   const AccountDetailBody({required this.accountId, super.key});
-
-  @override
-  State<AccountDetailBody> createState() => _AccountDetailBodyState();
-}
-
-class _AccountDetailBodyState extends State<AccountDetailBody>
-    with RouteReload {
-  @override
-  void reloadForRoute() {
-    context.read<AccountDetailBloc>().add(const AccountDetailInitialized());
-  }
 
   @override
   Widget build(BuildContext context) {
