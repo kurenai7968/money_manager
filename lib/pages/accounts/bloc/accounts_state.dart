@@ -10,8 +10,8 @@ enum AccountsError { none, saveFailed, archiveBlocked, nameRequired }
 class AccountsState extends Equatable {
   final AccountsStatus status;
   final List<AccountModel> accounts;
-  final Map<String, int> balances;
-  final int netWorth;
+  final Map<int, double> balances;
+  final double netWorth;
   final AccountsError error;
 
   const AccountsState({
@@ -23,7 +23,7 @@ class AccountsState extends Equatable {
   });
 
   List<AccountModel> get active =>
-      accounts.where((account) => !account.archived).toList();
+      accounts.where((account) => account.isActive).toList();
 
   List<AccountLine> get assets => _lines(credit: false);
 
@@ -33,18 +33,23 @@ class AccountsState extends Equatable {
     return [
       for (final account in active)
         if ((account.type == AccountType.credit) == credit)
-          AccountLine(
-            account: account,
-            balanceMinor: balances[account.id] ?? account.openingBalanceMinor,
-          ),
+          AccountLine(account: account, balance: _balance(account)),
     ];
+  }
+
+  double _balance(AccountModel account) {
+    final id = account.id;
+    if (id == null) {
+      return 0;
+    }
+    return balances[id] ?? 0;
   }
 
   AccountsState copyWith({
     AccountsStatus? status,
     List<AccountModel>? accounts,
-    Map<String, int>? balances,
-    int? netWorth,
+    Map<int, double>? balances,
+    double? netWorth,
     AccountsError? error,
   }) {
     return AccountsState(

@@ -23,41 +23,39 @@ void main() {
     accountRepo = MemoryAccountRepository()
       ..accounts.add(
         const AccountModel(
-          id: 'cash',
+          id: 1,
           name: 'Cash',
           type: AccountType.cash,
-          openingBalanceMinor: 0,
+          icon: 'other',
           sortOrder: 0,
         ),
       );
     transactionRepo = MemoryTransactionRepository()
       ..transactions.add(
         TransactionModel(
-          id: 'lunch',
+          id: 2,
           type: TransactionType.expense,
-          amountMinor: 700,
+          amount: 7.0,
           date: DateTime(2026, 10, 2),
           note: 'Lunch',
-          accountId: 'cash',
-          categoryId: 'food',
+          accountId: 1,
+          categoryId: 3,
         ),
       );
     categoryRepo = MemoryCategoryRepository()
       ..categories.addAll(const [
         CategoryModel(
-          id: 'food',
+          id: 3,
           name: 'Food',
           icon: 'restaurant',
-          color: 'coral',
-          kind: CategoryKind.expense,
+          type: CategoryKind.expense,
           sortOrder: 0,
         ),
         CategoryModel(
-          id: 'salary',
+          id: 4,
           name: 'Salary',
           icon: 'payments',
-          color: 'green',
-          kind: CategoryKind.income,
+          type: CategoryKind.income,
           sortOrder: 0,
         ),
       ]);
@@ -91,14 +89,14 @@ void main() {
     },
     verify: (_) {
       expect(
-        transactionRepo.transactions.where((item) => item.amountMinor == 500),
+        transactionRepo.transactions.where((item) => item.amount == 5.0),
         hasLength(1),
       );
     },
     expect: () => [
       isA<RecordState>()
-          .having((state) => state.accountId, 'account', 'cash')
-          .having((state) => state.categoryId, 'category', 'food'),
+          .having((state) => state.accountId, 'account', 1)
+          .having((state) => state.categoryId, 'category', 3),
       isA<RecordState>().having(
         (state) => state.error,
         'error',
@@ -145,7 +143,7 @@ void main() {
     'loads an existing transaction and evaluates the expression',
     build: buildBloc,
     act: (bloc) async {
-      bloc.add(const RecordInitialized(transactionId: 'lunch'));
+      bloc.add(const RecordInitialized(transactionId: 2));
       if (bloc.state.note != 'Lunch') {
         await bloc.stream.firstWhere((state) => state.note == 'Lunch');
       }

@@ -1,5 +1,4 @@
 import 'package:flutter/widgets.dart';
-import 'package:money_manager/core/utils/id.dart';
 import 'package:money_manager/l10n/app_localizations.dart';
 import 'package:money_manager/models/category_model.dart';
 import 'package:money_manager/models/account_book_kinds.dart';
@@ -9,15 +8,15 @@ List<CategoryModel> defaultCategories() {
   final zh = lookupAppLocalizations(const Locale('zh'));
   final zhCn = lookupAppLocalizations(const Locale('zh', 'CN'));
   const expense = [
-    ('food', 'coral'),
-    ('transit', 'blue'),
-    ('housing', 'amber'),
-    ('shopping', 'teal'),
-    ('entertainment', 'pink'),
-    ('medical', 'green'),
-    ('other', 'slate'),
+    'food',
+    'transit',
+    'housing',
+    'shopping',
+    'entertainment',
+    'medical',
+    'other',
   ];
-  const income = [('salary', 'green'), ('bonus', 'amber'), ('other', 'slate')];
+  const income = ['salary', 'bonus', 'other'];
 
   String nameFor(AppLocalizations l10n, String key) {
     return switch (key) {
@@ -33,15 +32,13 @@ List<CategoryModel> defaultCategories() {
     };
   }
 
-  CategoryModel item(CategoryKind kind, int index, (String, String) seed) {
+  CategoryModel item(CategoryKind type, int index, String icon) {
     return CategoryModel(
-      id: createId(),
-      languageEn: nameFor(en, seed.$1),
-      languageZh: nameFor(zh, seed.$1),
-      languageZhCn: nameFor(zhCn, seed.$1),
-      icon: seed.$1,
-      color: seed.$2,
-      kind: kind,
+      languageEn: nameFor(en, icon),
+      languageZh: nameFor(zh, icon),
+      languageZhCn: nameFor(zhCn, icon),
+      icon: icon,
+      type: type,
       sortOrder: index,
     );
   }

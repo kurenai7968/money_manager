@@ -93,7 +93,7 @@ class CategoriesBloc extends Bloc<CategoriesEvent, CategoriesState> {
       final source = transactions;
       final used = source == null ? 0 : await source.countForCategory(event.id);
       if (existing.isNotEmpty && used > 0) {
-        await _repository.save(existing.first.copyWith(archived: true));
+        await _repository.save(existing.first.copyWith(isActive: false));
       } else {
         await _repository.delete(event.id);
       }

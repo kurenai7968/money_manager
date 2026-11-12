@@ -2,28 +2,26 @@ import 'package:equatable/equatable.dart';
 import 'package:money_manager/models/account_book_kinds.dart';
 
 class CategoryModel extends Equatable {
-  final String id;
+  final int? id;
   final String? name;
   final String? languageEn;
   final String? languageZh;
   final String? languageZhCn;
   final String icon;
-  final String color;
-  final CategoryKind kind;
+  final CategoryKind type;
   final int sortOrder;
-  final bool archived;
+  final bool isActive;
 
   const CategoryModel({
-    required this.id,
+    this.id,
     this.name,
     this.languageEn,
     this.languageZh,
     this.languageZhCn,
     required this.icon,
-    required this.color,
-    required this.kind,
+    required this.type,
     required this.sortOrder,
-    this.archived = false,
+    this.isActive = true,
   });
 
   String labelFor(String languageCode) {
@@ -50,16 +48,15 @@ class CategoryModel extends Equatable {
   }
 
   CategoryModel copyWith({
-    String? id,
+    int? id,
     String? name,
     String? languageEn,
     String? languageZh,
     String? languageZhCn,
     String? icon,
-    String? color,
-    CategoryKind? kind,
+    CategoryKind? type,
     int? sortOrder,
-    bool? archived,
+    bool? isActive,
   }) {
     return CategoryModel(
       id: id ?? this.id,
@@ -68,10 +65,9 @@ class CategoryModel extends Equatable {
       languageZh: languageZh ?? this.languageZh,
       languageZhCn: languageZhCn ?? this.languageZhCn,
       icon: icon ?? this.icon,
-      color: color ?? this.color,
-      kind: kind ?? this.kind,
+      type: type ?? this.type,
       sortOrder: sortOrder ?? this.sortOrder,
-      archived: archived ?? this.archived,
+      isActive: isActive ?? this.isActive,
     );
   }
 
@@ -83,9 +79,8 @@ class CategoryModel extends Equatable {
     languageZh,
     languageZhCn,
     icon,
-    color,
-    kind,
+    type,
     sortOrder,
-    archived,
+    isActive,
   ];
 }

@@ -5,7 +5,7 @@ import 'package:money_manager/models/transaction_model.dart';
 
 class AccountBookModel extends Equatable {
   final AccountModel account;
-  final int balance;
+  final double balance;
   final List<TransactionModel> transactions;
 
   const AccountBookModel({
@@ -16,7 +16,7 @@ class AccountBookModel extends Equatable {
 
   AccountBookModel copyWith({
     AccountModel? account,
-    int? balance,
+    double? balance,
     List<TransactionModel>? transactions,
   }) {
     return AccountBookModel(
@@ -30,10 +30,10 @@ class AccountBookModel extends Equatable {
   List<Object?> get props => [account, balance, transactions];
 }
 
-int accountBookNetWorth(Iterable<AccountBookModel> books) {
-  var total = 0;
+double accountBookNetWorth(Iterable<AccountBookModel> books) {
+  var total = 0.0;
   for (final book in books) {
-    if (book.account.archived) {
+    if (!book.account.isActive) {
       continue;
     }
     final balance = book.balance;
@@ -43,13 +43,15 @@ int accountBookNetWorth(Iterable<AccountBookModel> books) {
 }
 
 List<TransactionModel> transactionsOnce(Iterable<AccountBookModel> books) {
-  final seen = <String>{};
+  final seen = <int>{};
   final transactions = <TransactionModel>[];
   for (final book in books) {
     for (final transaction in book.transactions) {
-      if (seen.add(transaction.id)) {
-        transactions.add(transaction);
+      final id = transaction.id;
+      if (id != null && !seen.add(id)) {
+        continue;
       }
+      transactions.add(transaction);
     }
   }
   transactions.sort((a, b) {
@@ -57,7 +59,7 @@ List<TransactionModel> transactionsOnce(Iterable<AccountBookModel> books) {
     if (byDate != 0) {
       return byDate;
     }
-    return b.id.compareTo(a.id);
+    return (b.id ?? 0).compareTo(a.id ?? 0);
   });
   return transactions;
 }

@@ -14,9 +14,9 @@ void main() {
     });
 
     test('queries selected columns with a limit and offset', () async {
-      await database.insert(AccountTable.tableName, _account('a', 'Alpha'));
-      await database.insert(AccountTable.tableName, _account('b', 'Beta'));
-      await database.insert(AccountTable.tableName, _account('c', 'Gamma'));
+      await database.insert(AccountTable.tableName, _account(1, 'Alpha'));
+      await database.insert(AccountTable.tableName, _account(2, 'Beta'));
+      await database.insert(AccountTable.tableName, _account(3, 'Gamma'));
 
       final rows = await database.query(
         AccountTable.tableName,
@@ -27,15 +27,15 @@ void main() {
       );
 
       expect(rows, [
-        {AccountTable.id: 'b', AccountTable.name: 'Beta'},
+        {AccountTable.id: 2, AccountTable.name: 'Beta'},
       ]);
     });
 
     test('insert replaces the row with the same id', () async {
-      await database.insert(AccountTable.tableName, _account('a', 'Alpha'));
+      await database.insert(AccountTable.tableName, _account(1, 'Alpha'));
       final replaced = await database.insert(
         AccountTable.tableName,
-        _account('a', 'Renamed'),
+        _account(1, 'Renamed'),
       );
 
       expect(replaced, isNonZero);
@@ -44,19 +44,19 @@ void main() {
     });
 
     test('update and delete report the number of rows', () async {
-      await database.insert(AccountTable.tableName, _account('a', 'Alpha'));
-      await database.insert(AccountTable.tableName, _account('b', 'Beta'));
+      await database.insert(AccountTable.tableName, _account(1, 'Alpha'));
+      await database.insert(AccountTable.tableName, _account(2, 'Beta'));
 
       final updated = await database.update(
         AccountTable.tableName,
         {AccountTable.name: 'Changed'},
         where: '${AccountTable.id} = ?',
-        whereArgs: ['a'],
+        whereArgs: [1],
       );
       final deleted = await database.delete(
         AccountTable.tableName,
         where: '${AccountTable.id} = ?',
-        whereArgs: ['b'],
+        whereArgs: [1],
       );
 
       expect(updated, 1);
@@ -71,21 +71,21 @@ void main() {
       final inserted = await database.rawInsert(
         'INSERT INTO ${AccountTable.tableName} '
         '(${AccountTable.id}, ${AccountTable.name}, ${AccountTable.type}, '
-        '${AccountTable.openingBalance}, ${AccountTable.sortOrder}, '
-        '${AccountTable.archived}) VALUES (?, ?, ?, ?, ?, ?)',
-        ['a', 'Alpha', 'cash', 0, 0, 0],
+        '${AccountTable.icon}, ${AccountTable.sortOrder}, '
+        '${AccountTable.isActive}) VALUES (?, ?, ?, ?, ?, ?)',
+        [1, 'Alpha', 'cash', 'other', 1, 1],
       );
       final updated = await database.rawUpdate(
         'UPDATE ${AccountTable.tableName} SET ${AccountTable.name} = ? '
         'WHERE ${AccountTable.id} = ?',
-        ['Renamed', 'a'],
+        ['Renamed', 1],
       );
       final rows = await database.rawQuery(
         'SELECT ${AccountTable.name} FROM ${AccountTable.tableName}',
       );
       final deleted = await database.rawDelete(
         'DELETE FROM ${AccountTable.tableName} WHERE ${AccountTable.id} = ?',
-        ['a'],
+        [1],
       );
 
       expect(inserted, isNonZero);
@@ -98,18 +98,18 @@ void main() {
 
     test('a transaction can read and write before it commits', () async {
       final count = await database.transaction((txn) async {
-        await txn.insert(AccountTable.tableName, _account('a', 'Alpha'));
+        await txn.insert(AccountTable.tableName, _account(1, 'Alpha'));
         final rows = await txn.query(
           AccountTable.tableName,
           where: '${AccountTable.id} = ?',
-          whereArgs: ['a'],
+          whereArgs: [1],
         );
         expect(rows.single[AccountTable.name], 'Alpha');
         final updated = await txn.update(
           AccountTable.tableName,
           {AccountTable.name: 'Renamed'},
           where: '${AccountTable.id} = ?',
-          whereArgs: ['a'],
+          whereArgs: [1],
         );
         expect(updated, 1);
         return txn.count('SELECT COUNT(*) FROM ${AccountTable.tableName}');
@@ -121,7 +121,7 @@ void main() {
     });
 
     test('a thrown transaction action rolls the writes back', () async {
-      await database.insert(AccountTable.tableName, _account('a', 'Alpha'));
+      await database.insert(AccountTable.tableName, _account(1, 'Alpha'));
 
       await expectLater(
         database.transaction((txn) async {
@@ -137,13 +137,13 @@ void main() {
   });
 }
 
-Map<String, dynamic> _account(String id, String name) {
+Map<String, dynamic> _account(int id, String name) {
   return {
     AccountTable.id: id,
     AccountTable.name: name,
     AccountTable.type: 'cash',
-    AccountTable.openingBalance: 0,
-    AccountTable.sortOrder: id.codeUnitAt(0),
-    AccountTable.archived: 0,
+    AccountTable.icon: 'other',
+    AccountTable.sortOrder: id,
+    AccountTable.isActive: 1,
   };
 }

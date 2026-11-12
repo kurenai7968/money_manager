@@ -5,12 +5,13 @@ import 'package:money_manager/repositories/account_repository.dart';
 
 class MemoryAccountRepository implements AccountRepository {
   final List<AccountModel> accounts = [];
-  final Map<String, int> balanceById = {};
+  final Map<int, double> balanceById = {};
+  var _nextId = 1;
 
   @override
-  Future<void> archive(String id) async {
+  Future<void> archive(int id) async {
     final index = accounts.indexWhere((account) => account.id == id);
-    accounts[index] = accounts[index].copyWith(archived: true);
+    accounts[index] = accounts[index].copyWith(isActive: false);
   }
 
   @override
@@ -28,14 +29,18 @@ class MemoryAccountRepository implements AccountRepository {
     final loaded = await getAll();
     final balances = {
       for (final account in loaded)
-        account.id: balanceById[account.id] ?? account.openingBalanceMinor,
+        if (account.id != null) account.id!: balanceById[account.id] ?? 0,
     };
-    var netWorth = 0;
+    var netWorth = 0.0;
     for (final account in loaded) {
-      if (account.archived) {
+      if (!account.isActive) {
         continue;
       }
-      final balance = balances[account.id]!;
+      final id = account.id;
+      if (id == null) {
+        continue;
+      }
+      final balance = balances[id]!;
       netWorth += account.type == AccountType.credit ? -balance : balance;
     }
     return AccountBalances(
@@ -46,7 +51,7 @@ class MemoryAccountRepository implements AccountRepository {
   }
 
   @override
-  Future<void> reorder(List<String> ids) async {
+  Future<void> reorder(List<int> ids) async {
     for (var index = 0; index < ids.length; index++) {
       final accountIndex = accounts.indexWhere(
         (account) => account.id == ids[index],
@@ -58,8 +63,14 @@ class MemoryAccountRepository implements AccountRepository {
   }
 
   @override
-  Future<void> save(AccountModel account) async {
-    accounts.removeWhere((item) => item.id == account.id);
-    accounts.add(account);
+  Future<int> save(AccountModel account) async {
+    final id = account.id ?? _nextId++;
+    if (id >= _nextId) {
+      _nextId = id + 1;
+    }
+    final saved = account.copyWith(id: id);
+    accounts.removeWhere((item) => item.id == id);
+    accounts.add(saved);
+    return id;
   }
 }

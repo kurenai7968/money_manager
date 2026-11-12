@@ -6,7 +6,7 @@ import 'package:money_manager/themes/app_themes.dart';
 
 class HomeAccountSheet extends StatelessWidget {
   final List<AccountModel> accounts;
-  final String? selectedId;
+  final int? selectedId;
 
   const HomeAccountSheet({required this.accounts, this.selectedId, super.key});
 

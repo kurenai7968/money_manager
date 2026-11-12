@@ -10,7 +10,7 @@ import 'package:money_manager/themes/app_themes.dart';
 import 'package:money_manager/widgets/transaction_item.dart';
 
 class AccountDetailBody extends StatelessWidget {
-  final String accountId;
+  final int accountId;
 
   const AccountDetailBody({required this.accountId, super.key});
 
@@ -39,7 +39,7 @@ class AccountDetailBody extends StatelessWidget {
                 ),
               ),
               Text(
-                formatMinor(state.balanceMinor, locale: locale),
+                formatAmount(state.balance, locale: locale),
                 style: Theme.of(context).textTheme.headlineMedium?.copyWith(
                   color: isCredit
                       ? Theme.of(context).colorScheme.primary

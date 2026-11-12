@@ -22,7 +22,7 @@ class CategoriesBody extends StatelessWidget {
                 key: ValueKey(kind),
                 categories: [
                   for (final category in state.active)
-                    if (category.kind == kind) category,
+                    if (category.type == kind) category,
                 ],
               ),
           ],

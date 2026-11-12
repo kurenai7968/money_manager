@@ -15,9 +15,9 @@ enum AppRoutes {
 
   final String path;
 
-  static String account(String id) => '/account/$id';
+  static String account(int id) => '/account/$id';
 
-  static String editAccount(String id) => '/account/$id/edit';
+  static String editAccount(int id) => '/account/$id/edit';
 
-  static String editCategory(String id) => '/category/$id';
+  static String editCategory(int id) => '/category/$id';
 }

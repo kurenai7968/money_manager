@@ -5,7 +5,7 @@ import 'package:money_manager/themes/app_themes.dart';
 
 class RecordAccountSheet extends StatelessWidget {
   final List<AccountModel> accounts;
-  final String? selectedId;
+  final int? selectedId;
 
   const RecordAccountSheet({
     required this.accounts,
@@ -36,7 +36,12 @@ class RecordAccountSheet extends StatelessWidget {
                       color: Theme.of(context).colorScheme.primary,
                     )
                   : null,
-              onTap: () => Navigator.pop(context, account.id),
+              onTap: () {
+                final id = account.id;
+                if (id != null) {
+                  Navigator.pop(context, id);
+                }
+              },
             ),
         ],
       ),

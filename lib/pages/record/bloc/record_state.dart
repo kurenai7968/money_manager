@@ -22,11 +22,11 @@ class RecordState extends Equatable {
   final TransactionType type;
   final DateTime date;
   final String note;
-  final String? accountId;
-  final String? categoryId;
-  final String? fromId;
-  final String? toId;
-  final String? transactionId;
+  final int? accountId;
+  final int? categoryId;
+  final int? fromId;
+  final int? toId;
+  final int? transactionId;
   final AmountExpression expression;
   final List<AccountModel> accounts;
   final List<CategoryModel> visibleCategories;
@@ -48,7 +48,13 @@ class RecordState extends Equatable {
     this.visibleCategories = const [],
   });
 
-  int? get result => expression.resultMinor;
+  double? get result {
+    final minor = expression.resultMinor;
+    if (minor == null) {
+      return null;
+    }
+    return minor / 100;
+  }
 
   RecordState copyWith({
     RecordStatus? status,
@@ -57,15 +63,15 @@ class RecordState extends Equatable {
     TransactionType? type,
     DateTime? date,
     String? note,
-    String? accountId,
+    int? accountId,
     bool clearAccountId = false,
-    String? categoryId,
+    int? categoryId,
     bool clearCategoryId = false,
-    String? fromId,
+    int? fromId,
     bool clearFromId = false,
-    String? toId,
+    int? toId,
     bool clearToId = false,
-    String? transactionId,
+    int? transactionId,
     bool clearTransactionId = false,
     AmountExpression? expression,
     List<AccountModel>? accounts,

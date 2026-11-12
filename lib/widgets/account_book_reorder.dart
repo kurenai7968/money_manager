@@ -21,7 +21,7 @@ Widget accountBookReorderProxy(Widget child, int _, Animation<double> _) {
 List<T> syncReorder<T>(
   List<T> current,
   List<T> incoming,
-  String Function(T item) idOf,
+  Object? Function(T item) idOf,
 ) {
   if (_sameOrder(current, incoming, idOf)) {
     return incoming;
@@ -39,7 +39,7 @@ List<T> syncReorder<T>(
 bool _sameOrder<T>(
   List<T> current,
   List<T> incoming,
-  String Function(T item) idOf,
+  Object? Function(T item) idOf,
 ) {
   if (current.length != incoming.length) {
     return false;

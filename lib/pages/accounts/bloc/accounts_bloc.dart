@@ -46,7 +46,6 @@ class AccountsBloc extends Bloc<AccountsEvent, AccountsState> {
     }
     try {
       await _repository.save(event.account);
-      await _accountBook.syncOpeningTransactions([event.account]);
     } catch (_) {
       emit(
         state.copyWith(
@@ -63,7 +62,7 @@ class AccountsBloc extends Bloc<AccountsEvent, AccountsState> {
     AccountArchivePressed event,
     Emitter<AccountsState> emit,
   ) async {
-    if (event.balanceMinor != 0) {
+    if (event.balance != 0) {
       emit(
         state.copyWith(
           status: AccountsStatus.failure,
@@ -73,7 +72,11 @@ class AccountsBloc extends Bloc<AccountsEvent, AccountsState> {
       return;
     }
     try {
-      await _repository.archive(event.account.id);
+      final id = event.account.id;
+      if (id == null) {
+        return;
+      }
+      await _repository.archive(id);
     } catch (_) {
       emit(
         state.copyWith(
@@ -111,7 +114,10 @@ class AccountsBloc extends Bloc<AccountsEvent, AccountsState> {
         state.copyWith(
           status: AccountsStatus.success,
           accounts: [for (final book in loaded) book.account],
-          balances: {for (final book in loaded) book.account.id: book.balance},
+          balances: {
+            for (final book in loaded)
+              if (book.account.id != null) book.account.id!: book.balance,
+          },
           netWorth: accountBookNetWorth(loaded),
           error: AccountsError.none,
         ),

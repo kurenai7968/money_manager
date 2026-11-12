@@ -2,26 +2,26 @@ import 'package:equatable/equatable.dart';
 import 'package:money_manager/models/account_book_kinds.dart';
 
 class AccountModel extends Equatable {
-  final String id;
+  final int? id;
   final String? name;
   final String? languageEn;
   final String? languageZh;
   final String? languageZhCn;
   final AccountType type;
-  final int openingBalanceMinor;
+  final String icon;
   final int sortOrder;
-  final bool archived;
+  final bool isActive;
 
   const AccountModel({
-    required this.id,
+    this.id,
     this.name,
     this.languageEn,
     this.languageZh,
     this.languageZhCn,
     required this.type,
-    required this.openingBalanceMinor,
+    required this.icon,
     required this.sortOrder,
-    this.archived = false,
+    this.isActive = true,
   });
 
   String labelFor(String languageCode) {
@@ -48,15 +48,15 @@ class AccountModel extends Equatable {
   }
 
   AccountModel copyWith({
-    String? id,
+    int? id,
     String? name,
     String? languageEn,
     String? languageZh,
     String? languageZhCn,
     AccountType? type,
-    int? openingBalanceMinor,
+    String? icon,
     int? sortOrder,
-    bool? archived,
+    bool? isActive,
   }) {
     return AccountModel(
       id: id ?? this.id,
@@ -65,9 +65,9 @@ class AccountModel extends Equatable {
       languageZh: languageZh ?? this.languageZh,
       languageZhCn: languageZhCn ?? this.languageZhCn,
       type: type ?? this.type,
-      openingBalanceMinor: openingBalanceMinor ?? this.openingBalanceMinor,
+      icon: icon ?? this.icon,
       sortOrder: sortOrder ?? this.sortOrder,
-      archived: archived ?? this.archived,
+      isActive: isActive ?? this.isActive,
     );
   }
 
@@ -79,20 +79,8 @@ class AccountModel extends Equatable {
     languageZh,
     languageZhCn,
     type,
-    openingBalanceMinor,
+    icon,
     sortOrder,
-    archived,
+    isActive,
   ];
-}
-
-int netWorthMinor(Iterable<AccountModel> accounts) {
-  var total = 0;
-  for (final account in accounts.where((item) => !item.archived)) {
-    if (account.type == AccountType.credit) {
-      total -= account.openingBalanceMinor;
-    } else {
-      total += account.openingBalanceMinor;
-    }
-  }
-  return total;
 }

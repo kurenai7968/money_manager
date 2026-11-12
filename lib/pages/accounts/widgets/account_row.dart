@@ -10,7 +10,7 @@ import 'package:money_manager/themes/account_book_palette.dart';
 
 class AccountRow extends StatelessWidget {
   final AccountModel account;
-  final int balance;
+  final double balance;
   final int index;
 
   const AccountRow({
@@ -33,7 +33,12 @@ class AccountRow extends StatelessWidget {
       AccountType.credit => AccountBookPalette.slate,
     };
     return ListTile(
-      onTap: () => context.push(AppRoutes.account(account.id)),
+      onTap: () {
+        final id = account.id;
+        if (id != null) {
+          context.push(AppRoutes.account(id));
+        }
+      },
       leading: Icon(Icons.circle, color: color, size: 12),
       title: Text(account.labelFor(context.categoryLanguageCode)),
       subtitle: isCredit ? Text(l10n.owed) : null,
@@ -41,7 +46,7 @@ class AccountRow extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           Text(
-            formatMinor(balance, locale: locale),
+            formatAmount(balance, locale: locale),
             style: Theme.of(context).textTheme.titleMedium
                 ?.copyWith(color: isCredit ? scheme.primary : scheme.onSurface),
           ),

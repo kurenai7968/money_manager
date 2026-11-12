@@ -4,8 +4,8 @@ import 'package:material_ui/material_ui.dart';
 import 'package:money_manager/themes/account_book_palette.dart';
 
 class HomeMonthDonut extends StatelessWidget {
-  final int income;
-  final int expense;
+  final double income;
+  final double expense;
   final String label;
   final String amount;
 
@@ -29,7 +29,7 @@ class HomeMonthDonut extends StatelessWidget {
             income: income,
             expense: expense,
             incomeColor: AccountBookPalette.green,
-            expenseColor: scheme.primary,
+            expenseColor: AccountBookPalette.coral,
             trackColor: scheme.outline,
           ),
           child: Center(
@@ -52,8 +52,8 @@ class HomeMonthDonut extends StatelessWidget {
 }
 
 class _DonutPainter extends CustomPainter {
-  final int income;
-  final int expense;
+  final double income;
+  final double expense;
   final Color incomeColor;
   final Color expenseColor;
   final Color trackColor;

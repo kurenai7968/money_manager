@@ -8,9 +8,9 @@ import 'package:money_manager/models/category_model.dart';
 abstract interface class CategoryRepository {
   Future<List<CategoryModel>> getAll();
   Future<bool> isEmpty();
-  Future<void> save(CategoryModel category);
-  Future<void> delete(String id);
-  Future<void> reorder(List<String> ids);
+  Future<int> save(CategoryModel category);
+  Future<void> delete(int id);
+  Future<void> reorder(List<int> ids);
 }
 
 class CategoryRepositoryImpl implements CategoryRepository {
@@ -43,9 +43,9 @@ class CategoryRepositoryImpl implements CategoryRepository {
   }
 
   @override
-  Future<void> save(CategoryModel category) {
-    return guard('Category could not be saved.', () async {
-      await _database.insert(
+  Future<int> save(CategoryModel category) {
+    return guard('Category could not be saved.', () {
+      return _database.insert(
         CategoryTable.tableName,
         category.toEntity().toJson(),
       );
@@ -53,7 +53,7 @@ class CategoryRepositoryImpl implements CategoryRepository {
   }
 
   @override
-  Future<void> delete(String id) {
+  Future<void> delete(int id) {
     return guard('Category could not be deleted.', () async {
       await _database.delete(
         CategoryTable.tableName,
@@ -64,7 +64,7 @@ class CategoryRepositoryImpl implements CategoryRepository {
   }
 
   @override
-  Future<void> reorder(List<String> ids) {
+  Future<void> reorder(List<int> ids) {
     return guard('Categories could not be reordered.', () {
       return _database.transaction((txn) async {
         for (var index = 0; index < ids.length; index++) {

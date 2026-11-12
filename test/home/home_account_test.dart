@@ -56,10 +56,10 @@ void main() {
       accounts: [
         for (var index = 0; index < 40; index++)
           AccountModel(
-            id: 'account-$index',
+            id: index + 1,
             name: 'Account $index',
             type: AccountType.cash,
-            openingBalanceMinor: 0,
+            icon: 'other',
             sortOrder: index,
           ),
       ],

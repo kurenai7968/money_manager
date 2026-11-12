@@ -9,9 +9,9 @@ import 'package:money_manager/pages/record/widgets/record_app_bar.dart';
 import 'package:money_manager/pages/record/widgets/record_body.dart';
 
 class RecordPage extends StatelessWidget {
-  final String? transactionId;
+  final int? transactionId;
   final TransactionType? initialType;
-  final String? initialAccountId;
+  final int? initialAccountId;
 
   const RecordPage({
     this.transactionId,

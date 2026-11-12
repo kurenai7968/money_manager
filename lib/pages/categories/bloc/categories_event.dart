@@ -28,7 +28,7 @@ class CategorySavePressed extends CategoriesEvent {
 }
 
 class CategoryDeletePressed extends CategoriesEvent {
-  final String id;
+  final int id;
 
   const CategoryDeletePressed(this.id);
 
@@ -38,7 +38,7 @@ class CategoryDeletePressed extends CategoriesEvent {
 
 class CategoriesReorderPressed extends CategoriesEvent {
   final CategoryKind kind;
-  final List<String> ids;
+  final List<int> ids;
 
   const CategoriesReorderPressed(this.kind, this.ids);
 

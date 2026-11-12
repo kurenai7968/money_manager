@@ -48,7 +48,7 @@ class AccountsBody extends StatelessWidget {
                       ),
                     ),
                     Text(
-                      formatMinor(overview.netWorth, locale: locale),
+                      formatAmount(overview.netWorth, locale: locale),
                       style: Theme.of(context).textTheme.headlineMedium,
                     ),
                   ],

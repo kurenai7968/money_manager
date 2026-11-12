@@ -2,6 +2,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:money_manager/core/extensions/context_extension.dart';
 import 'package:money_manager/core/utils/money_format.dart';
+import 'package:money_manager/models/account_book_kinds.dart';
 import 'package:money_manager/models/account_model.dart';
 import 'package:money_manager/models/category_model.dart';
 import 'package:money_manager/pages/analysis/bloc/analysis_bloc.dart';
@@ -29,11 +30,11 @@ class AnalysisBody extends StatelessWidget {
               ?.copyWith(color: Theme.of(context).colorScheme.onSurfaceVariant),
         ),
         Text(
-          formatMinor(current, locale: locale),
+          formatAmount(current, locale: locale),
           style: Theme.of(context).textTheme.headlineMedium,
         ),
         Text(
-          '${formatMinor(rollup.delta, locale: locale, signed: true)} · ${l10n.lastMonth} ${formatMinor(rollup.previous, locale: locale)}',
+          '${formatAmount(rollup.delta, locale: locale, signed: true)} · ${l10n.lastMonth} ${formatAmount(rollup.previous, locale: locale)}',
           style: Theme.of(context).textTheme.bodyMedium
               ?.copyWith(color: Theme.of(context).colorScheme.onSurfaceVariant),
         ),
@@ -52,8 +53,10 @@ class AnalysisBody extends StatelessWidget {
         Text(l10n.categories, style: Theme.of(context).textTheme.titleMedium),
         for (final entry in rollup.byCategory)
           AnalysisTotalRow(
-            color: AccountBookPalette.color(
-              _category(state.categories, entry.id)?.color ?? 'slate',
+            color: AccountBookPalette.directionColor(
+              income:
+                  _category(state.categories, entry.id)?.type ==
+                  CategoryKind.income,
             ),
             title:
                 _category(
@@ -61,7 +64,7 @@ class AnalysisBody extends StatelessWidget {
                   entry.id,
                 )?.labelFor(context.categoryLanguageCode) ??
                 '',
-            amount: formatMinor(entry.amountMinor, locale: locale),
+            amount: formatAmount(entry.amount, locale: locale),
             share: entry.sharePercent == null ? '' : '${entry.sharePercent}%',
           ),
         const SizedBox(height: AppSpacing.xl),
@@ -75,14 +78,14 @@ class AnalysisBody extends StatelessWidget {
                   entry.id,
                 )?.labelFor(context.categoryLanguageCode) ??
                 '',
-            amount: formatMinor(entry.amountMinor, locale: locale),
+            amount: formatAmount(entry.amount, locale: locale),
           ),
       ],
     );
   }
 }
 
-CategoryModel? _category(List<CategoryModel> categories, String? id) {
+CategoryModel? _category(List<CategoryModel> categories, int? id) {
   for (final category in categories) {
     if (category.id == id) {
       return category;
@@ -91,7 +94,7 @@ CategoryModel? _category(List<CategoryModel> categories, String? id) {
   return null;
 }
 
-AccountModel? _account(List<AccountModel> accounts, String? id) {
+AccountModel? _account(List<AccountModel> accounts, int? id) {
   for (final account in accounts) {
     if (account.id == id) {
       return account;

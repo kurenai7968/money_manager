@@ -6,7 +6,7 @@ import 'package:money_manager/pages/accounts/bloc/account_detail_state.dart';
 import 'package:money_manager/services/account_book_service.dart';
 
 class AccountDetailBloc extends Bloc<AccountDetailEvent, AccountDetailState> {
-  final String accountId;
+  final int accountId;
   final AccountBookService _accountBook;
 
   AccountDetailBloc({
@@ -61,7 +61,7 @@ class AccountDetailBloc extends Bloc<AccountDetailEvent, AccountDetailState> {
       AccountDetailState(
         status: status,
         account: selected.account,
-        balanceMinor: selected.balance,
+        balance: selected.balance,
         history: selected.transactions,
         categories: categories,
         accounts: accounts,

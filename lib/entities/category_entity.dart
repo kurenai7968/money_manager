@@ -6,29 +6,28 @@ part 'category_entity.g.dart';
 
 @JsonSerializable(fieldRename: FieldRename.snake)
 class CategoryEntity extends Equatable {
-  final String id;
+  @JsonKey(includeIfNull: false)
+  final int? id;
   final String? name;
   final String? languageEn;
   final String? languageZh;
   final String? languageZhCn;
   final String icon;
-  final String color;
-  final String kind;
+  final String type;
   final int sortOrder;
   @BoolIntConverter()
-  final bool archived;
+  final bool isActive;
 
   const CategoryEntity({
-    required this.id,
+    this.id,
     this.name,
     this.languageEn,
     this.languageZh,
     this.languageZhCn,
     required this.icon,
-    required this.color,
-    required this.kind,
+    required this.type,
     required this.sortOrder,
-    required this.archived,
+    required this.isActive,
   });
 
   factory CategoryEntity.fromJson(Map<String, dynamic> json) =>
@@ -44,9 +43,8 @@ class CategoryEntity extends Equatable {
     languageZh,
     languageZhCn,
     icon,
-    color,
-    kind,
+    type,
     sortOrder,
-    archived,
+    isActive,
   ];
 }

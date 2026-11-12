@@ -3,55 +3,55 @@ import 'package:money_manager/models/account_book_kinds.dart';
 import 'package:money_manager/models/transaction_model.dart';
 
 class MonthFigures extends Equatable {
-  final int incomeMinor;
-  final int expenseMinor;
+  final double income;
+  final double expense;
 
-  const MonthFigures({required this.incomeMinor, required this.expenseMinor});
+  const MonthFigures({required this.income, required this.expense});
 
-  int get balanceMinor => incomeMinor - expenseMinor;
+  double get balance => income - expense;
 
   @override
-  List<Object?> get props => [incomeMinor, expenseMinor];
+  List<Object?> get props => [income, expense];
 }
 
 MonthFigures monthFigures(
   Iterable<TransactionModel> transactions,
   DateTime month,
 ) {
-  var income = 0;
-  var expense = 0;
+  var income = 0.0;
+  var expense = 0.0;
   for (final transaction in transactions) {
     if (transaction.date.year != month.year ||
         transaction.date.month != month.month) {
       continue;
     }
     if (transaction.type == TransactionType.income) {
-      income += transaction.amountMinor;
+      income += transaction.amount;
     } else if (transaction.type == TransactionType.expense) {
-      expense += transaction.amountMinor;
+      expense += transaction.amount;
     }
   }
-  return MonthFigures(incomeMinor: income, expenseMinor: expense);
+  return MonthFigures(income: income, expense: expense);
 }
 
 class DayLedger extends Equatable {
   final DateTime day;
-  final int netMinor;
+  final double net;
   final List<TransactionModel> transactions;
 
   const DayLedger({
     required this.day,
-    required this.netMinor,
+    required this.net,
     required this.transactions,
   });
 
   @override
-  List<Object?> get props => [day, netMinor, transactions];
+  List<Object?> get props => [day, net, transactions];
 }
 
 List<DayLedger> daysOf(Iterable<TransactionModel> transactions) {
   final items = <DateTime, List<TransactionModel>>{};
-  final nets = <DateTime, int>{};
+  final nets = <DateTime, double>{};
   for (final transaction in transactions) {
     final day = DateTime(
       transaction.date.year,
@@ -60,9 +60,9 @@ List<DayLedger> daysOf(Iterable<TransactionModel> transactions) {
     );
     (items[day] ??= []).add(transaction);
     final delta = switch (transaction.type) {
-      TransactionType.income => transaction.amountMinor,
-      TransactionType.expense => -transaction.amountMinor,
-      TransactionType.transfer => 0,
+      TransactionType.income => transaction.amount,
+      TransactionType.expense => -transaction.amount,
+      TransactionType.transfer => 0.0,
     };
     if (delta == 0) {
       continue;
@@ -73,17 +73,17 @@ List<DayLedger> daysOf(Iterable<TransactionModel> transactions) {
     for (final entry in items.entries)
       DayLedger(
         day: entry.key,
-        netMinor: nets[entry.key] ?? 0,
+        net: nets[entry.key] ?? 0,
         transactions: entry.value,
       ),
   ];
 }
 
-int netOn(List<DayLedger> days, DateTime day) {
+double netOn(List<DayLedger> days, DateTime day) {
   final key = DateTime(day.year, day.month, day.day);
   for (final item in days) {
     if (item.day == key) {
-      return item.netMinor;
+      return item.net;
     }
   }
   return 0;

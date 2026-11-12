@@ -3,23 +3,23 @@ import 'package:money_manager/models/account_book_kinds.dart';
 import 'package:money_manager/models/transaction_model.dart';
 
 class AnalysisTotal extends Equatable {
-  final String? id;
-  final int amountMinor;
+  final int? id;
+  final double amount;
   final int? sharePercent;
 
   const AnalysisTotal({
     required this.id,
-    required this.amountMinor,
+    required this.amount,
     this.sharePercent,
   });
 
   @override
-  List<Object?> get props => [id, amountMinor, sharePercent];
+  List<Object?> get props => [id, amount, sharePercent];
 }
 
 class AnalysisRollup extends Equatable {
   final List<DateTime> months;
-  final List<int> monthValues;
+  final List<double> monthValues;
   final List<AnalysisTotal> byCategory;
   final List<AnalysisTotal> byAccount;
 
@@ -30,14 +30,14 @@ class AnalysisRollup extends Equatable {
     required this.byAccount,
   });
 
-  int get current => monthValues.last;
+  double get current => monthValues.last;
 
-  int get previous => monthValues[monthValues.length - 2];
+  double get previous => monthValues[monthValues.length - 2];
 
-  int get delta => current - previous;
+  double get delta => current - previous;
 
-  int get maxValue {
-    var max = 1;
+  double get maxValue {
+    var max = 1.0;
     for (final value in monthValues) {
       if (value > max) {
         max = value;
@@ -59,15 +59,15 @@ AnalysisRollup analysisRollup(
     for (var offset = 5; offset >= 0; offset--)
       DateTime(month.year, month.month - offset),
   ];
-  final income = List<int>.filled(months.length, 0);
-  final expense = List<int>.filled(months.length, 0);
+  final income = List<double>.filled(months.length, 0);
+  final expense = List<double>.filled(months.length, 0);
   final indexByMonth = <int, int>{
     for (var index = 0; index < months.length; index++)
       months[index].year * 12 + months[index].month: index,
   };
   final currentKey = month.year * 12 + month.month;
-  final byCategory = <String?, int>{};
-  final byAccount = <String?, int>{};
+  final byCategory = <int?, double>{};
+  final byAccount = <int?, double>{};
   final wantExpense = kind == CategoryKind.expense;
   for (final transaction in transactions) {
     final index =
@@ -76,9 +76,9 @@ AnalysisRollup analysisRollup(
       continue;
     }
     if (transaction.type == TransactionType.income) {
-      income[index] += transaction.amountMinor;
+      income[index] += transaction.amount;
     } else if (transaction.type == TransactionType.expense) {
-      expense[index] += transaction.amountMinor;
+      expense[index] += transaction.amount;
     } else {
       continue;
     }
@@ -91,10 +91,8 @@ AnalysisRollup analysisRollup(
     }
     final categoryId = transaction.categoryId;
     final accountId = transaction.accountId;
-    byCategory[categoryId] =
-        (byCategory[categoryId] ?? 0) + transaction.amountMinor;
-    byAccount[accountId] =
-        (byAccount[accountId] ?? 0) + transaction.amountMinor;
+    byCategory[categoryId] = (byCategory[categoryId] ?? 0) + transaction.amount;
+    byAccount[accountId] = (byAccount[accountId] ?? 0) + transaction.amount;
   }
   final totals = wantExpense ? expense : income;
   final current = totals.last;
@@ -106,14 +104,14 @@ AnalysisRollup analysisRollup(
   );
 }
 
-List<AnalysisTotal> _totals(Map<String?, int> totals, int? current) {
+List<AnalysisTotal> _totals(Map<int?, double> totals, double? current) {
   final entries = totals.entries.toList()
     ..sort((a, b) => b.value.compareTo(a.value));
   return [
     for (final entry in entries)
       AnalysisTotal(
         id: entry.key,
-        amountMinor: entry.value,
+        amount: entry.value,
         sharePercent: current == null || current == 0
             ? null
             : (entry.value * 100 / current).round(),

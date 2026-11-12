@@ -11,9 +11,9 @@ extension AccountEntityMapping on AccountEntity {
       languageZh: languageZh,
       languageZhCn: languageZhCn,
       type: AccountType.values.byName(type),
-      openingBalanceMinor: openingBalance,
+      icon: icon,
       sortOrder: sortOrder,
-      archived: archived,
+      isActive: isActive,
     );
   }
 }
@@ -27,9 +27,9 @@ extension AccountModelMapping on AccountModel {
       languageZh: languageZh,
       languageZhCn: languageZhCn,
       type: type.name,
-      openingBalance: openingBalanceMinor,
+      icon: icon,
       sortOrder: sortOrder,
-      archived: archived,
+      isActive: isActive,
     );
   }
 }

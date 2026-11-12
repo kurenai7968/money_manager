@@ -36,7 +36,6 @@ class HomeCalendarView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
     final selected = selectedDay;
     final focused =
         selected != null &&
@@ -63,11 +62,13 @@ class HomeCalendarView extends StatelessWidget {
                   return null;
                 }
                 return Text(
-                  formatMinor(net, locale: locale, signed: true),
+                  formatAmount(net, locale: locale, signed: true),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                    color: net > 0 ? AccountBookPalette.green : scheme.primary,
+                    color: net > 0
+                        ? AccountBookPalette.green
+                        : AccountBookPalette.coral,
                   ),
                 );
               },

@@ -7,9 +7,9 @@ import 'package:money_manager/models/transaction_model.dart';
 
 abstract interface class TransactionRepository {
   Future<List<TransactionModel>> getAll();
-  Future<void> save(TransactionModel transaction);
-  Future<void> delete(String id);
-  Future<int> countForCategory(String categoryId);
+  Future<int> save(TransactionModel transaction);
+  Future<void> delete(int id);
+  Future<int> countForCategory(int categoryId);
 }
 
 class TransactionRepositoryImpl implements TransactionRepository {
@@ -32,9 +32,9 @@ class TransactionRepositoryImpl implements TransactionRepository {
   }
 
   @override
-  Future<void> save(TransactionModel transaction) {
-    return guard('Transaction could not be saved.', () async {
-      await _database.insert(
+  Future<int> save(TransactionModel transaction) {
+    return guard('Transaction could not be saved.', () {
+      return _database.insert(
         TransactionTable.tableName,
         transaction.toEntity().toJson(),
       );
@@ -42,7 +42,7 @@ class TransactionRepositoryImpl implements TransactionRepository {
   }
 
   @override
-  Future<void> delete(String id) {
+  Future<void> delete(int id) {
     return guard('Transaction could not be deleted.', () async {
       await _database.delete(
         TransactionTable.tableName,
@@ -53,7 +53,7 @@ class TransactionRepositoryImpl implements TransactionRepository {
   }
 
   @override
-  Future<int> countForCategory(String categoryId) {
+  Future<int> countForCategory(int categoryId) {
     return guard('Transactions could not be read.', () {
       return _database.count(
         'SELECT COUNT(*) FROM ${TransactionTable.tableName} WHERE ${TransactionTable.categoryId} = ?',

@@ -16,11 +16,10 @@ void main() {
   });
 
   const food = CategoryModel(
-    id: 'food',
+    id: 1,
     name: 'Food',
     icon: 'food',
-    color: 'coral',
-    kind: CategoryKind.expense,
+    type: CategoryKind.expense,
     sortOrder: 0,
   );
 
@@ -42,17 +41,16 @@ void main() {
     act: (bloc) => bloc.add(
       const CategoriesInitialized([
         CategoryModel(
-          id: 'other',
+          id: 2,
           name: 'Other',
           icon: 'other',
-          color: 'slate',
-          kind: CategoryKind.expense,
+          type: CategoryKind.expense,
           sortOrder: 1,
         ),
       ]),
     ),
     verify: (bloc) {
-      expect(bloc.state.categories.map((category) => category.id), ['food']);
+      expect(bloc.state.categories.map((category) => category.id), [1]);
     },
   );
 
@@ -62,13 +60,12 @@ void main() {
     act: (bloc) => bloc.add(
       const CategorySavePressed(
         CategoryModel(
-          id: 'food',
+          id: 1,
           languageEn: 'Food',
           languageZh: '飲食',
           languageZhCn: '饮食',
           icon: 'food',
-          color: 'coral',
-          kind: CategoryKind.expense,
+          type: CategoryKind.expense,
           sortOrder: 0,
         ),
       ),
@@ -86,11 +83,10 @@ void main() {
     act: (bloc) => bloc.add(
       const CategorySavePressed(
         CategoryModel(
-          id: 'blank',
+          id: 3,
           name: ' ',
           icon: 'other',
-          color: 'slate',
-          kind: CategoryKind.expense,
+          type: CategoryKind.expense,
           sortOrder: 0,
         ),
       ),
@@ -109,7 +105,7 @@ void main() {
     setUp: () {
       repository.categories.add(food);
     },
-    act: (bloc) => bloc.add(const CategoryDeletePressed('food')),
+    act: (bloc) => bloc.add(const CategoryDeletePressed(1)),
     verify: (bloc) {
       expect(bloc.state.categories, isEmpty);
     },

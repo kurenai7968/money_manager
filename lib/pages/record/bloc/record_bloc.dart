@@ -1,6 +1,5 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:money_manager/pages/record/models/amount_expression.dart';
-import 'package:money_manager/core/utils/id.dart';
 import 'package:money_manager/services/account_book_service.dart';
 import 'package:money_manager/models/account_book_model.dart';
 import 'package:money_manager/models/account_model.dart';
@@ -13,10 +12,9 @@ import 'package:money_manager/pages/record/bloc/record_state.dart';
 class RecordBloc extends Bloc<RecordEvent, RecordState> {
   final AccountBookService _accountBook;
   final DateTime Function() _now;
-  String? _transactionId;
+  int? _transactionId;
   TransactionType? _initialType;
-  String? _initialAccountId;
-  String? _draftId;
+  int? _initialAccountId;
   var _opened = false;
   var _existingReady = false;
   List<AccountModel> _accountRows = const [];
@@ -83,7 +81,7 @@ class RecordBloc extends Bloc<RecordEvent, RecordState> {
           break;
         }
       }
-      if (selected != null && selected.kind.name != next.name) {
+      if (selected != null && selected.type.name != next.name) {
         categoryId = null;
         clearCategory = true;
       }
@@ -231,14 +229,13 @@ class RecordBloc extends Bloc<RecordEvent, RecordState> {
       emit(state.copyWith(status: RecordStatus.failure, error: error));
       return;
     }
-    _draftId ??= _transactionId ?? createId();
     final type = state.type;
     try {
-      await _accountBook.saveTransaction(
+      _transactionId = await _accountBook.saveTransaction(
         TransactionModel(
-          id: _draftId!,
+          id: _transactionId,
           type: type,
-          amountMinor: state.result!,
+          amount: state.result!,
           date: state.date,
           note: state.note,
           accountId: type == TransactionType.transfer ? null : state.accountId,
@@ -286,7 +283,7 @@ class RecordBloc extends Bloc<RecordEvent, RecordState> {
   RecordState _refresh(RecordState current) {
     final loaded = [
       for (final account in _accountRows)
-        if (!account.archived) account,
+        if (account.isActive) account,
     ];
     var next = current;
 
@@ -322,7 +319,9 @@ class RecordBloc extends Bloc<RecordEvent, RecordState> {
           clearFromId: existing.fromAccountId == null,
           toId: existing.toAccountId,
           clearToId: existing.toAccountId == null,
-          expression: AmountExpression.fromMinor(existing.amountMinor),
+          expression: AmountExpression.fromMinor(
+            (existing.amount * 100).round(),
+          ),
         );
         _existingReady = true;
       }
@@ -343,7 +342,7 @@ class RecordBloc extends Bloc<RecordEvent, RecordState> {
   RecordState _withCategories(RecordState current, List<AccountModel> loaded) {
     final visible = [
       for (final category in _categoryRows)
-        if (!category.archived && category.kind.name == current.type.name)
+        if (category.isActive && category.type.name == current.type.name)
           category,
     ]..sort((a, b) => a.sortOrder.compareTo(b.sortOrder));
     var categoryId = current.categoryId;
@@ -371,23 +370,26 @@ class RecordBloc extends Bloc<RecordEvent, RecordState> {
     );
   }
 
-  String _accountOn(List<AccountModel> loaded, String? preferred) {
+  int _accountOn(List<AccountModel> loaded, int? preferred) {
     for (final account in loaded) {
-      if (account.id == preferred) {
-        return account.id;
+      if (account.id != null && account.id == preferred) {
+        return account.id!;
       }
     }
-    return loaded.first.id;
+    return loaded.first.id!;
   }
 
-  RecordError? _validationError(int? amount, List<AccountModel> loaded) {
+  RecordError? _validationError(double? amount, List<AccountModel> loaded) {
     if (loaded.isEmpty) {
       return RecordError.needAccount;
     }
     if (amount == null || amount <= 0) {
       return RecordError.invalid;
     }
-    final known = loaded.map((account) => account.id).toSet();
+    final known = <int>{
+      for (final account in loaded)
+        if (account.id != null) account.id!,
+    };
     if (state.type == TransactionType.transfer) {
       final fromId = state.fromId;
       final toId = state.toId;

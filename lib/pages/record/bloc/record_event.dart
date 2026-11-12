@@ -10,9 +10,9 @@ sealed class RecordEvent extends Equatable {
 }
 
 class RecordInitialized extends RecordEvent {
-  final String? transactionId;
+  final int? transactionId;
   final TransactionType? initialType;
-  final String? initialAccountId;
+  final int? initialAccountId;
 
   const RecordInitialized({
     this.transactionId,
@@ -52,7 +52,7 @@ class RecordNoteChanged extends RecordEvent {
 }
 
 class RecordAccountSelected extends RecordEvent {
-  final String accountId;
+  final int accountId;
 
   const RecordAccountSelected(this.accountId);
 
@@ -61,7 +61,7 @@ class RecordAccountSelected extends RecordEvent {
 }
 
 class RecordCategorySelected extends RecordEvent {
-  final String categoryId;
+  final int categoryId;
 
   const RecordCategorySelected(this.categoryId);
 
@@ -70,7 +70,7 @@ class RecordCategorySelected extends RecordEvent {
 }
 
 class RecordTransferFromSelected extends RecordEvent {
-  final String accountId;
+  final int accountId;
 
   const RecordTransferFromSelected(this.accountId);
 
@@ -79,7 +79,7 @@ class RecordTransferFromSelected extends RecordEvent {
 }
 
 class RecordTransferToSelected extends RecordEvent {
-  final String accountId;
+  final int accountId;
 
   const RecordTransferToSelected(this.accountId);
 

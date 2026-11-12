@@ -7,10 +7,10 @@ import 'package:money_manager/widgets/account_book_sheet.dart';
 
 class RecordTransferFields extends StatelessWidget {
   final List<AccountModel> accounts;
-  final String? fromId;
-  final String? toId;
-  final ValueChanged<String> onFrom;
-  final ValueChanged<String> onTo;
+  final int? fromId;
+  final int? toId;
+  final ValueChanged<int> onFrom;
+  final ValueChanged<int> onTo;
 
   const RecordTransferFields({
     required this.accounts,
@@ -53,17 +53,17 @@ class RecordTransferFields extends StatelessWidget {
     );
   }
 
-  String _name(String? id, String fallback, String languageCode) {
+  String _name(int? id, String fallback, String languageCode) {
     final match = accounts.where((account) => account.id == id);
     return match.isEmpty ? fallback : match.first.labelFor(languageCode);
   }
 
   Future<void> _pick(
     BuildContext context,
-    ValueChanged<String> onSelected,
-    String? selectedId,
+    ValueChanged<int> onSelected,
+    int? selectedId,
   ) async {
-    final selected = await showAccountBookSheet<String>(
+    final selected = await showAccountBookSheet<int>(
       context: context,
       maxHeightFactor: 0.5,
       builder: (context) =>

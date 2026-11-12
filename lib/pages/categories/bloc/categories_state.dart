@@ -17,7 +17,7 @@ class CategoriesState extends Equatable {
   });
 
   List<CategoryModel> get active =>
-      categories.where((category) => !category.archived).toList();
+      categories.where((category) => category.isActive).toList();
 
   CategoriesState copyWith({
     CategoriesStatus? status,

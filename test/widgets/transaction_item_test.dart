@@ -19,27 +19,26 @@ const _delegates = [
 ];
 
 const _food = CategoryModel(
-  id: 'food',
+  id: 1,
   name: 'Food',
   icon: 'food',
-  color: 'coral',
-  kind: CategoryKind.expense,
+  type: CategoryKind.expense,
   sortOrder: 0,
 );
 
 const _cash = AccountModel(
-  id: 'cash',
+  id: 2,
   name: 'Cash',
   type: AccountType.cash,
-  openingBalanceMinor: 0,
+  icon: 'other',
   sortOrder: 0,
 );
 
 const _card = AccountModel(
-  id: 'card',
+  id: 3,
   name: 'Card',
   type: AccountType.credit,
-  openingBalanceMinor: 0,
+  icon: 'other',
   sortOrder: 1,
 );
 
@@ -50,9 +49,9 @@ void main() {
     await _pumpItem(
       tester,
       transaction: TransactionModel(
-        id: 'lunch',
+        id: 4,
         type: TransactionType.expense,
-        amountMinor: 8800,
+        amount: 88.0,
         date: DateTime(2026, 10, 30),
         note: 'Lunch #work',
         accountId: _cash.id,
@@ -81,12 +80,12 @@ void main() {
     await _pumpItem(
       tester,
       transaction: TransactionModel(
-        id: 'move',
+        id: 5,
         type: TransactionType.transfer,
-        amountMinor: 2000,
+        amount: 20.0,
         date: DateTime(2026, 10, 30),
-        fromAccountId: 'cash',
-        toAccountId: 'card',
+        fromAccountId: 2,
+        toAccountId: 3,
       ),
       categories: const [],
       accounts: const [_cash, _card],
@@ -109,9 +108,9 @@ void main() {
     await _pumpItem(
       tester,
       transaction: TransactionModel(
-        id: 'opening-cash',
+        id: 6,
         type: TransactionType.income,
-        amountMinor: 5000,
+        amount: 50.0,
         date: DateTime(2026, 10, 30),
         accountId: _cash.id,
       ),
@@ -136,19 +135,19 @@ void main() {
           body: TransactionList(
             transactions: [
               TransactionModel(
-                id: 'lunch',
+                id: 4,
                 type: TransactionType.expense,
-                amountMinor: 8800,
+                amount: 88.0,
                 date: DateTime(2026, 10, 30),
                 categoryId: _food.id,
                 accountId: _cash.id,
               ),
               TransactionModel(
-                id: 'pay',
+                id: 7,
                 type: TransactionType.income,
-                amountMinor: 100,
+                amount: 1.0,
                 date: DateTime(2026, 10, 29),
-                accountId: 'cash',
+                accountId: 2,
               ),
             ],
             categories: const [_food],
@@ -178,9 +177,9 @@ void main() {
     await _pumpItem(
       tester,
       transaction: TransactionModel(
-        id: 'lunch',
+        id: 4,
         type: TransactionType.expense,
-        amountMinor: 123456,
+        amount: 1234.56,
         date: DateTime(2026, 10, 30),
         note: 'A very long note that should stay on one line',
         accountId: _cash.id,
@@ -188,20 +187,19 @@ void main() {
       ),
       categories: const [
         CategoryModel(
-          id: 'food',
+          id: 1,
           name: 'A very long category name',
           icon: 'food',
-          color: 'coral',
-          kind: CategoryKind.expense,
+          type: CategoryKind.expense,
           sortOrder: 0,
         ),
       ],
       accounts: const [
         AccountModel(
-          id: 'cash',
+          id: 2,
           name: 'A very long account name',
           type: AccountType.cash,
-          openingBalanceMinor: 0,
+          icon: 'other',
           sortOrder: 0,
         ),
       ],
@@ -219,22 +217,22 @@ void main() {
       tester,
       accounts: const [
         AccountModel(
-          id: 'cash',
+          id: 2,
           name: 'Wallet',
           type: AccountType.cash,
-          openingBalanceMinor: 0,
+          icon: 'other',
           sortOrder: 0,
         ),
       ],
       categories: const [_food],
       transactions: [
         TransactionModel(
-          id: 'lunch',
+          id: 4,
           type: TransactionType.expense,
-          amountMinor: 8800,
+          amount: 88.0,
           date: DateTime(now.year, now.month, now.day),
           note: 'Lunch #work',
-          accountId: 'cash',
+          accountId: 2,
           categoryId: _food.id,
         ),
       ],

@@ -1,7 +1,5 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:money_manager/core/utils/id.dart';
 import 'package:money_manager/services/account_book_service.dart';
-import 'package:money_manager/core/utils/money_format.dart';
 import 'package:money_manager/models/account_model.dart';
 import 'package:money_manager/pages/accounts/bloc/account_form_event.dart';
 import 'package:money_manager/pages/accounts/bloc/account_form_state.dart';
@@ -15,18 +13,18 @@ class AccountFormBloc extends Bloc<AccountFormEvent, AccountFormState> {
   String? _languageEn;
   String? _languageZh;
   String? _languageZhCn;
-  var _locale = 'en';
   List<AccountModel> _accountRows = const [];
-  Map<String, int> _balances = const {};
+  Map<int, double> _balances = const {};
 
   AccountFormBloc({
     required AccountRepository accounts,
     required AccountBookService accountBook,
   }) : _accounts = accounts,
        _accountBook = accountBook,
-       super(AccountFormState(accountId: createId())) {
+       super(const AccountFormState()) {
     on<AccountFormInitialized>(_onInitialized);
     on<AccountFormTypeSelected>(_onTypeSelected);
+    on<AccountFormIconSelected>(_onIconSelected);
     on<AccountFormSavePressed>(_onSave);
     on<AccountFormArchivePressed>(_onArchive);
   }
@@ -35,7 +33,6 @@ class AccountFormBloc extends Bloc<AccountFormEvent, AccountFormState> {
     AccountFormInitialized event,
     Emitter<AccountFormState> emit,
   ) async {
-    _locale = event.locale;
     _languageCode = event.languageCode;
     final next = state.copyWith(
       editing: event.accountId != null,
@@ -48,7 +45,10 @@ class AccountFormBloc extends Bloc<AccountFormEvent, AccountFormState> {
     try {
       final loaded = await _accountBook.loadAccounts();
       _accountRows = [for (final book in loaded) book.account];
-      _balances = {for (final book in loaded) book.account.id: book.balance};
+      _balances = {
+        for (final book in loaded)
+          if (book.account.id != null) book.account.id!: book.balance,
+      };
     } catch (_) {
       _accountRows = const [];
       _balances = const {};
@@ -61,6 +61,13 @@ class AccountFormBloc extends Bloc<AccountFormEvent, AccountFormState> {
     Emitter<AccountFormState> emit,
   ) {
     emit(state.copyWith(type: event.type));
+  }
+
+  void _onIconSelected(
+    AccountFormIconSelected event,
+    Emitter<AccountFormState> emit,
+  ) {
+    emit(state.copyWith(icon: event.icon));
   }
 
   Future<void> _onSave(
@@ -77,16 +84,6 @@ class AccountFormBloc extends Bloc<AccountFormEvent, AccountFormState> {
       );
       return;
     }
-    final minor = parseAmountMinor(event.balanceText);
-    if (minor == null) {
-      emit(
-        state.copyWith(
-          status: AccountFormStatus.failure,
-          error: AccountFormError.amountInvalid,
-        ),
-      );
-      return;
-    }
     final code = event.languageCode;
     final account = AccountModel(
       id: state.accountId,
@@ -97,9 +94,9 @@ class AccountFormBloc extends Bloc<AccountFormEvent, AccountFormState> {
           ? (code == 'zh_CN' ? name : _languageZhCn)
           : null,
       type: state.type,
-      openingBalanceMinor: minor,
+      icon: state.icon,
       sortOrder: state.sortOrder,
-      archived: state.archived,
+      isActive: state.isActive,
     );
     if (!account.hasLabel) {
       emit(
@@ -111,10 +108,10 @@ class AccountFormBloc extends Bloc<AccountFormEvent, AccountFormState> {
       return;
     }
     try {
-      await _accounts.save(account);
-      await _accountBook.syncOpeningTransactions([account]);
+      final id = await _accounts.save(account);
       emit(
         state.copyWith(
+          accountId: id,
           status: AccountFormStatus.success,
           error: AccountFormError.none,
           saved: true,
@@ -129,9 +126,13 @@ class AccountFormBloc extends Bloc<AccountFormEvent, AccountFormState> {
     AccountFormArchivePressed event,
     Emitter<AccountFormState> emit,
   ) async {
+    final id = state.accountId;
+    if (id == null) {
+      return;
+    }
     AccountModel? account;
     for (final item in _accountRows) {
-      if (item.id == state.accountId) {
+      if (item.id == id) {
         account = item;
         break;
       }
@@ -139,7 +140,7 @@ class AccountFormBloc extends Bloc<AccountFormEvent, AccountFormState> {
     if (account == null) {
       return;
     }
-    final balance = _balances[account.id] ?? account.openingBalanceMinor;
+    final balance = _balances[id] ?? 0;
     if (balance != 0) {
       emit(
         state.copyWith(
@@ -150,7 +151,7 @@ class AccountFormBloc extends Bloc<AccountFormEvent, AccountFormState> {
       return;
     }
     try {
-      await _accounts.archive(account.id);
+      await _accounts.archive(id);
       emit(
         state.copyWith(
           status: AccountFormStatus.success,
@@ -186,17 +187,14 @@ class AccountFormBloc extends Bloc<AccountFormEvent, AccountFormState> {
           prepared: true,
           editing: true,
           type: existing.type,
+          icon: existing.icon,
           sortOrder: existing.sortOrder,
-          archived: existing.archived,
+          isActive: existing.isActive,
           localized:
               existing.languageEn != null ||
               existing.languageZh != null ||
               existing.languageZhCn != null,
           name: existing.labelFor(code),
-          balanceText: formatMinor(
-            existing.openingBalanceMinor,
-            locale: _locale,
-          ).replaceAll(',', ''),
         ),
       );
       return;

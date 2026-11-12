@@ -11,10 +11,9 @@ extension CategoryEntityMapping on CategoryEntity {
       languageZh: languageZh,
       languageZhCn: languageZhCn,
       icon: icon,
-      color: color,
-      kind: CategoryKind.values.byName(kind),
+      type: CategoryKind.values.byName(type),
       sortOrder: sortOrder,
-      archived: archived,
+      isActive: isActive,
     );
   }
 }
@@ -28,10 +27,9 @@ extension CategoryModelMapping on CategoryModel {
       languageZh: languageZh,
       languageZhCn: languageZhCn,
       icon: icon,
-      color: color,
-      kind: kind.name,
+      type: type.name,
       sortOrder: sortOrder,
-      archived: archived,
+      isActive: isActive,
     );
   }
 }

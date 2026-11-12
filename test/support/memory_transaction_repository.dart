@@ -3,15 +3,16 @@ import 'package:money_manager/repositories/transaction_repository.dart';
 
 class MemoryTransactionRepository implements TransactionRepository {
   final List<TransactionModel> transactions = [];
-  final Set<String> usedCategories = {};
+  final Set<int> usedCategories = {};
+  var _nextId = 1;
 
   @override
-  Future<int> countForCategory(String categoryId) async {
+  Future<int> countForCategory(int categoryId) async {
     return usedCategories.contains(categoryId) ? 1 : 0;
   }
 
   @override
-  Future<void> delete(String id) async {
+  Future<void> delete(int id) async {
     transactions.removeWhere((item) => item.id == id);
   }
 
@@ -19,8 +20,14 @@ class MemoryTransactionRepository implements TransactionRepository {
   Future<List<TransactionModel>> getAll() async => [...transactions];
 
   @override
-  Future<void> save(TransactionModel transaction) async {
-    transactions.removeWhere((item) => item.id == transaction.id);
-    transactions.add(transaction);
+  Future<int> save(TransactionModel transaction) async {
+    final id = transaction.id ?? _nextId++;
+    if (id >= _nextId) {
+      _nextId = id + 1;
+    }
+    final saved = transaction.copyWith(id: id);
+    transactions.removeWhere((item) => item.id == id);
+    transactions.add(saved);
+    return id;
   }
 }

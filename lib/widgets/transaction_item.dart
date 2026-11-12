@@ -56,7 +56,7 @@ class TransactionList extends StatelessWidget {
       entries.add(
         _DayHeaderEntry(
           day: group.day,
-          expenseMinor: group.expenseMinor,
+          expense: group.expense,
           first: index == 0,
         ),
       );
@@ -75,10 +75,10 @@ class TransactionList extends StatelessWidget {
       itemBuilder: (context, index) {
         final entry = entries[index];
         return switch (entry) {
-          _DayHeaderEntry(:final day, :final expenseMinor, :final first) =>
+          _DayHeaderEntry(:final day, :final expense, :final first) =>
             _TransactionDayHeader(
               day: day,
-              expenseMinor: expenseMinor,
+              expense: expense,
               locale: locale,
               first: first,
             ),
@@ -111,8 +111,8 @@ class TransactionItem extends StatelessWidget {
   final List<CategoryModel> categories;
   final List<AccountModel> accounts;
   final String locale;
-  final Map<String, CategoryModel>? categoriesById;
-  final Map<String, AccountModel>? accountsById;
+  final Map<int, CategoryModel>? categoriesById;
+  final Map<int, AccountModel>? accountsById;
 
   const TransactionItem({
     required this.transaction,
@@ -176,7 +176,7 @@ class TransactionItem extends StatelessWidget {
                           maxLines: 1,
                           style: Theme.of(context).textTheme.titleMedium
                               ?.copyWith(
-                                color: _amountColor(context, category),
+                                color: _amountColor(context),
                               ),
                         ),
                       ],
@@ -242,7 +242,7 @@ class TransactionItem extends StatelessWidget {
   }
 
   String _accountLabel(String languageCode) {
-    String nameOf(String? id) {
+    String nameOf(int? id) {
       if (id == null) {
         return '';
       }
@@ -273,28 +273,25 @@ class TransactionItem extends StatelessWidget {
   }
 
   String _amount() {
-    final minor = transaction.amountMinor;
+    final amount = transaction.amount;
     if (transaction.type == TransactionType.transfer) {
-      return formatMinor(minor, locale: locale);
+      return formatAmount(amount, locale: locale);
     }
-    return formatMinor(
-      transaction.type == TransactionType.expense ? -minor : minor,
+    return formatAmount(
+      transaction.type == TransactionType.expense ? -amount : amount,
       locale: locale,
       signed: true,
     );
   }
 
-  Color _amountColor(BuildContext context, CategoryModel? category) {
+  Color _amountColor(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
     if (transaction.type == TransactionType.transfer) {
       return scheme.onSurface;
     }
-    if (category != null) {
-      return AccountBookPalette.color(category.color);
-    }
-    return transaction.type == TransactionType.income
-        ? AccountBookPalette.green
-        : scheme.primary;
+    return AccountBookPalette.directionColor(
+      income: transaction.type == TransactionType.income,
+    );
   }
 }
 
@@ -313,7 +310,9 @@ class _TransactionIcon extends StatelessWidget {
     final known = category;
     if (known != null) {
       icon = AccountBookPalette.icon(known.icon);
-      background = AccountBookPalette.color(known.color);
+      background = AccountBookPalette.directionColor(
+        income: type == TransactionType.income,
+      );
       foreground = scheme.onPrimary;
     } else {
       background = scheme.surfaceContainerHighest;
@@ -375,13 +374,13 @@ class _NoteText extends StatelessWidget {
 
 class _TransactionDayHeader extends StatelessWidget {
   final DateTime day;
-  final int expenseMinor;
+  final double expense;
   final String locale;
   final bool first;
 
   const _TransactionDayHeader({
     required this.day,
-    required this.expenseMinor,
+    required this.expense,
     required this.locale,
     required this.first,
   });
@@ -408,11 +407,11 @@ class _TransactionDayHeader extends StatelessWidget {
               style: style,
             ),
           ),
-          if (expenseMinor > 0) ...[
+          if (expense > 0) ...[
             const SizedBox(width: AppSpacing.s),
             Flexible(
               child: Text(
-                '${context.l10n.expense} ${formatMinor(expenseMinor, locale: locale)}',
+                '${context.l10n.expense} ${formatAmount(expense, locale: locale)}',
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
                 style: style,
@@ -431,11 +430,11 @@ class _DayGroup {
 
   _DayGroup(this.day, this.items);
 
-  int get expenseMinor {
-    var total = 0;
+  double get expense {
+    var total = 0.0;
     for (final item in items) {
       if (item.type == TransactionType.expense) {
-        total += item.amountMinor;
+        total += item.amount;
       }
     }
     return total;
@@ -446,12 +445,12 @@ sealed class _Entry {}
 
 class _DayHeaderEntry extends _Entry {
   final DateTime day;
-  final int expenseMinor;
+  final double expense;
   final bool first;
 
   _DayHeaderEntry({
     required this.day,
-    required this.expenseMinor,
+    required this.expense,
     required this.first,
   });
 }
@@ -465,10 +464,13 @@ class _TransactionEntry extends _Entry {
 
 final _noteTag = RegExp(r'#[^\s#]+');
 
-Map<String, T> _firstById<T>(List<T> items, String Function(T item) idOf) {
-  final index = <String, T>{};
+Map<int, T> _firstById<T>(List<T> items, int? Function(T item) idOf) {
+  final index = <int, T>{};
   for (final item in items) {
-    index.putIfAbsent(idOf(item), () => item);
+    final id = idOf(item);
+    if (id != null) {
+      index.putIfAbsent(id, () => item);
+    }
   }
   return index;
 }

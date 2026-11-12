@@ -3,49 +3,49 @@ import 'package:money_manager/models/account_book_kinds.dart';
 
 enum AccountFormStatus { initial, success, failure }
 
-enum AccountFormError { none, nameRequired, amountInvalid, archiveBlocked }
+enum AccountFormError { none, nameRequired, archiveBlocked }
 
 class AccountFormState extends Equatable {
   final AccountFormStatus status;
   final AccountFormError error;
-  final String accountId;
+  final int? accountId;
   final bool prepared;
   final bool editing;
   final bool saved;
   final AccountType type;
+  final String icon;
   final int sortOrder;
-  final bool archived;
+  final bool isActive;
   final String name;
-  final String balanceText;
   final bool localized;
 
   const AccountFormState({
-    required this.accountId,
+    this.accountId,
     this.status = AccountFormStatus.initial,
     this.error = AccountFormError.none,
     this.prepared = false,
     this.editing = false,
     this.saved = false,
     this.type = AccountType.cash,
+    this.icon = 'other',
     this.sortOrder = 0,
-    this.archived = false,
+    this.isActive = true,
     this.name = '',
-    this.balanceText = '',
     this.localized = false,
   });
 
   AccountFormState copyWith({
     AccountFormStatus? status,
     AccountFormError? error,
-    String? accountId,
+    int? accountId,
     bool? prepared,
     bool? editing,
     bool? saved,
     AccountType? type,
+    String? icon,
     int? sortOrder,
-    bool? archived,
+    bool? isActive,
     String? name,
-    String? balanceText,
     bool? localized,
   }) {
     return AccountFormState(
@@ -56,10 +56,10 @@ class AccountFormState extends Equatable {
       editing: editing ?? this.editing,
       saved: saved ?? this.saved,
       type: type ?? this.type,
+      icon: icon ?? this.icon,
       sortOrder: sortOrder ?? this.sortOrder,
-      archived: archived ?? this.archived,
+      isActive: isActive ?? this.isActive,
       name: name ?? this.name,
-      balanceText: balanceText ?? this.balanceText,
       localized: localized ?? this.localized,
     );
   }
@@ -73,10 +73,10 @@ class AccountFormState extends Equatable {
     editing,
     saved,
     type,
+    icon,
     sortOrder,
-    archived,
+    isActive,
     name,
-    balanceText,
     localized,
   ];
 }

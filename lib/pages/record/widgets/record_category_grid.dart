@@ -1,14 +1,15 @@
 import 'package:flutter/foundation.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:money_manager/core/extensions/context_extension.dart';
+import 'package:money_manager/models/account_book_kinds.dart';
 import 'package:money_manager/models/category_model.dart';
 import 'package:money_manager/themes/app_themes.dart';
 import 'package:money_manager/themes/account_book_palette.dart';
 
 class RecordCategoryGrid extends StatelessWidget {
   final List<CategoryModel> categories;
-  final String? selectedId;
-  final ValueChanged<String> onSelected;
+  final int? selectedId;
+  final ValueChanged<int> onSelected;
   @visibleForTesting
   static int debugBuildCount = 0;
 
@@ -62,7 +63,9 @@ class RecordCategoryGrid extends StatelessWidget {
                 final category = categories[index];
                 final selected = category.id == selectedId;
                 final label = category.labelFor(context.categoryLanguageCode);
-                final color = AccountBookPalette.color(category.color);
+                final color = AccountBookPalette.directionColor(
+                  income: category.type == CategoryKind.income,
+                );
                 final scheme = Theme.of(context).colorScheme;
                 return Semantics(
                   button: true,
@@ -77,7 +80,10 @@ class RecordCategoryGrid extends StatelessWidget {
                     child: InkWell(
                       borderRadius: BorderRadius.circular(AppRadius.m),
                       onTap: () {
-                        onSelected(category.id);
+                        final id = category.id;
+                        if (id != null) {
+                          onSelected(id);
+                        }
                         Scrollable.ensureVisible(context);
                       },
                       child: Column(

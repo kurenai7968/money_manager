@@ -5,7 +5,7 @@ import 'package:money_manager/widgets/account_book_reorder.dart';
 
 class AccountSliver extends StatefulWidget {
   final List<AccountLine> lines;
-  final ValueChanged<List<String>> onReorder;
+  final ValueChanged<List<int>> onReorder;
 
   const AccountSliver({
     required this.lines,
@@ -37,7 +37,7 @@ class _AccountSliverState extends State<AccountSliver> {
         return AccountRow(
           key: ValueKey(line.account.id),
           account: line.account,
-          balance: line.balanceMinor,
+          balance: line.balance,
           index: index,
         );
       },
@@ -58,6 +58,9 @@ class _AccountSliverState extends State<AccountSliver> {
     }
     updated.insert(target, moved);
     setState(() => _lines = updated);
-    widget.onReorder([for (final line in updated) line.account.id]);
+    widget.onReorder([
+      for (final line in updated)
+        if (line.account.id != null) line.account.id!,
+    ]);
   }
 }

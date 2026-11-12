@@ -2,7 +2,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:money_manager/core/extensions/context_extension.dart';
-import 'package:money_manager/core/utils/id.dart';
 import 'package:money_manager/models/category_model.dart';
 import 'package:money_manager/models/account_book_kinds.dart';
 import 'package:money_manager/pages/categories/bloc/categories_bloc.dart';
@@ -14,7 +13,7 @@ import 'package:money_manager/themes/account_book_palette.dart';
 import 'package:money_manager/widgets/confirm_delete_dialog.dart';
 
 class CategoryFormBody extends StatefulWidget {
-  final String? categoryId;
+  final int? categoryId;
   final CategoryKind initialKind;
 
   const CategoryFormBody({
@@ -30,10 +29,9 @@ class CategoryFormBody extends StatefulWidget {
 class _CategoryFormBodyState extends State<CategoryFormBody> {
   final _name = TextEditingController();
   String? _icon;
-  var _color = 'coral';
-  late CategoryKind _kind;
+  late CategoryKind _type;
   var _sortOrder = 0;
-  var _archived = false;
+  var _isActive = true;
   var _ready = false;
   var _waiting = false;
   String? _error;
@@ -41,7 +39,7 @@ class _CategoryFormBodyState extends State<CategoryFormBody> {
   @override
   void initState() {
     super.initState();
-    _kind = widget.initialKind;
+    _type = widget.initialKind;
   }
 
   @override
@@ -66,13 +64,12 @@ class _CategoryFormBodyState extends State<CategoryFormBody> {
       final category = existing.first;
       _name.text = category.labelFor(context.categoryLanguageCode);
       _icon = category.icon;
-      _color = category.color;
-      _kind = category.kind;
+      _type = category.type;
       _sortOrder = category.sortOrder;
-      _archived = category.archived;
+      _isActive = category.isActive;
       return;
     }
-    _sortOrder = _nextSortOrder(state.categories, _kind);
+    _sortOrder = _nextSortOrder(state.categories, _type);
   }
 
   @override
@@ -113,16 +110,16 @@ class _CategoryFormBodyState extends State<CategoryFormBody> {
                   label: Text(l10n.income),
                 ),
               ],
-              selected: {_kind},
+              selected: {_type},
               onSelectionChanged: (value) {
-                final kind = value.first;
+                final type = value.first;
                 final categories = context
                     .read<CategoriesBloc>()
                     .state
                     .categories;
                 setState(() {
-                  _kind = kind;
-                  _sortOrder = _nextSortOrder(categories, kind);
+                  _type = type;
+                  _sortOrder = _nextSortOrder(categories, type);
                 });
               },
             ),
@@ -137,25 +134,10 @@ class _CategoryFormBodyState extends State<CategoryFormBody> {
                 CategoryIconChoice(
                   iconKey: key,
                   selected: key == _icon,
-                  color: AccountBookPalette.color(_color),
-                  onPressed: () => setState(() => _icon = key),
-                ),
-            ],
-          ),
-          const SizedBox(height: AppSpacing.xl),
-          Text(l10n.color, style: Theme.of(context).textTheme.labelLarge),
-          const SizedBox(height: AppSpacing.s),
-          Wrap(
-            spacing: AppSpacing.m,
-            children: [
-              for (final key in AccountBookPalette.colorKeys)
-                IconButton(
-                  tooltip: key,
-                  onPressed: () => setState(() => _color = key),
-                  icon: Icon(
-                    key == _color ? Icons.circle : Icons.circle_outlined,
-                    color: AccountBookPalette.color(key),
+                  color: AccountBookPalette.directionColor(
+                    income: _type == CategoryKind.income,
                   ),
+                  onPressed: () => setState(() => _icon = key),
                 ),
             ],
           ),
@@ -191,13 +173,12 @@ class _CategoryFormBodyState extends State<CategoryFormBody> {
     context.read<CategoriesBloc>().add(
       CategorySavePressed(
         CategoryModel(
-          id: widget.categoryId ?? createId(),
+          id: widget.categoryId,
           name: text,
           icon: icon,
-          color: _color,
-          kind: _kind,
+          type: _type,
           sortOrder: _sortOrder,
-          archived: _archived,
+          isActive: _isActive,
         ),
       ),
     );
@@ -220,10 +201,10 @@ class _CategoryFormBodyState extends State<CategoryFormBody> {
   }
 }
 
-int _nextSortOrder(List<CategoryModel> categories, CategoryKind kind) {
+int _nextSortOrder(List<CategoryModel> categories, CategoryKind type) {
   final orders = [
     for (final category in categories)
-      if (category.kind == kind) category.sortOrder,
+      if (category.type == type) category.sortOrder,
   ];
   if (orders.isEmpty) {
     return 0;

@@ -3,7 +3,7 @@ class TransactionTable {
 
   static const id = 'id';
   static const type = 'type';
-  static const amountMinor = 'amount_minor';
+  static const amount = 'amount';
   static const date = 'date';
   static const note = 'note';
   static const accountId = 'account_id';
@@ -13,13 +13,13 @@ class TransactionTable {
 
   static const createSql =
       'CREATE TABLE $tableName ('
-      '$id TEXT PRIMARY KEY, '
+      '$id INTEGER PRIMARY KEY AUTOINCREMENT, '
       '$type TEXT NOT NULL, '
-      '$amountMinor INTEGER NOT NULL, '
+      '$amount REAL NOT NULL, '
       '$date TEXT NOT NULL, '
       '$note TEXT, '
-      '$accountId TEXT, '
-      '$categoryId TEXT, '
-      '$fromAccountId TEXT, '
-      '$toAccountId TEXT)';
+      '$accountId INTEGER, '
+      '$categoryId INTEGER, '
+      '$fromAccountId INTEGER, '
+      '$toAccountId INTEGER)';
 }

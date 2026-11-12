@@ -51,7 +51,7 @@ class HomeSummaryView extends StatelessWidget {
                           ?.copyWith(color: scheme.onSurfaceVariant),
                     ),
                     Text(
-                      formatMinor(figures.incomeMinor, locale: locale),
+                      formatAmount(figures.income, locale: locale),
                       style: Theme.of(context).textTheme.titleLarge
                           ?.copyWith(color: AccountBookPalette.green),
                     ),
@@ -69,9 +69,9 @@ class HomeSummaryView extends StatelessWidget {
                           ?.copyWith(color: scheme.onSurfaceVariant),
                     ),
                     Text(
-                      formatMinor(figures.expenseMinor, locale: locale),
+                      formatAmount(figures.expense, locale: locale),
                       style: Theme.of(context).textTheme.titleLarge
-                          ?.copyWith(color: scheme.primary),
+                          ?.copyWith(color: AccountBookPalette.coral),
                     ),
                   ],
                 ),
@@ -81,10 +81,10 @@ class HomeSummaryView extends StatelessWidget {
         ),
         const SizedBox(height: AppSpacing.xl),
         HomeMonthDonut(
-          income: figures.incomeMinor,
-          expense: figures.expenseMinor,
+          income: figures.income,
+          expense: figures.expense,
           label: l10n.monthBalance,
-          amount: formatMinor(figures.balanceMinor, locale: locale),
+          amount: formatAmount(figures.balance, locale: locale),
         ),
         Padding(
           padding: const EdgeInsets.fromLTRB(

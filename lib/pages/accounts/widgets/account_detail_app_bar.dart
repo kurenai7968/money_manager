@@ -8,7 +8,7 @@ import 'package:money_manager/widgets/base_app_bar.dart';
 
 class AccountDetailAppBar extends StatelessWidget
     implements PreferredSizeWidget {
-  final String accountId;
+  final int accountId;
 
   const AccountDetailAppBar({required this.accountId, super.key});
 

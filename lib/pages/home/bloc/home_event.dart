@@ -34,7 +34,7 @@ class HomeDaySelected extends HomeEvent {
 }
 
 class HomeAccountSelected extends HomeEvent {
-  final String? accountId;
+  final int? accountId;
 
   const HomeAccountSelected(this.accountId);
 

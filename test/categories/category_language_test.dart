@@ -10,7 +10,7 @@ void main() {
     final categories = defaultCategories();
     final food = categories.firstWhere(
       (category) =>
-          category.icon == 'food' && category.kind == CategoryKind.expense,
+          category.icon == 'food' && category.type == CategoryKind.expense,
     );
 
     expect(food.name, isNull);
@@ -25,11 +25,10 @@ void main() {
 
   test('a user category shows its name in every language', () {
     const category = CategoryModel(
-      id: 'rent',
+      id: 1,
       name: 'Rent',
       icon: 'other',
-      color: 'slate',
-      kind: CategoryKind.expense,
+      type: CategoryKind.expense,
       sortOrder: 0,
     );
 

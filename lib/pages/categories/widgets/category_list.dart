@@ -2,6 +2,7 @@ import 'package:material_ui/material_ui.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:money_manager/core/extensions/context_extension.dart';
+import 'package:money_manager/models/account_book_kinds.dart';
 import 'package:money_manager/models/category_model.dart';
 import 'package:money_manager/pages/categories/bloc/categories_bloc.dart';
 import 'package:money_manager/pages/categories/bloc/categories_event.dart';
@@ -44,9 +45,16 @@ class _CategoryListState extends State<CategoryList> {
         final category = _categories[index];
         return ListTile(
           key: ValueKey(category.id),
-          onTap: () => context.push(AppRoutes.editCategory(category.id)),
+          onTap: () {
+            final id = category.id;
+            if (id != null) {
+              context.push(AppRoutes.editCategory(id));
+            }
+          },
           leading: CircleAvatar(
-            backgroundColor: AccountBookPalette.color(category.color),
+            backgroundColor: AccountBookPalette.directionColor(
+              income: category.type == CategoryKind.income,
+            ),
             child: Icon(
               AccountBookPalette.icon(category.icon),
               color: Theme.of(context).colorScheme.onPrimary,
@@ -82,8 +90,9 @@ class _CategoryListState extends State<CategoryList> {
     updated.insert(target, moved);
     setState(() => _categories = updated);
     context.read<CategoriesBloc>().add(
-      CategoriesReorderPressed(moved.kind, [
-        for (final category in updated) category.id,
+      CategoriesReorderPressed(moved.type, [
+        for (final category in updated)
+          if (category.id != null) category.id!,
       ]),
     );
   }

@@ -17,40 +17,36 @@ import '../support/memory_category_repository.dart';
 import '../support/memory_transaction_repository.dart';
 
 const _food = CategoryModel(
-  id: 'food',
+  id: 1,
   name: 'Food',
   icon: 'food',
-  color: 'coral',
-  kind: CategoryKind.expense,
+  type: CategoryKind.expense,
   sortOrder: 0,
 );
 
 const _transit = CategoryModel(
-  id: 'transit',
+  id: 2,
   name: 'Transit',
   icon: 'transit',
-  color: 'blue',
-  kind: CategoryKind.expense,
+  type: CategoryKind.expense,
   sortOrder: 1,
 );
 
 const _salary = CategoryModel(
-  id: 'salary',
+  id: 3,
   name: 'Salary',
   icon: 'salary',
-  color: 'green',
-  kind: CategoryKind.income,
+  type: CategoryKind.income,
   sortOrder: 0,
 );
 
 const _localizedFood = CategoryModel(
-  id: 'food',
+  id: 1,
   languageEn: 'Food',
   languageZh: '飲食',
   languageZhCn: '饮食',
   icon: 'food',
-  color: 'coral',
-  kind: CategoryKind.expense,
+  type: CategoryKind.expense,
   sortOrder: 0,
 );
 
@@ -89,9 +85,9 @@ void main() {
     final saved = await categories.getAll();
     expect(
       saved
-          .where((category) => category.kind == CategoryKind.expense)
+          .where((category) => category.type == CategoryKind.expense)
           .map((category) => category.id),
-      ['transit', 'food'],
+      [2, 1],
     );
   });
 
@@ -179,7 +175,7 @@ void main() {
 
   testWidgets('editing a default category keeps one name', (tester) async {
     final categories = _repository([_localizedFood]);
-    await _pumpForm(tester, categories, categoryId: 'food');
+    await _pumpForm(tester, categories, categoryId: 1);
 
     expect(_iconSelected(tester, 'food'), isTrue);
     expect(find.text('Food'), findsOneWidget);
@@ -200,7 +196,7 @@ void main() {
 
   testWidgets('deleting a category asks for confirmation', (tester) async {
     final categories = _repository([_food]);
-    await _pumpForm(tester, categories, categoryId: 'food');
+    await _pumpForm(tester, categories, categoryId: 1);
 
     await tester.ensureVisible(find.text('Delete'));
     await tester.tap(find.text('Delete'));
@@ -268,7 +264,7 @@ Future<void> _pumpPage(
 Future<void> _pumpForm(
   WidgetTester tester,
   MemoryCategoryRepository categories, {
-  String? categoryId,
+  int? categoryId,
 }) async {
   final router = GoRouter(
     routes: [

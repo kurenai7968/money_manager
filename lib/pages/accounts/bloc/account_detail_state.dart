@@ -8,7 +8,7 @@ enum AccountDetailStatus { initial, success, failure }
 class AccountDetailState extends Equatable {
   final AccountDetailStatus status;
   final AccountModel? account;
-  final int balanceMinor;
+  final double balance;
   final List<TransactionModel> history;
   final List<CategoryModel> categories;
   final List<AccountModel> accounts;
@@ -16,7 +16,7 @@ class AccountDetailState extends Equatable {
   const AccountDetailState({
     this.status = AccountDetailStatus.initial,
     this.account,
-    this.balanceMinor = 0,
+    this.balance = 0,
     this.history = const [],
     this.categories = const [],
     this.accounts = const [],
@@ -26,7 +26,7 @@ class AccountDetailState extends Equatable {
     AccountDetailStatus? status,
     AccountModel? account,
     bool clearAccount = false,
-    int? balanceMinor,
+    double? balance,
     List<TransactionModel>? history,
     List<CategoryModel>? categories,
     List<AccountModel>? accounts,
@@ -34,7 +34,7 @@ class AccountDetailState extends Equatable {
     return AccountDetailState(
       status: status ?? this.status,
       account: clearAccount ? null : account ?? this.account,
-      balanceMinor: balanceMinor ?? this.balanceMinor,
+      balance: balance ?? this.balance,
       history: history ?? this.history,
       categories: categories ?? this.categories,
       accounts: accounts ?? this.accounts,
@@ -45,7 +45,7 @@ class AccountDetailState extends Equatable {
   List<Object?> get props => [
     status,
     account,
-    balanceMinor,
+    balance,
     history,
     categories,
     accounts,

@@ -8,7 +8,7 @@ import 'package:money_manager/pages/categories/widgets/category_form_app_bar.dar
 import 'package:money_manager/pages/categories/widgets/category_form_body.dart';
 
 class CategoryFormPage extends StatelessWidget {
-  final String? categoryId;
+  final int? categoryId;
   final CategoryKind initialKind;
 
   const CategoryFormPage({

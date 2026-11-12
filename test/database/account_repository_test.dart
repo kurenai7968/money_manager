@@ -13,10 +13,10 @@ void main() {
     await openTestDatabase();
     final repository = AccountRepositoryImpl(database: AppDatabase.instance);
     const account = AccountModel(
-      id: 'bank',
+      id: 1,
       name: 'Bank',
       type: AccountType.bank,
-      openingBalanceMinor: 7200000,
+      icon: 'other',
       sortOrder: 1,
     );
 
@@ -30,12 +30,12 @@ void main() {
     await openTestDatabase();
     final repository = AccountRepositoryImpl(database: AppDatabase.instance);
     const cash = AccountModel(
-      id: 'cash',
+      id: 1,
       languageEn: 'Cash',
       languageZh: '現金',
       languageZhCn: '现金',
       type: AccountType.cash,
-      openingBalanceMinor: 0,
+      icon: 'other',
       sortOrder: 0,
     );
 
@@ -52,121 +52,68 @@ void main() {
       database: AppDatabase.instance,
     );
     const cash = AccountModel(
-      id: 'cash',
+      id: 1,
       name: 'Cash',
       type: AccountType.cash,
-      openingBalanceMinor: 10000,
+      icon: 'other',
       sortOrder: 0,
     );
     const card = AccountModel(
-      id: 'card',
+      id: 2,
       name: 'Card',
       type: AccountType.credit,
-      openingBalanceMinor: 0,
+      icon: 'other',
       sortOrder: 1,
     );
     const old = AccountModel(
-      id: 'old',
+      id: 3,
       name: 'Old',
       type: AccountType.bank,
-      openingBalanceMinor: 500,
+      icon: 'other',
       sortOrder: 2,
-      archived: true,
+      isActive: false,
     );
     await accounts.save(cash);
     await accounts.save(card);
     await accounts.save(old);
     await transactions.save(
       TransactionModel(
-        id: 'meal',
+        id: 4,
         type: TransactionType.expense,
-        amountMinor: 2000,
+        amount: 20.0,
         date: DateTime(2026, 10, 23),
-        accountId: 'card',
-        categoryId: 'food',
+        accountId: 2,
+        categoryId: 8,
       ),
     );
     await transactions.save(
       TransactionModel(
-        id: 'pay',
+        id: 5,
         type: TransactionType.transfer,
-        amountMinor: 2000,
+        amount: 20.0,
         date: DateTime(2026, 10, 24),
-        fromAccountId: 'cash',
-        toAccountId: 'card',
+        fromAccountId: 1,
+        toAccountId: 2,
+      ),
+    );
+    await transactions.save(
+      TransactionModel(
+        id: 6,
+        type: TransactionType.income,
+        amount: 5.0,
+        date: DateTime(2026, 10, 25),
+        accountId: 3,
       ),
     );
 
     final balances = await accounts.balances();
 
-    expect(balances.balanceById, {'cash': 8000, 'card': 0, 'old': 500});
-    expect(balances.netWorth, 8000);
-    expect(balances.accounts.map((account) => account.id), [
-      'cash',
-      'card',
-      'old',
-    ]);
+    expect(balances.balanceById, {1: -20, 2: 0, 3: 5});
+    expect(balances.netWorth, -20);
+    expect(balances.accounts.map((account) => account.id), [1, 2, 3]);
   });
 
-  test('counts an opening transaction once', () async {
-    await openTestDatabase();
-    final accounts = AccountRepositoryImpl(database: AppDatabase.instance);
-    final transactions = TransactionRepositoryImpl(
-      database: AppDatabase.instance,
-    );
-    const cash = AccountModel(
-      id: 'cash',
-      name: 'Cash',
-      type: AccountType.cash,
-      openingBalanceMinor: 10000,
-      sortOrder: 0,
-    );
-    const card = AccountModel(
-      id: 'card',
-      name: 'Card',
-      type: AccountType.credit,
-      openingBalanceMinor: 1200,
-      sortOrder: 1,
-    );
-    await accounts.save(cash);
-    await accounts.save(card);
-    await transactions.save(
-      TransactionModel(
-        id: 'opening-cash',
-        type: TransactionType.income,
-        amountMinor: 10000,
-        date: DateTime(2026, 10, 1),
-        accountId: 'cash',
-      ),
-    );
-    await transactions.save(
-      TransactionModel(
-        id: 'meal',
-        type: TransactionType.expense,
-        amountMinor: 2000,
-        date: DateTime(2026, 10, 2),
-        accountId: 'cash',
-        categoryId: 'food',
-      ),
-    );
-    await transactions.save(
-      TransactionModel(
-        id: 'opening-card',
-        type: TransactionType.income,
-        amountMinor: 1200,
-        date: DateTime(2026, 10, 1),
-        accountId: 'card',
-      ),
-    );
-
-    final balances = await accounts.balances();
-
-    expect(balances.balanceById['cash'], 8000);
-    expect(balances.balanceById['card'], 1200);
-    expect(balances.netWorth, 8000 - 1200);
-  });
-
-  test('counts a negative opening expense once', () async {
+  test('counts income and expense from transactions', () async {
     await openTestDatabase();
     final accounts = AccountRepositoryImpl(database: AppDatabase.instance);
     final transactions = TransactionRepositoryImpl(
@@ -174,26 +121,86 @@ void main() {
     );
     await accounts.save(
       const AccountModel(
-        id: 'cash',
+        id: 1,
         name: 'Cash',
         type: AccountType.cash,
-        openingBalanceMinor: -500,
+        icon: 'other',
         sortOrder: 0,
+      ),
+    );
+    await accounts.save(
+      const AccountModel(
+        id: 2,
+        name: 'Card',
+        type: AccountType.credit,
+        icon: 'other',
+        sortOrder: 1,
       ),
     );
     await transactions.save(
       TransactionModel(
-        id: 'opening-cash',
-        type: TransactionType.expense,
-        amountMinor: 500,
+        id: 3,
+        type: TransactionType.income,
+        amount: 100.0,
         date: DateTime(2026, 10, 1),
-        accountId: 'cash',
+        accountId: 1,
+      ),
+    );
+    await transactions.save(
+      TransactionModel(
+        id: 4,
+        type: TransactionType.expense,
+        amount: 20.0,
+        date: DateTime(2026, 10, 2),
+        accountId: 1,
+        categoryId: 8,
+      ),
+    );
+    await transactions.save(
+      TransactionModel(
+        id: 5,
+        type: TransactionType.expense,
+        amount: 12.0,
+        date: DateTime(2026, 10, 1),
+        accountId: 2,
       ),
     );
 
     final balances = await accounts.balances();
 
-    expect(balances.balanceById['cash'], -500);
-    expect(balances.netWorth, -500);
+    expect(balances.balanceById[1], 80);
+    expect(balances.balanceById[2], 12);
+    expect(balances.netWorth, 68);
+  });
+
+  test('counts an expense as a negative cash balance', () async {
+    await openTestDatabase();
+    final accounts = AccountRepositoryImpl(database: AppDatabase.instance);
+    final transactions = TransactionRepositoryImpl(
+      database: AppDatabase.instance,
+    );
+    await accounts.save(
+      const AccountModel(
+        id: 1,
+        name: 'Cash',
+        type: AccountType.cash,
+        icon: 'other',
+        sortOrder: 0,
+      ),
+    );
+    await transactions.save(
+      TransactionModel(
+        id: 2,
+        type: TransactionType.expense,
+        amount: 5.0,
+        date: DateTime(2026, 10, 1),
+        accountId: 1,
+      ),
+    );
+
+    final balances = await accounts.balances();
+
+    expect(balances.balanceById[1], -5);
+    expect(balances.netWorth, -5);
   });
 }

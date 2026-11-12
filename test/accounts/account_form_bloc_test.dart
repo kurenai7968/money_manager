@@ -19,10 +19,10 @@ void main() {
     accountRepo = MemoryAccountRepository()
       ..accounts.add(
         const AccountModel(
-          id: 'cash',
+          id: 1,
           name: 'Cash',
           type: AccountType.cash,
-          openingBalanceMinor: 0,
+          icon: 'other',
           sortOrder: 4,
         ),
       );
@@ -41,27 +41,14 @@ void main() {
   }
 
   blocTest<AccountFormBloc, AccountFormState>(
-    'rejects a blank name and an invalid amount',
+    'rejects a blank name',
     build: buildBloc,
     act: (bloc) async {
       bloc.add(const AccountFormInitialized(languageCode: 'en', locale: 'en'));
       if (!bloc.state.prepared) {
         await bloc.stream.firstWhere((state) => state.prepared);
       }
-      bloc.add(
-        const AccountFormSavePressed(
-          name: '  ',
-          balanceText: '1',
-          languageCode: 'en',
-        ),
-      );
-      bloc.add(
-        const AccountFormSavePressed(
-          name: 'Wallet',
-          balanceText: 'nope',
-          languageCode: 'en',
-        ),
-      );
+      bloc.add(const AccountFormSavePressed(name: '  ', languageCode: 'en'));
     },
     expect: () => [
       isA<AccountFormState>()
@@ -72,14 +59,10 @@ void main() {
         'error',
         AccountFormError.nameRequired,
       ),
-      isA<AccountFormState>().having(
-        (state) => state.error,
-        'error',
-        AccountFormError.amountInvalid,
-      ),
     ],
     verify: (_) {
       expect(accountRepo.accounts, hasLength(1));
+      expect(transactionRepo.transactions, isEmpty);
     },
   );
 
@@ -91,13 +74,7 @@ void main() {
       if (!bloc.state.prepared) {
         await bloc.stream.firstWhere((state) => state.prepared);
       }
-      bloc.add(
-        const AccountFormSavePressed(
-          name: 'Wallet',
-          balanceText: '10',
-          languageCode: 'en',
-        ),
-      );
+      bloc.add(const AccountFormSavePressed(name: 'Wallet', languageCode: 'en'));
       if (!bloc.state.saved) {
         await bloc.stream.firstWhere((state) => state.saved);
       }
@@ -106,8 +83,10 @@ void main() {
       final saved = accountRepo.accounts.singleWhere(
         (account) => account.name == 'Wallet',
       );
-      expect(saved.openingBalanceMinor, 1000);
       expect(saved.type, AccountType.cash);
+      expect(saved.icon, 'other');
+      expect(saved.isActive, isTrue);
+      expect(transactionRepo.transactions, isEmpty);
       expect(bloc.state.saved, isTrue);
     },
     expect: () => [
@@ -124,10 +103,10 @@ void main() {
     'blocks archive when the balance is not zero',
     build: buildBloc,
     act: (bloc) async {
-      accountRepo.balanceById['cash'] = -100;
+      accountRepo.balanceById[1] = -100.0;
       bloc.add(
         const AccountFormInitialized(
-          accountId: 'cash',
+          accountId: 1,
           languageCode: 'en',
           locale: 'en',
         ),

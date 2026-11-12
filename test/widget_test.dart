@@ -129,7 +129,7 @@ void main() {
 
     await tester.tap(find.text('Cancel'));
     await tester.pumpAndSettle();
-    expect((await loadAccounts()).single.archived, isFalse);
+    expect((await loadAccounts()).single.isActive, isTrue);
 
     await tester.ensureVisible(find.text('Delete'));
     await tester.tap(find.text('Delete'));
@@ -142,6 +142,6 @@ void main() {
     );
     await tester.pumpAndSettle();
 
-    expect((await loadAccounts()).single.archived, isTrue);
+    expect((await loadAccounts()).single.isActive, isFalse);
   });
 }

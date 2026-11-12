@@ -11,13 +11,12 @@ void main() {
     await openTestDatabase();
     final repository = CategoryRepositoryImpl(database: AppDatabase.instance);
     const food = CategoryModel(
-      id: 'food',
+      id: 1,
       languageEn: 'Food',
       languageZh: '飲食',
       languageZhCn: '饮食',
       icon: 'food',
-      color: 'coral',
-      kind: CategoryKind.expense,
+      type: CategoryKind.expense,
       sortOrder: 0,
     );
 
@@ -31,21 +30,19 @@ void main() {
     await openTestDatabase();
     final repository = CategoryRepositoryImpl(database: AppDatabase.instance);
     const food = CategoryModel(
-      id: 'food',
+      id: 1,
       languageEn: 'Food',
       languageZh: '飲食',
       languageZhCn: '饮食',
       icon: 'food',
-      color: 'coral',
-      kind: CategoryKind.expense,
+      type: CategoryKind.expense,
       sortOrder: 0,
     );
     const renamed = CategoryModel(
-      id: 'food',
+      id: 1,
       name: 'Groceries',
       icon: 'shopping',
-      color: 'teal',
-      kind: CategoryKind.expense,
+      type: CategoryKind.expense,
       sortOrder: 0,
     );
 

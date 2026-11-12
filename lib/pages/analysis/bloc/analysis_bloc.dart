@@ -71,7 +71,7 @@ class AnalysisBloc extends Bloc<AnalysisEvent, AnalysisState> {
         categories: _categoryRows,
         accounts: [
           for (final account in _accountRows)
-            if (!account.archived) account,
+            if (account.isActive) account,
         ],
       ),
     );

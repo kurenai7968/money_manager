@@ -20,21 +20,21 @@ void main() {
       tester,
       accounts: const [
         AccountModel(
-          id: 'cash',
+          id: 1,
           name: 'Cash',
           type: AccountType.cash,
-          openingBalanceMinor: 0,
+          icon: 'other',
           sortOrder: 0,
         ),
       ],
       transactions: [
         TransactionModel(
-          id: 'lunch',
+          id: 2,
           type: TransactionType.expense,
-          amountMinor: 20,
+          amount: 0.2,
           date: DateTime(now.year, now.month, now.day),
           note: 'Lunch',
-          accountId: 'cash',
+          accountId: 1,
         ),
       ],
     );

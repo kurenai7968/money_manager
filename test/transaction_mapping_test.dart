@@ -4,17 +4,17 @@ import 'package:money_manager/entities/transaction_entity.dart';
 import 'package:money_manager/models/account_book_kinds.dart';
 
 void main() {
-  test('reads a stored opening row as income', () {
+  test('reads a stored income row', () {
     final model = const TransactionEntity(
-      id: 'opening-cash',
-      type: 'opening',
-      amountMinor: 1500,
+      id: 1,
+      type: 'income',
+      amount: 15.0,
       date: '2026-10-01',
-      accountId: 'cash',
+      accountId: 2,
     ).toModel();
 
     expect(model.type, TransactionType.income);
-    expect(model.amountMinor, 1500);
-    expect(model.accountId, 'cash');
+    expect(model.amount, 15);
+    expect(model.accountId, 2);
   });
 }

@@ -76,9 +76,9 @@ class AppRouter {
               }
             }
             return RecordPage(
-              transactionId: state.uri.queryParameters['id'],
+              transactionId: _readId(state.uri.queryParameters['id']),
               initialType: type,
-              initialAccountId: state.uri.queryParameters['from'],
+              initialAccountId: _readId(state.uri.queryParameters['from']),
             );
           },
         ),
@@ -91,13 +91,15 @@ class AppRouter {
           path: AppRoutes.accountEdit.path,
           parentNavigatorKey: _rootKey,
           builder: (context, state) =>
-              AccountFormPage(accountId: state.pathParameters['id']),
+              AccountFormPage(accountId: _readId(state.pathParameters['id'])),
         ),
         GoRoute(
           path: AppRoutes.accountDetail.path,
           parentNavigatorKey: _rootKey,
           builder: (context, state) =>
-              AccountDetailPage(accountId: state.pathParameters['id']!),
+              AccountDetailPage(
+                accountId: _readId(state.pathParameters['id']) ?? 0,
+              ),
         ),
         GoRoute(
           path: AppRoutes.categories.path,
@@ -118,9 +120,16 @@ class AppRouter {
           path: AppRoutes.categoryEdit.path,
           parentNavigatorKey: _rootKey,
           builder: (context, state) =>
-              CategoryFormPage(categoryId: state.pathParameters['id']),
+              CategoryFormPage(categoryId: _readId(state.pathParameters['id'])),
         ),
       ],
     );
   }
+}
+
+int? _readId(String? value) {
+  if (value == null || value.isEmpty) {
+    return null;
+  }
+  return int.tryParse(value);
 }

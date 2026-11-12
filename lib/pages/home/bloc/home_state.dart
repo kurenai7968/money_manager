@@ -1,8 +1,8 @@
 import 'package:equatable/equatable.dart';
-import 'package:money_manager/pages/home/models/home_figures.dart';
 import 'package:money_manager/models/account_model.dart';
 import 'package:money_manager/models/category_model.dart';
 import 'package:money_manager/models/transaction_model.dart';
+import 'package:money_manager/pages/home/models/home_figures.dart';
 
 enum HomeView { summary, calendar }
 
@@ -19,21 +19,39 @@ class HomeState extends Equatable {
   final List<TransactionModel> selectedTransactions;
   final List<CategoryModel> categories;
   final List<AccountModel> accounts;
-  final String? selectedAccountId;
+  final int? selectedAccountId;
 
   const HomeState({
     required this.month,
     required this.selectedDay,
-    this.status = HomeStatus.initial,
-    this.view = HomeView.summary,
-    this.transactions = const [],
-    this.figures = const MonthFigures(incomeMinor: 0, expenseMinor: 0),
-    this.days = const [],
-    this.selectedTransactions = const [],
-    this.categories = const [],
-    this.accounts = const [],
-    this.selectedAccountId,
+    required this.status,
+    required this.view,
+    required this.transactions,
+    required this.figures,
+    required this.days,
+    required this.selectedTransactions,
+    required this.categories,
+    required this.accounts,
+    required this.selectedAccountId,
   });
+
+  static HomeState initial() {
+    final today = DateTime.now();
+
+    return HomeState(
+      month: DateTime(today.year, today.month),
+      selectedDay: DateTime(today.year, today.month, today.day),
+      status: HomeStatus.initial,
+      view: HomeView.summary,
+      transactions: const [],
+      figures: const MonthFigures(income: 0, expense: 0),
+      days: const [],
+      selectedTransactions: const [],
+      categories: const [],
+      accounts: const [],
+      selectedAccountId: null,
+    );
+  }
 
   HomeState copyWith({
     HomeStatus? status,
@@ -47,7 +65,7 @@ class HomeState extends Equatable {
     List<TransactionModel>? selectedTransactions,
     List<CategoryModel>? categories,
     List<AccountModel>? accounts,
-    String? selectedAccountId,
+    int? selectedAccountId,
     bool clearSelectedAccount = false,
   }) {
     return HomeState(

@@ -5,20 +5,21 @@ part 'transaction_entity.g.dart';
 
 @JsonSerializable(fieldRename: FieldRename.snake)
 class TransactionEntity extends Equatable {
-  final String id;
+  @JsonKey(includeIfNull: false)
+  final int? id;
   final String type;
-  final int amountMinor;
+  final double amount;
   final String date;
   final String? note;
-  final String? accountId;
-  final String? categoryId;
-  final String? fromAccountId;
-  final String? toAccountId;
+  final int? accountId;
+  final int? categoryId;
+  final int? fromAccountId;
+  final int? toAccountId;
 
   const TransactionEntity({
-    required this.id,
+    this.id,
     required this.type,
-    required this.amountMinor,
+    required this.amount,
     required this.date,
     this.note,
     this.accountId,
@@ -36,7 +37,7 @@ class TransactionEntity extends Equatable {
   List<Object?> get props => [
     id,
     type,
-    amountMinor,
+    amount,
     date,
     note,
     accountId,

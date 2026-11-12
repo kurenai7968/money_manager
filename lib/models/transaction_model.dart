@@ -2,20 +2,20 @@ import 'package:equatable/equatable.dart';
 import 'package:money_manager/models/account_book_kinds.dart';
 
 class TransactionModel extends Equatable {
-  final String id;
+  final int? id;
   final TransactionType type;
-  final int amountMinor;
+  final double amount;
   final DateTime date;
   final String note;
-  final String? accountId;
-  final String? categoryId;
-  final String? fromAccountId;
-  final String? toAccountId;
+  final int? accountId;
+  final int? categoryId;
+  final int? fromAccountId;
+  final int? toAccountId;
 
   const TransactionModel({
-    required this.id,
+    this.id,
     required this.type,
-    required this.amountMinor,
+    required this.amount,
     required this.date,
     this.note = '',
     this.accountId,
@@ -25,21 +25,21 @@ class TransactionModel extends Equatable {
   });
 
   TransactionModel copyWith({
-    String? id,
+    int? id,
     TransactionType? type,
-    int? amountMinor,
+    double? amount,
     DateTime? date,
     String? note,
-    String? accountId,
-    String? categoryId,
-    String? fromAccountId,
-    String? toAccountId,
+    int? accountId,
+    int? categoryId,
+    int? fromAccountId,
+    int? toAccountId,
     bool clearCategory = false,
   }) {
     return TransactionModel(
       id: id ?? this.id,
       type: type ?? this.type,
-      amountMinor: amountMinor ?? this.amountMinor,
+      amount: amount ?? this.amount,
       date: date ?? this.date,
       note: note ?? this.note,
       accountId: accountId ?? this.accountId,
@@ -53,7 +53,7 @@ class TransactionModel extends Equatable {
   List<Object?> get props => [
     id,
     type,
-    amountMinor,
+    amount,
     date,
     note,
     accountId,

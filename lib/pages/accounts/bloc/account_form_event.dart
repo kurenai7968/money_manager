@@ -9,7 +9,7 @@ sealed class AccountFormEvent extends Equatable {
 }
 
 class AccountFormInitialized extends AccountFormEvent {
-  final String? accountId;
+  final int? accountId;
   final String languageCode;
   final String locale;
 
@@ -32,19 +32,26 @@ class AccountFormTypeSelected extends AccountFormEvent {
   List<Object?> get props => [type];
 }
 
+class AccountFormIconSelected extends AccountFormEvent {
+  final String icon;
+
+  const AccountFormIconSelected(this.icon);
+
+  @override
+  List<Object?> get props => [icon];
+}
+
 class AccountFormSavePressed extends AccountFormEvent {
   final String name;
-  final String balanceText;
   final String languageCode;
 
   const AccountFormSavePressed({
     required this.name,
-    required this.balanceText,
     required this.languageCode,
   });
 
   @override
-  List<Object?> get props => [name, balanceText, languageCode];
+  List<Object?> get props => [name, languageCode];
 }
 
 class AccountFormArchivePressed extends AccountFormEvent {

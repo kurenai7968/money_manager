@@ -16,10 +16,10 @@ import '../support/memory_transaction_repository.dart';
 
 void main() {
   const cash = AccountModel(
-    id: 'cash',
+    id: 1,
     name: 'Cash',
     type: AccountType.cash,
-    openingBalanceMinor: 0,
+    icon: 'other',
     sortOrder: 0,
   );
 
@@ -30,38 +30,38 @@ void main() {
   setUp(() {
     accountRepo = MemoryAccountRepository()
       ..accounts.add(cash)
-      ..balanceById['cash'] = -1200;
+      ..balanceById[1] = -1200;
     transactionRepo = MemoryTransactionRepository()
       ..transactions.addAll([
         TransactionModel(
-          id: 'lunch',
+          id: 2,
           type: TransactionType.expense,
-          amountMinor: 1000,
+          amount: 10.0,
           date: DateTime(2026, 10, 2),
-          accountId: 'cash',
-          categoryId: 'food',
+          accountId: 1,
+          categoryId: 3,
         ),
         TransactionModel(
-          id: 'move',
+          id: 4,
           type: TransactionType.transfer,
-          amountMinor: 200,
+          amount: 2.0,
           date: DateTime(2026, 10, 3),
-          fromAccountId: 'cash',
-          toAccountId: 'bank',
+          fromAccountId: 1,
+          toAccountId: 5,
         ),
         TransactionModel(
-          id: 'other',
+          id: 6,
           type: TransactionType.expense,
-          amountMinor: 50,
+          amount: 0.5,
           date: DateTime(2026, 10, 4),
-          accountId: 'bank',
-          categoryId: 'food',
+          accountId: 5,
+          categoryId: 3,
         ),
       ]);
     categoryRepo = MemoryCategoryRepository();
   });
 
-  AccountDetailBloc buildBloc(String accountId) {
+  AccountDetailBloc buildBloc(int accountId) {
     return AccountDetailBloc(
       accountId: accountId,
       accountBook: AccountBookServiceImpl(
@@ -74,24 +74,24 @@ void main() {
 
   blocTest<AccountDetailBloc, AccountDetailState>(
     'shows the account history and one balance',
-    build: () => buildBloc('cash'),
+    build: () => buildBloc(1),
     act: (bloc) => bloc.add(const AccountDetailInitialized()),
     verify: (bloc) {
-      expect(bloc.state.history.map((item) => item.id), ['lunch', 'move']);
-      expect(bloc.state.balanceMinor, -1200);
+      expect(bloc.state.history.map((item) => item.id), [2, 4]);
+      expect(bloc.state.balance, -1200);
     },
     expect: () => [
       isA<AccountDetailState>().having(
         (state) => state.account?.id,
         'account',
-        'cash',
+        1,
       ),
     ],
   );
 
   blocTest<AccountDetailBloc, AccountDetailState>(
     'has no account when the id is missing',
-    build: () => buildBloc('missing'),
+    build: () => buildBloc(7),
     act: (bloc) => bloc.add(const AccountDetailInitialized()),
     expect: () => [
       isA<AccountDetailState>()
@@ -105,7 +105,7 @@ void main() {
     setUp: () {
       accountRepo = _FailingAccounts();
     },
-    build: () => buildBloc('cash'),
+    build: () => buildBloc(1),
     act: (bloc) => bloc.add(const AccountDetailInitialized()),
     expect: () => [
       isA<AccountDetailState>()
@@ -121,7 +121,7 @@ void main() {
 
 class _FailingAccounts implements AccountRepository {
   @override
-  Future<void> archive(String id) async {}
+  Future<void> archive(int id) async {}
 
   @override
   Future<List<AccountModel>> getAll() async => throw StateError('unavailable');
@@ -133,8 +133,8 @@ class _FailingAccounts implements AccountRepository {
   Future<bool> isEmpty() async => throw StateError('unavailable');
 
   @override
-  Future<void> reorder(List<String> ids) async {}
+  Future<void> reorder(List<int> ids) async {}
 
   @override
-  Future<void> save(AccountModel account) async {}
+  Future<int> save(AccountModel account) async => 0;
 }

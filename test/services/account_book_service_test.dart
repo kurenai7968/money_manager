@@ -24,125 +24,50 @@ void main() {
   });
 
   const cash = AccountModel(
-    id: 'cash',
+    id: 1,
     name: 'Cash',
     type: AccountType.cash,
-    openingBalanceMinor: 1500,
+    icon: 'other',
     sortOrder: 0,
   );
 
   final expense = TransactionModel(
-    id: 'lunch',
+    id: 2,
     type: TransactionType.expense,
-    amountMinor: 8600,
+    amount: 86.0,
     date: DateTime(2026, 10, 23),
-    accountId: 'cash',
-    categoryId: 'food',
+    accountId: 1,
+    categoryId: 3,
   );
 
   test('saves an expense', () async {
-    await accountBook.saveTransaction(expense);
-    expect(repository.transactions.single.amountMinor, 8600);
+    final id = await accountBook.saveTransaction(expense);
+    expect(id, 2);
+    expect(repository.transactions.single.amount, 86);
   });
 
-  test('writes the signed opening balance when that income is saved', () async {
+  test('saving a transaction leaves the account unchanged', () async {
     accounts.accounts.add(cash);
     await accountBook.saveTransaction(
       TransactionModel(
-        id: 'opening-cash',
+        id: 4,
         type: TransactionType.income,
-        amountMinor: 2000,
+        amount: 20.0,
         date: DateTime(2026, 10, 23),
-        accountId: 'cash',
-        categoryId: 'salary',
+        accountId: 1,
+        categoryId: 5,
       ),
     );
-    expect(accounts.accounts.single.openingBalanceMinor, 2000);
-    expect(repository.transactions.single.id, 'opening-cash');
-    expect(repository.transactions.single.amountMinor, 2000);
-  });
 
-  test(
-    'writes a negative opening balance when that expense is saved',
-    () async {
-      accounts.accounts.add(cash);
-      await accountBook.saveTransaction(
-        TransactionModel(
-          id: 'opening-cash',
-          type: TransactionType.expense,
-          amountMinor: 400,
-          date: DateTime(2026, 10, 23),
-          accountId: 'cash',
-          categoryId: 'food',
-        ),
-      );
-      expect(accounts.accounts.single.openingBalanceMinor, -400);
-      expect(repository.transactions.single.type, TransactionType.expense);
-    },
-  );
-
-  test(
-    'clears the opening balance when that transaction becomes a transfer',
-    () async {
-      accounts.accounts.add(cash);
-      await accountBook.saveTransaction(
-        TransactionModel(
-          id: 'opening-cash',
-          type: TransactionType.transfer,
-          amountMinor: 1500,
-          date: DateTime(2026, 10, 23),
-          fromAccountId: 'cash',
-          toAccountId: 'bank',
-        ),
-      );
-      expect(accounts.accounts.single.openingBalanceMinor, 0);
-      final saved = repository.transactions.single;
-      expect(saved.id, isNot('opening-cash'));
-      expect(saved.type, TransactionType.transfer);
-    },
-  );
-
-  test(
-    'clears the opening balance when that transaction moves account',
-    () async {
-      accounts.accounts.add(cash);
-      await accountBook.saveTransaction(
-        TransactionModel(
-          id: 'opening-cash',
-          type: TransactionType.income,
-          amountMinor: 1500,
-          date: DateTime(2026, 10, 23),
-          accountId: 'bank',
-          categoryId: 'salary',
-        ),
-      );
-      expect(accounts.accounts.single.openingBalanceMinor, 0);
-      final saved = repository.transactions.single;
-      expect(saved.id, isNot('opening-cash'));
-      expect(saved.accountId, 'bank');
-    },
-  );
-
-  test('clears the opening balance when that transaction is deleted', () async {
-    accounts.accounts.add(cash);
-    repository.transactions.add(
-      TransactionModel(
-        id: 'opening-cash',
-        type: TransactionType.income,
-        amountMinor: 1500,
-        date: DateTime(2026, 10, 23),
-        accountId: 'cash',
-        categoryId: 'salary',
-      ),
-    );
-    await accountBook.deleteTransaction('opening-cash');
-    expect(accounts.accounts.single.openingBalanceMinor, 0);
-    expect(repository.transactions, isEmpty);
+    expect(accounts.accounts.single, cash);
+    expect(repository.transactions.single.amount, 20);
   });
 
   test('deletes a transaction', () async {
+    accounts.accounts.add(cash);
     repository.transactions.add(expense);
-    await accountBook.deleteTransaction('lunch');
+    await accountBook.deleteTransaction(2);
     expect(repository.transactions, isEmpty);
+    expect(accounts.accounts.single, cash);
   });
 }

@@ -3,9 +3,10 @@ import 'package:money_manager/repositories/category_repository.dart';
 
 class MemoryCategoryRepository implements CategoryRepository {
   final List<CategoryModel> categories = [];
+  var _nextId = 1;
 
   @override
-  Future<void> delete(String id) async {
+  Future<void> delete(int id) async {
     categories.removeWhere((category) => category.id == id);
   }
 
@@ -20,7 +21,7 @@ class MemoryCategoryRepository implements CategoryRepository {
   Future<bool> isEmpty() async => categories.isEmpty;
 
   @override
-  Future<void> reorder(List<String> ids) async {
+  Future<void> reorder(List<int> ids) async {
     for (var index = 0; index < ids.length; index++) {
       final categoryIndex = categories.indexWhere(
         (category) => category.id == ids[index],
@@ -32,8 +33,14 @@ class MemoryCategoryRepository implements CategoryRepository {
   }
 
   @override
-  Future<void> save(CategoryModel category) async {
-    categories.removeWhere((item) => item.id == category.id);
-    categories.add(category);
+  Future<int> save(CategoryModel category) async {
+    final id = category.id ?? _nextId++;
+    if (id >= _nextId) {
+      _nextId = id + 1;
+    }
+    final saved = category.copyWith(id: id);
+    categories.removeWhere((item) => item.id == id);
+    categories.add(saved);
+    return id;
   }
 }

@@ -70,7 +70,7 @@ class HomeAppBar extends StatelessWidget implements PreferredSizeWidget {
         return HomeAccountSheet(
           accounts: [
             for (final account in state.accounts)
-              if (!account.archived) account,
+              if (account.isActive) account,
           ],
           selectedId: state.selectedAccountId,
         );

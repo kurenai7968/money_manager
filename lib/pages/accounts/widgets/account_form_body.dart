@@ -7,11 +7,13 @@ import 'package:money_manager/models/account_book_kinds.dart';
 import 'package:money_manager/pages/accounts/bloc/account_form_bloc.dart';
 import 'package:money_manager/pages/accounts/bloc/account_form_event.dart';
 import 'package:money_manager/pages/accounts/bloc/account_form_state.dart';
+import 'package:money_manager/pages/categories/widgets/category_icon_choice.dart';
 import 'package:money_manager/themes/app_themes.dart';
+import 'package:money_manager/themes/account_book_palette.dart';
 import 'package:money_manager/widgets/confirm_delete_dialog.dart';
 
 class AccountFormBody extends StatefulWidget {
-  final String? accountId;
+  final int? accountId;
 
   const AccountFormBody({this.accountId, super.key});
 
@@ -21,13 +23,11 @@ class AccountFormBody extends StatefulWidget {
 
 class _AccountFormBodyState extends State<AccountFormBody> {
   final _name = TextEditingController();
-  final _balance = TextEditingController();
   var _applied = false;
 
   @override
   void dispose() {
     _name.dispose();
-    _balance.dispose();
     super.dispose();
   }
 
@@ -37,7 +37,6 @@ class _AccountFormBodyState extends State<AccountFormBody> {
     }
     _applied = true;
     _name.text = state.name;
-    _balance.text = state.balanceText;
   }
 
   @override
@@ -45,6 +44,7 @@ class _AccountFormBodyState extends State<AccountFormBody> {
     final l10n = context.l10n;
     final state = context.watch<AccountFormBloc>().state;
     _apply(state);
+    final scheme = Theme.of(context).colorScheme;
     return BlocListener<AccountFormBloc, AccountFormState>(
       listenWhen: (previous, current) => current.saved && !previous.saved,
       listener: (context, state) => context.pop(),
@@ -55,17 +55,22 @@ class _AccountFormBodyState extends State<AccountFormBody> {
           const SizedBox(height: AppSpacing.s),
           TextField(controller: _name, textInputAction: TextInputAction.next),
           const SizedBox(height: AppSpacing.xl),
-          Text(
-            l10n.openingBalance,
-            style: Theme.of(context).textTheme.labelLarge,
-          ),
+          Text(l10n.icon, style: Theme.of(context).textTheme.labelLarge),
           const SizedBox(height: AppSpacing.s),
-          TextField(
-            controller: _balance,
-            keyboardType: const TextInputType.numberWithOptions(
-              decimal: true,
-              signed: true,
-            ),
+          Wrap(
+            spacing: AppSpacing.s,
+            runSpacing: AppSpacing.s,
+            children: [
+              for (final key in AccountBookPalette.iconKeys)
+                CategoryIconChoice(
+                  iconKey: key,
+                  selected: key == state.icon,
+                  color: scheme.primary,
+                  onPressed: () => context.read<AccountFormBloc>().add(
+                    AccountFormIconSelected(key),
+                  ),
+                ),
+            ],
           ),
           const SizedBox(height: AppSpacing.xl),
           Wrap(
@@ -95,7 +100,6 @@ class _AccountFormBodyState extends State<AccountFormBody> {
             onPressed: () => context.read<AccountFormBloc>().add(
               AccountFormSavePressed(
                 name: _name.text,
-                balanceText: _balance.text,
                 languageCode: context.categoryLanguageCode,
               ),
             ),
@@ -132,7 +136,6 @@ String _errorLabel(AppLocalizations l10n, AccountFormError error) {
   return switch (error) {
     AccountFormError.none => '',
     AccountFormError.nameRequired => l10n.nameRequired,
-    AccountFormError.amountInvalid => l10n.amountInvalid,
     AccountFormError.archiveBlocked => l10n.archiveBlocked,
   };
 }

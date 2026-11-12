@@ -23,54 +23,52 @@ void main() {
     transactionsRepo = MemoryTransactionRepository()
       ..transactions.addAll([
         TransactionModel(
-          id: 'lunch',
+          id: 1,
           type: TransactionType.expense,
-          amountMinor: 400,
+          amount: 4.0,
           date: DateTime(2026, 10, 3),
-          accountId: 'cash',
-          categoryId: 'food',
+          accountId: 2,
+          categoryId: 3,
         ),
         TransactionModel(
-          id: 'older',
+          id: 4,
           type: TransactionType.expense,
-          amountMinor: 100,
+          amount: 1.0,
           date: DateTime(2026, 9, 3),
-          accountId: 'cash',
-          categoryId: 'food',
+          accountId: 2,
+          categoryId: 3,
         ),
         TransactionModel(
-          id: 'pay',
+          id: 5,
           type: TransactionType.income,
-          amountMinor: 50,
+          amount: 0.5,
           date: DateTime(2026, 10, 4),
-          accountId: 'cash',
-          categoryId: 'salary',
+          accountId: 2,
+          categoryId: 6,
         ),
         TransactionModel(
-          id: 'move',
+          id: 7,
           type: TransactionType.transfer,
-          amountMinor: 900,
+          amount: 9.0,
           date: DateTime(2026, 10, 5),
-          fromAccountId: 'cash',
-          toAccountId: 'bank',
+          fromAccountId: 2,
+          toAccountId: 8,
         ),
       ]);
     categoryRepo = MemoryCategoryRepository()
       ..categories.addAll(const [
         CategoryModel(
-          id: 'food',
+          id: 3,
           name: 'Food',
           icon: 'restaurant',
-          color: 'coral',
-          kind: CategoryKind.expense,
+          type: CategoryKind.expense,
           sortOrder: 0,
         ),
         CategoryModel(
-          id: 'salary',
+          id: 6,
           name: 'Salary',
           icon: 'payments',
-          color: 'green',
-          kind: CategoryKind.income,
+          type: CategoryKind.income,
           sortOrder: 1,
         ),
       ]);
@@ -100,8 +98,8 @@ void main() {
     },
     expect: () => [
       isA<AnalysisState>()
-          .having((state) => state.rollup.current, 'current', 400)
-          .having((state) => state.rollup.previous, 'previous', 100)
+          .having((state) => state.rollup.current, 'current', 4.0)
+          .having((state) => state.rollup.previous, 'previous', 1.0)
           .having(
             (state) => state.rollup.byCategory.single.sharePercent,
             'share',
@@ -110,8 +108,8 @@ void main() {
           .having((state) => state.rollup.byAccount, 'accounts', hasLength(1)),
       isA<AnalysisState>()
           .having((state) => state.kind, 'kind', CategoryKind.income)
-          .having((state) => state.rollup.current, 'current', 50)
-          .having((state) => state.rollup.previous, 'previous', 0),
+          .having((state) => state.rollup.current, 'current', 0.5)
+          .having((state) => state.rollup.previous, 'previous', 0.0),
     ],
   );
 
@@ -122,26 +120,26 @@ void main() {
     expect: () => [
       isA<AnalysisState>()
           .having((state) => state.status, 'status', AnalysisStatus.failure)
-          .having((state) => state.rollup.current, 'current', 0)
+          .having((state) => state.rollup.current, 'current', 0.0)
           .having((state) => state.rollup.byCategory, 'categories', isEmpty),
     ],
   );
 }
 
 const _cash = AccountModel(
-  id: 'cash',
+  id: 2,
   name: 'Cash',
   type: AccountType.cash,
-  openingBalanceMinor: 0,
+  icon: 'other',
   sortOrder: 0,
 );
 
 class _FailingTransactions implements TransactionRepository {
   @override
-  Future<int> countForCategory(String categoryId) async => 0;
+  Future<int> countForCategory(int categoryId) async => 0;
 
   @override
-  Future<void> delete(String id) async {}
+  Future<void> delete(int id) async {}
 
   @override
   Future<List<TransactionModel>> getAll() async {
@@ -149,5 +147,5 @@ class _FailingTransactions implements TransactionRepository {
   }
 
   @override
-  Future<void> save(TransactionModel transaction) async {}
+  Future<int> save(TransactionModel transaction) async => 0;
 }

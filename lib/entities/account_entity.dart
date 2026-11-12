@@ -6,27 +6,28 @@ part 'account_entity.g.dart';
 
 @JsonSerializable(fieldRename: FieldRename.snake)
 class AccountEntity extends Equatable {
-  final String id;
+  @JsonKey(includeIfNull: false)
+  final int? id;
   final String? name;
   final String? languageEn;
   final String? languageZh;
   final String? languageZhCn;
   final String type;
-  final int openingBalance;
+  final String icon;
   final int sortOrder;
   @BoolIntConverter()
-  final bool archived;
+  final bool isActive;
 
   const AccountEntity({
-    required this.id,
+    this.id,
     this.name,
     this.languageEn,
     this.languageZh,
     this.languageZhCn,
     required this.type,
-    required this.openingBalance,
+    required this.icon,
     required this.sortOrder,
-    required this.archived,
+    required this.isActive,
   });
 
   factory AccountEntity.fromJson(Map<String, dynamic> json) =>
@@ -42,8 +43,8 @@ class AccountEntity extends Equatable {
     languageZh,
     languageZhCn,
     type,
-    openingBalance,
+    icon,
     sortOrder,
-    archived,
+    isActive,
   ];
 }

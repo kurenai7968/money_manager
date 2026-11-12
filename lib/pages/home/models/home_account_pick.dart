@@ -1,5 +1,5 @@
 class HomeAccountPick {
-  final String? accountId;
+  final int? accountId;
 
   const HomeAccountPick(this.accountId);
 }

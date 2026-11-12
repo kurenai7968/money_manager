@@ -31,6 +31,10 @@ abstract final class AccountBookPalette {
     'bonus',
   ];
 
+  static Color directionColor({required bool income}) {
+    return income ? green : coral;
+  }
+
   static Color color(String key) {
     return switch (key) {
       'blue' => blue,

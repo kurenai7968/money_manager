@@ -6,10 +6,8 @@ extension TransactionEntityMapping on TransactionEntity {
   TransactionModel toModel() {
     return TransactionModel(
       id: id,
-      type: type == 'opening'
-          ? TransactionType.income
-          : TransactionType.values.byName(type),
-      amountMinor: amountMinor,
+      type: TransactionType.values.byName(type),
+      amount: amount,
       date: DateTime.parse(date),
       note: note ?? '',
       accountId: accountId,
@@ -27,7 +25,7 @@ extension TransactionModelMapping on TransactionModel {
     return TransactionEntity(
       id: id,
       type: type.name,
-      amountMinor: amountMinor,
+      amount: amount,
       date: '${date.year}-$month-$day',
       note: note.isEmpty ? null : note,
       accountId: accountId,

@@ -9,29 +9,18 @@ import 'package:money_manager/pages/home/models/home_figures.dart';
 import 'package:money_manager/services/account_book_service.dart';
 
 class HomeBloc extends Bloc<HomeEvent, HomeState> {
-  final AccountBookService _accountBook;
-  final DateTime Function() _now;
+  final AccountBookService _accountBookService;
   var _failed = false;
   List<AccountModel> _accountRows = const [];
   List<TransactionModel> _transactionRows = const [];
   List<CategoryModel> _categoryRows = const [];
 
-  HomeBloc({required this._accountBook, DateTime Function()? now})
-    : _now = now ?? DateTime.now,
-      super(_initial(now ?? DateTime.now)) {
+  HomeBloc({required this._accountBookService}) : super(HomeState.initial()) {
     on<HomeInitialized>(_onInitialized);
     on<HomeMonthShifted>(_onMonthShifted);
     on<HomeViewToggled>(_onViewToggled);
     on<HomeDaySelected>(_onDaySelected);
     on<HomeAccountSelected>(_onAccountSelected);
-  }
-
-  static HomeState _initial(DateTime Function() now) {
-    final today = now();
-    return HomeState(
-      month: DateTime(today.year, today.month),
-      selectedDay: DateTime(today.year, today.month, today.day),
-    );
   }
 
   Future<void> _onInitialized(
@@ -44,10 +33,10 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
 
   Future<void> _load() async {
     try {
-      final loaded = await _accountBook.loadAccounts();
+      final loaded = await _accountBookService.loadAccounts();
       _accountRows = [for (final book in loaded) book.account];
       _transactionRows = transactionsOnce(loaded);
-      _categoryRows = await _accountBook.loadCategories();
+      _categoryRows = await _accountBookService.loadCategories();
       _failed = false;
     } catch (_) {
       _failed = true;
@@ -56,7 +45,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
 
   void _onMonthShifted(HomeMonthShifted event, Emitter<HomeState> emit) {
     final month = DateTime(state.month.year, state.month.month + event.delta);
-    final today = _now();
+    final today = DateTime.now();
     final selected = today.year == month.year && today.month == month.month
         ? DateTime(today.year, today.month, today.day)
         : null;
@@ -120,12 +109,12 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     );
   }
 
-  String? _activeAccountId(String? accountId) {
+  int? _activeAccountId(int? accountId) {
     if (accountId == null) {
       return null;
     }
     for (final account in _accountRows) {
-      if (account.id == accountId && !account.archived) {
+      if (account.id == accountId && account.isActive) {
         return accountId;
       }
     }
@@ -135,7 +124,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
 
 List<TransactionModel> _forAccount(
   List<TransactionModel> transactions,
-  String? accountId,
+  int? accountId,
 ) {
   if (accountId == null) {
     return transactions;

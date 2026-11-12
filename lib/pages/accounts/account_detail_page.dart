@@ -6,7 +6,7 @@ import 'package:money_manager/pages/accounts/widgets/account_detail_app_bar.dart
 import 'package:money_manager/pages/accounts/widgets/account_detail_body.dart';
 
 class AccountDetailPage extends StatelessWidget {
-  final String accountId;
+  final int accountId;
 
   const AccountDetailPage({required this.accountId, super.key});
 
