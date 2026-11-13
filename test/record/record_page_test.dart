@@ -46,6 +46,8 @@ void main() {
     await tapKey(tester, '8');
     expect(find.text('18'), findsOneWidget);
     await commit(tester);
+    expect(find.text('Lunch'), findsOneWidget);
+    expect(find.text('-18'), findsWidgets);
     await reopenApp(tester);
 
     expect(find.text('Lunch'), findsOneWidget);
@@ -67,6 +69,7 @@ void main() {
     await tapKey(tester, '←');
     await tapKey(tester, '7');
     await commit(tester);
+    expect(find.text('-7'), findsWidgets);
     await reopenApp(tester);
 
     expect(find.text('-7'), findsWidgets);
@@ -93,6 +96,7 @@ void main() {
       ),
     );
     await tester.pumpAndSettle();
+    expect(find.text('No transactions this month'), findsOneWidget);
     await reopenApp(tester);
     expect(find.text('No transactions this month'), findsOneWidget);
     expect(find.text('Lunch'), findsNothing);
@@ -117,6 +121,8 @@ void main() {
     await tapKey(tester, '4');
     await tapKey(tester, '0');
     await commit(tester);
+    expect(find.text('Salary'), findsOneWidget);
+    expect(find.text('+40'), findsOneWidget);
     await reopenApp(tester);
 
     expect(find.text('Salary'), findsOneWidget);
@@ -346,6 +352,29 @@ void main() {
       findsOneWidget,
     );
     expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('returning to account detail reloads that account', (
+    tester,
+  ) async {
+    await pumpAccountBook(tester);
+    await openRecord(tester);
+    await tapKey(tester, '6');
+    await commit(tester);
+
+    await openAccounts(tester);
+    await tester.tap(find.text('Cash'));
+    await tester.pumpAndSettle();
+    expect(find.text('-6'), findsWidgets);
+
+    await tester.tap(find.text('Food'));
+    await tester.pumpAndSettle();
+    await tapKey(tester, '←');
+    await tapKey(tester, '9');
+    await commit(tester);
+
+    expect(find.text('-9'), findsWidgets);
+    expect(find.text('-6'), findsNothing);
   });
 }
 

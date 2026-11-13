@@ -5,12 +5,10 @@ import 'package:money_manager/themes/app_themes.dart';
 class AppTabBar extends StatelessWidget {
   final int selectedIndex;
   final ValueChanged<int> onSelected;
-  final VoidCallback onRecord;
 
   const AppTabBar({
     required this.selectedIndex,
     required this.onSelected,
-    required this.onRecord,
     super.key,
   });
 
@@ -42,20 +40,6 @@ class AppTabBar extends StatelessWidget {
                   icon: Icons.pie_chart_outline,
                   label: l10n.analysis,
                   onTap: () => onSelected(1),
-                ),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: AppSpacing.s),
-                  child: IconButton(
-                    tooltip: l10n.record,
-                    onPressed: onRecord,
-                    style: IconButton.styleFrom(
-                      backgroundColor: scheme.primary,
-                      foregroundColor: scheme.onPrimary,
-                      fixedSize: const Size.square(56),
-                      shape: const CircleBorder(),
-                    ),
-                    icon: const Icon(Icons.add),
-                  ),
                 ),
                 _TabItem(
                   selected: selectedIndex == 2,

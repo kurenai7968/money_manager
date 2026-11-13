@@ -16,6 +16,8 @@ class HomeSummaryView extends StatelessWidget {
   final List<CategoryModel> categories;
   final List<AccountModel> accounts;
   final String locale;
+  final EdgeInsets listPadding;
+  final VoidCallback onRecordReturned;
 
   const HomeSummaryView({
     required this.figures,
@@ -23,6 +25,8 @@ class HomeSummaryView extends StatelessWidget {
     required this.categories,
     required this.accounts,
     required this.locale,
+    required this.listPadding,
+    required this.onRecordReturned,
     super.key,
   });
 
@@ -109,6 +113,8 @@ class HomeSummaryView extends StatelessWidget {
                   categories: categories,
                   accounts: accounts,
                   locale: locale,
+                  padding: listPadding,
+                  onReturned: onRecordReturned,
                 ),
         ),
       ],

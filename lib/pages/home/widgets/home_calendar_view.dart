@@ -20,6 +20,8 @@ class HomeCalendarView extends StatelessWidget {
   final FirstDayOfWeek firstDayOfWeek;
   final String locale;
   final ValueChanged<DateTime> onSelect;
+  final EdgeInsets listPadding;
+  final VoidCallback onRecordReturned;
 
   const HomeCalendarView({
     required this.month,
@@ -31,6 +33,8 @@ class HomeCalendarView extends StatelessWidget {
     required this.firstDayOfWeek,
     required this.locale,
     required this.onSelect,
+    required this.listPadding,
+    required this.onRecordReturned,
     super.key,
   });
 
@@ -84,6 +88,8 @@ class HomeCalendarView extends StatelessWidget {
                   accounts: accounts,
                   locale: locale,
                   showDayHeaders: false,
+                  padding: listPadding,
+                  onReturned: onRecordReturned,
                 ),
         ),
       ],

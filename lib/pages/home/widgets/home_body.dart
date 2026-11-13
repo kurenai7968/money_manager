@@ -5,6 +5,7 @@ import 'package:money_manager/pages/home/bloc/home_bloc.dart';
 import 'package:money_manager/pages/home/bloc/home_event.dart';
 import 'package:money_manager/pages/home/bloc/home_state.dart';
 import 'package:money_manager/pages/home/widgets/home_calendar_view.dart';
+import 'package:money_manager/pages/home/widgets/home_record_button.dart';
 import 'package:money_manager/pages/home/widgets/home_summary_view.dart';
 
 class HomeBody extends StatelessWidget {
@@ -19,6 +20,11 @@ class HomeBody extends StatelessWidget {
         .state
         .appSetting
         .firstDayOfWeek;
+    const listPadding = EdgeInsets.only(bottom: HomeRecordButton.listClearance);
+    void reload() {
+      context.read<HomeBloc>().add(const HomeInitialized());
+    }
+
     if (state.view == HomeView.summary) {
       return HomeSummaryView(
         figures: state.figures,
@@ -26,6 +32,8 @@ class HomeBody extends StatelessWidget {
         categories: state.categories,
         accounts: state.accounts,
         locale: locale,
+        listPadding: listPadding,
+        onRecordReturned: reload,
       );
     }
     return HomeCalendarView(
@@ -38,6 +46,8 @@ class HomeBody extends StatelessWidget {
       firstDayOfWeek: firstDay,
       locale: locale,
       onSelect: (day) => context.read<HomeBloc>().add(HomeDaySelected(day)),
+      listPadding: listPadding,
+      onRecordReturned: reload,
     );
   }
 }

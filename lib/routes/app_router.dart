@@ -24,10 +24,7 @@ class AppRouter {
       routes: [
         StatefulShellRoute.indexedStack(
           builder: (context, state, navigationShell) {
-            return AppShell(
-              navigationShell: navigationShell,
-              onRecord: () => context.push(AppRoutes.record.path),
-            );
+            return AppShell(navigationShell: navigationShell);
           },
           branches: [
             StatefulShellBranch(
@@ -96,10 +93,9 @@ class AppRouter {
         GoRoute(
           path: AppRoutes.accountDetail.path,
           parentNavigatorKey: _rootKey,
-          builder: (context, state) =>
-              AccountDetailPage(
-                accountId: _readId(state.pathParameters['id']) ?? 0,
-              ),
+          builder: (context, state) => AccountDetailPage(
+            accountId: _readId(state.pathParameters['id']) ?? 0,
+          ),
         ),
         GoRoute(
           path: AppRoutes.categories.path,

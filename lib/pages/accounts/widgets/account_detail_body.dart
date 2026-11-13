@@ -5,6 +5,7 @@ import 'package:money_manager/core/extensions/context_extension.dart';
 import 'package:money_manager/core/utils/money_format.dart';
 import 'package:money_manager/models/account_book_kinds.dart';
 import 'package:money_manager/pages/accounts/bloc/account_detail_bloc.dart';
+import 'package:money_manager/pages/accounts/bloc/account_detail_event.dart';
 import 'package:money_manager/routes/app_routes.dart';
 import 'package:money_manager/themes/app_themes.dart';
 import 'package:money_manager/widgets/transaction_item.dart';
@@ -24,6 +25,10 @@ class AccountDetailBody extends StatelessWidget {
     }
     final locale = Localizations.localeOf(context).toString();
     final isCredit = account.type == AccountType.credit;
+    void reload() {
+      context.read<AccountDetailBloc>().add(const AccountDetailInitialized());
+    }
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -55,6 +60,7 @@ class AccountDetailBody extends StatelessWidget {
             categories: state.categories,
             accounts: state.accounts,
             locale: locale,
+            onReturned: reload,
           ),
         ),
         Padding(
@@ -62,9 +68,15 @@ class AccountDetailBody extends StatelessWidget {
           child: SizedBox(
             width: double.infinity,
             child: FilledButton(
-              onPressed: () => context.push(
-                '${AppRoutes.record.path}?type=transfer&from=${account.id}',
-              ),
+              onPressed: () async {
+                await context.push(
+                  '${AppRoutes.record.path}?type=transfer&from=${account.id}',
+                );
+                if (!context.mounted) {
+                  return;
+                }
+                reload();
+              },
               child: Text(l10n.transfer),
             ),
           ),

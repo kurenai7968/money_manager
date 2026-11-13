@@ -4,13 +4,8 @@ import 'package:money_manager/widgets/app_tab_bar.dart';
 
 class AppShell extends StatelessWidget {
   final StatefulNavigationShell navigationShell;
-  final VoidCallback onRecord;
 
-  const AppShell({
-    required this.navigationShell,
-    required this.onRecord,
-    super.key,
-  });
+  const AppShell({required this.navigationShell, super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -18,7 +13,6 @@ class AppShell extends StatelessWidget {
       body: navigationShell,
       bottomNavigationBar: AppTabBar(
         selectedIndex: navigationShell.currentIndex,
-        onRecord: onRecord,
         onSelected: (index) {
           navigationShell.goBranch(
             index,

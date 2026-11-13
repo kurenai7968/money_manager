@@ -17,6 +17,8 @@ class TransactionList extends StatelessWidget {
   final List<AccountModel> accounts;
   final String locale;
   final bool showDayHeaders;
+  final EdgeInsets? padding;
+  final VoidCallback? onReturned;
 
   const TransactionList({
     required this.transactions,
@@ -24,6 +26,8 @@ class TransactionList extends StatelessWidget {
     required this.accounts,
     required this.locale,
     this.showDayHeaders = true,
+    this.padding,
+    this.onReturned,
     super.key,
   });
 
@@ -31,8 +35,14 @@ class TransactionList extends StatelessWidget {
   Widget build(BuildContext context) {
     final categoriesById = _firstById(categories, (category) => category.id);
     final accountsById = _firstById(accounts, (account) => account.id);
+    final listPadding =
+        padding ??
+        (showDayHeaders
+            ? const EdgeInsets.only(bottom: AppSpacing.s)
+            : EdgeInsets.zero);
     if (!showDayHeaders) {
       return ListView.separated(
+        padding: listPadding,
         itemCount: transactions.length,
         separatorBuilder: (context, _) =>
             Divider(height: 1, color: Theme.of(context).colorScheme.outline),
@@ -44,6 +54,7 @@ class TransactionList extends StatelessWidget {
             categoriesById: categoriesById,
             accountsById: accountsById,
             locale: locale,
+            onReturned: onReturned,
           );
         },
       );
@@ -70,7 +81,7 @@ class TransactionList extends StatelessWidget {
       }
     }
     return ListView.builder(
-      padding: const EdgeInsets.only(bottom: AppSpacing.s),
+      padding: listPadding,
       itemCount: entries.length,
       itemBuilder: (context, index) {
         final entry = entries[index];
@@ -97,6 +108,7 @@ class TransactionList extends StatelessWidget {
                 categoriesById: categoriesById,
                 accountsById: accountsById,
                 locale: locale,
+                onReturned: onReturned,
               ),
             ],
           ),
@@ -113,6 +125,7 @@ class TransactionItem extends StatelessWidget {
   final String locale;
   final Map<int, CategoryModel>? categoriesById;
   final Map<int, AccountModel>? accountsById;
+  final VoidCallback? onReturned;
 
   const TransactionItem({
     required this.transaction,
@@ -121,6 +134,7 @@ class TransactionItem extends StatelessWidget {
     required this.locale,
     this.categoriesById,
     this.accountsById,
+    this.onReturned,
     super.key,
   });
 
@@ -139,8 +153,13 @@ class TransactionItem extends StatelessWidget {
     return Material(
       type: MaterialType.transparency,
       child: InkWell(
-        onTap: () =>
-            context.push('${AppRoutes.record.path}?id=${transaction.id}'),
+        onTap: () async {
+          await context.push('${AppRoutes.record.path}?id=${transaction.id}');
+          if (!context.mounted) {
+            return;
+          }
+          onReturned?.call();
+        },
         child: Padding(
           padding: const EdgeInsets.symmetric(
             horizontal: AppSpacing.l,
@@ -175,9 +194,7 @@ class TransactionItem extends StatelessWidget {
                           _amount(),
                           maxLines: 1,
                           style: Theme.of(context).textTheme.titleMedium
-                              ?.copyWith(
-                                color: _amountColor(context),
-                              ),
+                              ?.copyWith(color: _amountColor(context)),
                         ),
                       ],
                     ),

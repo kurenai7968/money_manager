@@ -75,6 +75,28 @@ void main() {
     await pumpApp(tester);
     await tester.pumpAndSettle();
 
+    final now = DateTime.now();
+    await tester.tap(find.byTooltip('Next month'));
+    await tester.pump();
+    final nextMonth = DateFormat.yMMMM('en')
+        .format(DateTime(now.year, now.month + 1));
+    expect(find.text(nextMonth), findsOneWidget);
+
+    final button = find.byType(FloatingActionButton);
+    expect(button, findsOneWidget);
+    expect(
+      find.descendant(
+        of: find.byType(AppTabBar),
+        matching: find.byIcon(Icons.add),
+      ),
+      findsNothing,
+    );
+    final fab = tester.getRect(button);
+    final bar = tester.getRect(find.byType(AppTabBar));
+    expect(fab.center.dx, greaterThan(bar.center.dx));
+    expect(fab.bottom, lessThanOrEqualTo(bar.top));
+    expect(bar.right - fab.right, lessThan(32));
+
     await tester.tap(find.byTooltip('Record'));
     await tester.pumpAndSettle();
 
@@ -85,6 +107,7 @@ void main() {
     await tester.tap(find.byType(BackButton));
     await tester.pumpAndSettle();
     expect(find.text('Home'), findsOneWidget);
+    expect(find.text(nextMonth), findsOneWidget);
   });
 
   testWidgets('Adding an account shows it in the list', (tester) async {
