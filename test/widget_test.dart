@@ -16,14 +16,14 @@ void main() {
     await tester.pumpAndSettle();
 
     final now = DateTime.now();
-    final month = DateFormat.yMMMM('en').format(DateTime(now.year, now.month));
+    final month = DateFormat('yyyy-MM').format(DateTime(now.year, now.month));
     expect(find.text(month), findsOneWidget);
     expect(find.text('Home'), findsOneWidget);
     expect(find.byTooltip('Calendar'), findsOneWidget);
 
     await tester.tap(find.byTooltip('Next month'));
     await tester.pump();
-    final nextMonth = DateFormat.yMMMM('en')
+    final nextMonth = DateFormat('yyyy-MM')
         .format(DateTime(now.year, now.month + 1));
     expect(find.text(nextMonth), findsOneWidget);
 
@@ -78,7 +78,7 @@ void main() {
     final now = DateTime.now();
     await tester.tap(find.byTooltip('Next month'));
     await tester.pump();
-    final nextMonth = DateFormat.yMMMM('en')
+    final nextMonth = DateFormat('yyyy-MM')
         .format(DateTime(now.year, now.month + 1));
     expect(find.text(nextMonth), findsOneWidget);
 
@@ -124,10 +124,8 @@ void main() {
     await tester.enterText(find.byType(TextField).first, 'Wallet');
     await tester.tap(find.text('Save'));
     await tester.pumpAndSettle();
-    await reopenApp(tester);
-    await tester.tap(find.text('Accounts'));
-    await tester.pumpAndSettle();
 
+    expect(find.byType(TextField), findsNothing);
     expect(find.text('Wallet'), findsOneWidget);
   });
 

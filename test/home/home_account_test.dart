@@ -15,11 +15,18 @@ void main() {
     tester.view.devicePixelRatio = 1;
     addTearDown(tester.view.resetPhysicalSize);
     addTearDown(tester.view.resetDevicePixelRatio);
+    await tester.binding.setSurfaceSize(const Size(390, 844));
+    addTearDown(() => tester.binding.setSurfaceSize(null));
 
     await pumpApp(tester);
     await tester.pumpAndSettle();
 
     expect(find.text('All'), findsOneWidget);
+    _expectAccountBeforeMonth(tester, 'All');
+    expect(
+      tester.getSize(find.byTooltip('Previous month')).width,
+      lessThanOrEqualTo(32),
+    );
 
     await tester.tap(find.byTooltip('Choose account'));
     await tester.pumpAndSettle();
@@ -50,6 +57,8 @@ void main() {
     tester.view.devicePixelRatio = 1;
     addTearDown(tester.view.resetPhysicalSize);
     addTearDown(tester.view.resetDevicePixelRatio);
+    await tester.binding.setSurfaceSize(const Size(390, 844));
+    addTearDown(() => tester.binding.setSurfaceSize(null));
 
     await pumpApp(
       tester,
@@ -85,4 +94,56 @@ void main() {
     );
     expect(find.text('Account 39'), findsOneWidget);
   });
+
+  testWidgets('a long account name keeps its beginning', (tester) async {
+    tester.platformDispatcher.localeTestValue = const Locale('en');
+    addTearDown(tester.platformDispatcher.clearLocaleTestValue);
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    await tester.binding.setSurfaceSize(const Size(390, 844));
+    addTearDown(() => tester.binding.setSurfaceSize(null));
+
+    const name = 'North Station cash wallet extra';
+    await pumpApp(
+      tester,
+      accounts: const [
+        AccountModel(
+          id: 1,
+          name: name,
+          type: AccountType.cash,
+          icon: 'other',
+          sortOrder: 0,
+        ),
+      ],
+    );
+    await tester.pumpAndSettle();
+    await tester.tap(find.byTooltip('Choose account'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text(name));
+    await tester.pumpAndSettle();
+
+    final label = tester.widget<Text>(find.text(name));
+    expect(label.maxLines, 1);
+    expect(label.overflow, TextOverflow.ellipsis);
+    expect(label.softWrap, isFalse);
+    _expectAccountBeforeMonth(tester, name);
+    expect(tester.getSize(find.text(name)).width, lessThan(160));
+  });
+}
+
+Finder get _yearMonth {
+  return find.byWidgetPredicate((widget) {
+    final text = widget is Text ? widget.data : null;
+    return text != null && RegExp(r'^\d{4}-\d{2}$').hasMatch(text);
+  });
+}
+
+void _expectAccountBeforeMonth(WidgetTester tester, String label) {
+  final account = tester.getRect(find.text(label));
+  final month = tester.getRect(_yearMonth);
+  expect(account.left, lessThan(24));
+  expect(account.width, greaterThan(12));
+  expect(account.right, lessThanOrEqualTo(month.left));
 }

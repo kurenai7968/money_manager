@@ -42,9 +42,8 @@ class AppProviders extends StatelessWidget {
         ),
       ],
       child: BlocProvider(
-        create: (context) => AppSettingBloc(
-          appSettingRepository: context.read<AppSettingRepository>(),
-        ),
+        create: (context) =>
+            AppSettingBloc(appSettingRepository: context.read()),
         child: child,
       ),
     );

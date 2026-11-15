@@ -22,6 +22,7 @@ Personal account book for one person. Phone first. Utility register.
 - 2026-10-23: Style is Minimal and clean. Monochrome. Serif and persimmon are out.
 - 2026-10-23: Home is one page. The app bar has one action. Its icon is the other mode: calendar opens the calendar, bars return to the summary. The month stays in the title.
 - 2026-11-06: The home app bar keeps the month as the centered title and the action that switches summary and calendar. A leading control selects one account or all accounts. All is the default. The control opens a sheet.
+- 2026-11-13: The home month stays centered. Its step controls are compact so the leading account keeps room. A long account name ellipsizes after the first characters.
 - 2026-11-06: Modal bottom sheets use the page background, a 12 top radius, and no shadow. An account sheet is at most half the screen and scrolls past that.
 - 2026-10-23: A month has one 結餘: income minus expense. Transfers stay out of 結餘.
 - 2026-10-23: Category create and edit live under Settings. The transaction page only picks a category.

@@ -15,50 +15,60 @@ class HomeAppBar extends StatelessWidget implements PreferredSizeWidget {
   const HomeAppBar({super.key});
 
   @override
-  Size get preferredSize => const Size.fromHeight(kToolbarHeight);
-
-  @override
   Widget build(BuildContext context) {
     final state = context.watch<HomeBloc>().state;
     final l10n = context.l10n;
     final showingSummary = state.view == HomeView.summary;
     final locale = Localizations.localeOf(context).toString();
-    final monthLabel = cachedYearMonth(locale).format(state.month);
+    final monthLabel = cachedDateFormat(locale, 'yyyy-MM').format(state.month);
     return BaseAppBar(
-      leadingWidth: 120,
-      leading: _HomeAccountButton(
-        label: _accountLabel(context, state),
-        tooltip: l10n.chooseAccount,
-        onPressed: () => _pickAccount(context, state),
-      ),
+      automaticallyImplyLeading: false,
       title: Row(
-        mainAxisSize: MainAxisSize.min,
+        mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          IconButton(
+          Expanded(
+            child: _HomeAccountButton(
+              label: _accountLabel(context, state),
+              tooltip: l10n.chooseAccount,
+              onPressed: () => _pickAccount(context, state),
+            ),
+          ),
+          _BarIconButton(
             tooltip: l10n.previousMonth,
+            icon: Icons.chevron_left,
             onPressed: () =>
                 context.read<HomeBloc>().add(const HomeMonthShifted(-1)),
-            icon: const Icon(Icons.chevron_left),
           ),
-          Flexible(child: Text(monthLabel, overflow: TextOverflow.ellipsis)),
-          IconButton(
+          Flexible(
+            child: Text(
+              monthLabel,
+              maxLines: 1,
+              softWrap: false,
+              overflow: TextOverflow.ellipsis,
+              textAlign: TextAlign.center,
+            ),
+          ),
+          _BarIconButton(
             tooltip: l10n.nextMonth,
+            icon: Icons.chevron_right,
             onPressed: () =>
                 context.read<HomeBloc>().add(const HomeMonthShifted(1)),
-            icon: const Icon(Icons.chevron_right),
+          ),
+          Expanded(
+            child: Align(
+              alignment: AlignmentDirectional.centerEnd,
+              child: _BarIconButton(
+                tooltip: showingSummary ? l10n.showCalendar : l10n.showSummary,
+                icon: showingSummary
+                    ? Icons.calendar_today_outlined
+                    : Icons.bar_chart,
+                onPressed: () =>
+                    context.read<HomeBloc>().add(const HomeViewToggled()),
+              ),
+            ),
           ),
         ],
       ),
-      actions: [
-        IconButton(
-          tooltip: showingSummary ? l10n.showCalendar : l10n.showSummary,
-          onPressed: () =>
-              context.read<HomeBloc>().add(const HomeViewToggled()),
-          icon: Icon(
-            showingSummary ? Icons.calendar_today_outlined : Icons.bar_chart,
-          ),
-        ),
-      ],
     );
   }
 
@@ -80,6 +90,9 @@ class HomeAppBar extends StatelessWidget implements PreferredSizeWidget {
       context.read<HomeBloc>().add(HomeAccountSelected(picked.accountId));
     }
   }
+
+  @override
+  Size get preferredSize => const Size.fromHeight(kToolbarHeight);
 }
 
 String _accountLabel(BuildContext context, HomeState state) {
@@ -93,6 +106,39 @@ String _accountLabel(BuildContext context, HomeState state) {
     }
   }
   return context.l10n.allAccounts;
+}
+
+class _BarIconButton extends StatelessWidget {
+  static const double extent = 32;
+
+  final String tooltip;
+  final IconData icon;
+  final VoidCallback onPressed;
+
+  const _BarIconButton({
+    required this.tooltip,
+    required this.icon,
+    required this.onPressed,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return IconButton(
+      tooltip: tooltip,
+      onPressed: onPressed,
+      icon: Icon(icon),
+      iconSize: 22,
+      padding: EdgeInsets.zero,
+      visualDensity: VisualDensity.compact,
+      style: IconButton.styleFrom(
+        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+        padding: EdgeInsets.zero,
+        minimumSize: const Size(extent, extent),
+        fixedSize: const Size(extent, extent),
+        visualDensity: VisualDensity.compact,
+      ),
+    );
+  }
 }
 
 class _HomeAccountButton extends StatelessWidget {
@@ -114,21 +160,28 @@ class _HomeAccountButton extends StatelessWidget {
         onTap: onPressed,
         child: SizedBox(
           height: kToolbarHeight,
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: AppSpacing.s),
-            child: Row(
-              children: [
-                Flexible(
-                  child: Text(
-                    label,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: Theme.of(context).textTheme.labelLarge,
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              final showIcon = constraints.maxWidth >= 36;
+              return Row(
+                children: [
+                  Flexible(
+                    child: Text(
+                      label,
+                      maxLines: 1,
+                      softWrap: false,
+                      overflow: TextOverflow.ellipsis,
+                      style: Theme.of(context).textTheme.labelLarge,
+                    ),
                   ),
-                ),
-                const Icon(Icons.expand_more, size: 18),
-              ],
-            ),
+                  if (showIcon) ...[
+                    const SizedBox(width: AppSpacing.xs),
+                    const Icon(Icons.expand_more, size: 18),
+                    const SizedBox(width: AppSpacing.s),
+                  ],
+                ],
+              );
+            },
           ),
         ),
       ),

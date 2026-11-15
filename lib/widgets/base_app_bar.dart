@@ -23,11 +23,6 @@ class BaseAppBar extends StatelessWidget implements PreferredSizeWidget {
   });
 
   @override
-  Size get preferredSize => Size.fromHeight(
-    (appBarHeight ?? kToolbarHeight) + (bottom?.preferredSize.height ?? 0),
-  );
-
-  @override
   Widget build(BuildContext context) {
     return AppBar(
       title: title,
@@ -39,4 +34,9 @@ class BaseAppBar extends StatelessWidget implements PreferredSizeWidget {
       automaticallyImplyLeading: automaticallyImplyLeading,
     );
   }
+
+  @override
+  Size get preferredSize => Size.fromHeight(
+    (appBarHeight ?? kToolbarHeight) + (bottom?.preferredSize.height ?? 0),
+  );
 }
