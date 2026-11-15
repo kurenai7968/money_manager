@@ -1,13 +1,13 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:money_manager/pages/record/models/amount_expression.dart';
-import 'package:money_manager/services/account_book_service.dart';
+import 'package:money_manager/models/account_book_kinds.dart';
 import 'package:money_manager/models/account_book_model.dart';
 import 'package:money_manager/models/account_model.dart';
 import 'package:money_manager/models/category_model.dart';
-import 'package:money_manager/models/account_book_kinds.dart';
 import 'package:money_manager/models/transaction_model.dart';
 import 'package:money_manager/pages/record/bloc/record_event.dart';
 import 'package:money_manager/pages/record/bloc/record_state.dart';
+import 'package:money_manager/pages/record/models/amount_expression.dart';
+import 'package:money_manager/services/account_book_service.dart';
 
 class RecordBloc extends Bloc<RecordEvent, RecordState> {
   final AccountBookService _accountBook;
@@ -21,12 +21,9 @@ class RecordBloc extends Bloc<RecordEvent, RecordState> {
   List<TransactionModel> _transactionRows = const [];
   List<CategoryModel> _categoryRows = const [];
 
-  RecordBloc({
-    required AccountBookService accountBook,
-    DateTime Function()? now,
-  }) : _accountBook = accountBook,
-       _now = now ?? DateTime.now,
-       super(RecordState(date: (now ?? DateTime.now)())) {
+  RecordBloc({required this._accountBook, DateTime Function()? now})
+    : _now = now ?? DateTime.now,
+      super(RecordState(date: (now ?? DateTime.now)())) {
     on<RecordInitialized>(_onInitialized);
     on<RecordTypeSelected>(_onTypeSelected);
     on<RecordDateSelected>(_onDateSelected);
