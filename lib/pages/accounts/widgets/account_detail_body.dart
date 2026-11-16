@@ -57,6 +57,7 @@ class AccountDetailBody extends StatelessWidget {
         Expanded(
           child: TransactionList(
             transactions: state.history,
+            days: state.days,
             categories: state.categories,
             accounts: state.accounts,
             locale: locale,
@@ -70,7 +71,10 @@ class AccountDetailBody extends StatelessWidget {
             child: FilledButton(
               onPressed: () async {
                 await context.push(
-                  '${AppRoutes.record.path}?type=transfer&from=${account.id}',
+                  AppRoutes.recordLocation(
+                    type: TransactionType.transfer.name,
+                    from: account.id,
+                  ),
                 );
                 if (!context.mounted) {
                   return;

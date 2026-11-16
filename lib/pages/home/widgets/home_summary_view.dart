@@ -12,6 +12,7 @@ import 'package:money_manager/widgets/transaction_item.dart';
 
 class HomeSummaryView extends StatelessWidget {
   final MonthFigures figures;
+  final List<DayLedger> days;
   final List<TransactionModel> transactions;
   final List<CategoryModel> categories;
   final List<AccountModel> accounts;
@@ -21,6 +22,7 @@ class HomeSummaryView extends StatelessWidget {
 
   const HomeSummaryView({
     required this.figures,
+    required this.days,
     required this.transactions,
     required this.categories,
     required this.accounts,
@@ -110,6 +112,7 @@ class HomeSummaryView extends StatelessWidget {
               ? Center(child: Text(l10n.emptyMonth))
               : TransactionList(
                   transactions: transactions,
+                  days: days,
                   categories: categories,
                   accounts: accounts,
                   locale: locale,

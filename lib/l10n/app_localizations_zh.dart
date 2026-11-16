@@ -58,9 +58,6 @@ class AppLocalizationsZh extends AppLocalizations {
   String get name => '名稱';
 
   @override
-  String get openingBalance => '初始餘額';
-
-  @override
   String get cash => '現金';
 
   @override
@@ -328,9 +325,6 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
 
   @override
   String get name => '名称';
-
-  @override
-  String get openingBalance => '初始余额';
 
   @override
   String get cash => '现金';

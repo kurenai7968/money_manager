@@ -37,6 +37,7 @@ class AnalysisBloc extends Bloc<AnalysisEvent, AnalysisState> {
     AnalysisInitialized event,
     Emitter<AnalysisState> emit,
   ) async {
+    emit(state.copyWith(status: AnalysisStatus.loading));
     await _load();
     _publish(emit, state);
   }

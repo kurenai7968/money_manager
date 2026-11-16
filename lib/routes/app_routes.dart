@@ -15,9 +15,24 @@ enum AppRoutes {
 
   final String path;
 
-  static String account(int id) => '/account/$id';
+  static String account(int id) =>
+      AppRoutes.accountDetail.path.replaceFirst(':id', '$id');
 
-  static String editAccount(int id) => '/account/$id/edit';
+  static String editAccount(int id) =>
+      AppRoutes.accountEdit.path.replaceFirst(':id', '$id');
 
-  static String editCategory(int id) => '/category/$id';
+  static String editCategory(int id) =>
+      AppRoutes.categoryEdit.path.replaceFirst(':id', '$id');
+
+  static String recordLocation({int? id, String? type, int? from}) {
+    final query = <String, String>{
+      if (id != null) 'id': '$id',
+      if (type != null) 'type': type,
+      if (from != null) 'from': '$from',
+    };
+    if (query.isEmpty) {
+      return AppRoutes.record.path;
+    }
+    return Uri(path: AppRoutes.record.path, queryParameters: query).toString();
+  }
 }

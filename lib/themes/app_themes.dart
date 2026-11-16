@@ -20,29 +20,34 @@ abstract final class AppThemes {
 
   static ThemeData _theme(Brightness brightness) {
     final isLight = brightness == Brightness.light;
+    final primary = isLight ? const Color(0xFFC2410C) : const Color(0xFFD46A4A);
+    final onPrimary = isLight
+        ? const Color(0xFFFFF8F5)
+        : const Color(0xFF2A120C);
+    final surface = isLight ? const Color(0xFFF7F7F6) : const Color(0xFF141413);
+    final onSurface = isLight
+        ? const Color(0xFF171717)
+        : const Color(0xFFE8E6E1);
+    final muted = isLight ? const Color(0xFF5C5C5C) : const Color(0xFFB7B3AC);
+    final hairline = isLight
+        ? const Color(0xFFE6E6E4)
+        : const Color(0xFF3A3834);
     final scheme =
-        ColorScheme.fromSeed(
-          seedColor: isLight
-              ? const Color(0xFFC2410C)
-              : const Color(0xFFD46A4A),
+        ColorScheme(
           brightness: brightness,
-          dynamicSchemeVariant: DynamicSchemeVariant.fidelity,
+          primary: primary,
+          onPrimary: onPrimary,
+          secondary: primary,
+          onSecondary: onPrimary,
+          error: const Color(0xFFB3261E),
+          onError: const Color(0xFFFFFFFF),
+          surface: surface,
+          onSurface: onSurface,
         ).copyWith(
-          primary: isLight ? const Color(0xFFC2410C) : const Color(0xFFD46A4A),
-          onPrimary: isLight
-              ? const Color(0xFFFFF8F5)
-              : const Color(0xFF2A120C),
-          surface: isLight ? const Color(0xFFF7F7F6) : const Color(0xFF141413),
-          onSurface: isLight
-              ? const Color(0xFF171717)
-              : const Color(0xFFE8E6E1),
-          onSurfaceVariant: isLight
-              ? const Color(0xFF5C5C5C)
-              : const Color(0xFFB7B3AC),
-          outline: isLight ? const Color(0xFFE6E6E4) : const Color(0xFF3A3834),
-          outlineVariant: isLight
-              ? const Color(0xFFE6E6E4)
-              : const Color(0xFF3A3834),
+          onSurfaceVariant: muted,
+          outline: hairline,
+          outlineVariant: hairline,
+          surfaceContainerHighest: hairline,
         );
 
     return ThemeData(

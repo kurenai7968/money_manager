@@ -27,6 +27,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     HomeInitialized event,
     Emitter<HomeState> emit,
   ) async {
+    emit(state.copyWith(status: HomeStatus.loading));
     await _load();
     _publish(emit, state);
   }

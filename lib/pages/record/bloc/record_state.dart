@@ -4,7 +4,7 @@ import 'package:money_manager/models/account_model.dart';
 import 'package:money_manager/models/category_model.dart';
 import 'package:money_manager/models/account_book_kinds.dart';
 
-enum RecordStatus { initial, success, failure }
+enum RecordStatus { initial, loading, success, failure }
 
 enum RecordError {
   none,

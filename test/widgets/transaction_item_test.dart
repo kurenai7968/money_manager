@@ -5,6 +5,7 @@ import 'package:money_manager/l10n/app_localizations.dart';
 import 'package:money_manager/models/account_model.dart';
 import 'package:money_manager/models/category_model.dart';
 import 'package:money_manager/models/account_book_kinds.dart';
+import 'package:money_manager/models/day_ledger.dart';
 import 'package:money_manager/models/transaction_model.dart';
 import 'package:money_manager/themes/app_themes.dart';
 import 'package:money_manager/themes/account_book_palette.dart';
@@ -125,6 +126,23 @@ void main() {
   });
 
   testWidgets('day header shows the date and that day expense', (tester) async {
+    final transactions = [
+      TransactionModel(
+        id: 4,
+        type: TransactionType.expense,
+        amount: 88.0,
+        date: DateTime(2026, 10, 30),
+        categoryId: _food.id,
+        accountId: _cash.id,
+      ),
+      TransactionModel(
+        id: 7,
+        type: TransactionType.income,
+        amount: 1.0,
+        date: DateTime(2026, 10, 29),
+        accountId: 2,
+      ),
+    ];
     await tester.pumpWidget(
       MaterialApp(
         locale: const Locale('en'),
@@ -133,23 +151,8 @@ void main() {
         theme: AppThemes.light,
         home: Scaffold(
           body: TransactionList(
-            transactions: [
-              TransactionModel(
-                id: 4,
-                type: TransactionType.expense,
-                amount: 88.0,
-                date: DateTime(2026, 10, 30),
-                categoryId: _food.id,
-                accountId: _cash.id,
-              ),
-              TransactionModel(
-                id: 7,
-                type: TransactionType.income,
-                amount: 1.0,
-                date: DateTime(2026, 10, 29),
-                accountId: 2,
-              ),
-            ],
+            transactions: transactions,
+            days: daysOf(transactions),
             categories: const [_food],
             accounts: const [_cash],
             locale: 'en',

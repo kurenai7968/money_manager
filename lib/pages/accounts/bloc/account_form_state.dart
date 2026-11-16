@@ -1,7 +1,7 @@
 import 'package:equatable/equatable.dart';
 import 'package:money_manager/models/account_book_kinds.dart';
 
-enum AccountFormStatus { initial, success, failure }
+enum AccountFormStatus { initial, loading, success, failure }
 
 enum AccountFormError { none, nameRequired, archiveBlocked }
 

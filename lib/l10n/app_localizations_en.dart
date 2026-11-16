@@ -58,9 +58,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get name => 'Name';
 
   @override
-  String get openingBalance => 'Opening balance';
-
-  @override
   String get cash => 'Cash';
 
   @override

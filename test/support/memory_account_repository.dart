@@ -62,8 +62,14 @@ class MemoryAccountRepository implements AccountRepository {
     }
   }
 
+  Object? saveError;
+
   @override
   Future<int> save(AccountModel account) async {
+    final error = saveError;
+    if (error != null) {
+      throw error;
+    }
     final id = account.id ?? _nextId++;
     if (id >= _nextId) {
       _nextId = id + 1;

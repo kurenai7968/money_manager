@@ -97,6 +97,11 @@ void main() {
       bloc.add(const AnalysisKindSelected(CategoryKind.income));
     },
     expect: () => [
+      isA<AnalysisState>().having(
+        (state) => state.status,
+        'status',
+        AnalysisStatus.loading,
+      ),
       isA<AnalysisState>()
           .having((state) => state.rollup.current, 'current', 4.0)
           .having((state) => state.rollup.previous, 'previous', 1.0)
@@ -118,6 +123,11 @@ void main() {
     build: () => buildBloc(transactions: _FailingTransactions()),
     act: (bloc) => bloc.add(const AnalysisInitialized()),
     expect: () => [
+      isA<AnalysisState>().having(
+        (state) => state.status,
+        'status',
+        AnalysisStatus.loading,
+      ),
       isA<AnalysisState>()
           .having((state) => state.status, 'status', AnalysisStatus.failure)
           .having((state) => state.rollup.current, 'current', 0.0)

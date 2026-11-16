@@ -195,12 +195,6 @@ abstract class AppLocalizations {
   /// **'Name'**
   String get name;
 
-  /// No description provided for @openingBalance.
-  ///
-  /// In en, this message translates to:
-  /// **'Opening balance'**
-  String get openingBalance;
-
   /// No description provided for @cash.
   ///
   /// In en, this message translates to:

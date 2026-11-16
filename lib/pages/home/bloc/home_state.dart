@@ -6,7 +6,7 @@ import 'package:money_manager/pages/home/models/home_figures.dart';
 
 enum HomeView { summary, calendar }
 
-enum HomeStatus { initial, success, failure }
+enum HomeStatus { initial, loading, success, failure }
 
 class HomeState extends Equatable {
   final HomeStatus status;

@@ -66,6 +66,11 @@ void main() {
       bloc.add(const HomeInitialized());
     },
     expect: () => [
+      isA<HomeState>().having(
+        (state) => state.status,
+        'status',
+        HomeStatus.loading,
+      ),
       isA<HomeState>()
           .having((state) => state.status, 'status', HomeStatus.success)
           .having((state) => state.figures.expense, 'expense', 18)
@@ -87,6 +92,11 @@ void main() {
       bloc.add(const HomeMonthShifted(1));
     },
     expect: () => [
+      isA<HomeState>().having(
+        (state) => state.status,
+        'status',
+        HomeStatus.loading,
+      ),
       isA<HomeState>().having((state) => state.selectedDay, 'today', day),
       isA<HomeState>()
           .having((state) => state.month, 'month', nextMonth)
@@ -100,6 +110,11 @@ void main() {
     build: () => buildBloc(transactions: _FailingTransactions()),
     act: (bloc) => bloc.add(const HomeInitialized()),
     expect: () => [
+      isA<HomeState>().having(
+        (state) => state.status,
+        'status',
+        HomeStatus.loading,
+      ),
       isA<HomeState>()
           .having((state) => state.status, 'status', HomeStatus.failure)
           .having((state) => state.figures.expense, 'expense', 0)
@@ -133,6 +148,11 @@ void main() {
         ..add(const HomeAccountSelected(null));
     },
     expect: () => [
+      isA<HomeState>().having(
+        (state) => state.status,
+        'status',
+        HomeStatus.loading,
+      ),
       isA<HomeState>()
           .having((state) => state.selectedAccountId, 'account', isNull)
           .having((state) => state.figures.income, 'income', 9)
@@ -175,13 +195,21 @@ void main() {
     },
     expect: () => [
       isA<HomeState>().having(
-        (state) => state.selectedAccountId,
-        'account',
-        isNull,
+        (state) => state.status,
+        'status',
+        HomeStatus.loading,
       ),
+      isA<HomeState>()
+          .having((state) => state.status, 'status', HomeStatus.success)
+          .having((state) => state.selectedAccountId, 'account', isNull),
       isA<HomeState>()
           .having((state) => state.selectedAccountId, 'account', 1)
           .having((state) => state.transactions, 'rows', hasLength(2)),
+      isA<HomeState>().having(
+        (state) => state.status,
+        'status',
+        HomeStatus.loading,
+      ),
       isA<HomeState>()
           .having((state) => state.selectedAccountId, 'account', isNull)
           .having((state) => state.transactions, 'rows', hasLength(2))

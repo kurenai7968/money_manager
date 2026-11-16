@@ -51,6 +51,11 @@ void main() {
       bloc.add(const AccountFormSavePressed(name: '  ', languageCode: 'en'));
     },
     expect: () => [
+      isA<AccountFormState>().having(
+        (state) => state.status,
+        'status',
+        AccountFormStatus.loading,
+      ),
       isA<AccountFormState>()
           .having((state) => state.prepared, 'prepared', isTrue)
           .having((state) => state.sortOrder, 'sort', 5),
@@ -74,7 +79,9 @@ void main() {
       if (!bloc.state.prepared) {
         await bloc.stream.firstWhere((state) => state.prepared);
       }
-      bloc.add(const AccountFormSavePressed(name: 'Wallet', languageCode: 'en'));
+      bloc.add(
+        const AccountFormSavePressed(name: 'Wallet', languageCode: 'en'),
+      );
       if (!bloc.state.saved) {
         await bloc.stream.firstWhere((state) => state.saved);
       }
@@ -90,6 +97,11 @@ void main() {
       expect(bloc.state.saved, isTrue);
     },
     expect: () => [
+      isA<AccountFormState>().having(
+        (state) => state.status,
+        'status',
+        AccountFormStatus.loading,
+      ),
       isA<AccountFormState>().having(
         (state) => state.prepared,
         'prepared',
@@ -123,6 +135,11 @@ void main() {
     },
     expect: () => [
       isA<AccountFormState>().having(
+        (state) => state.status,
+        'status',
+        AccountFormStatus.loading,
+      ),
+      isA<AccountFormState>().having(
         (state) => state.editing,
         'editing',
         isTrue,
@@ -131,6 +148,38 @@ void main() {
         (state) => state.error,
         'error',
         AccountFormError.archiveBlocked,
+      ),
+    ],
+  );
+
+  blocTest<AccountFormBloc, AccountFormState>(
+    'emits failure when the account cannot be saved',
+    build: buildBloc,
+    act: (bloc) async {
+      bloc.add(const AccountFormInitialized(languageCode: 'en', locale: 'en'));
+      if (!bloc.state.prepared) {
+        await bloc.stream.firstWhere((state) => state.prepared);
+      }
+      accountRepo.saveError = StateError('unavailable');
+      bloc.add(
+        const AccountFormSavePressed(name: 'Wallet', languageCode: 'en'),
+      );
+    },
+    expect: () => [
+      isA<AccountFormState>().having(
+        (state) => state.status,
+        'status',
+        AccountFormStatus.loading,
+      ),
+      isA<AccountFormState>().having(
+        (state) => state.prepared,
+        'prepared',
+        isTrue,
+      ),
+      isA<AccountFormState>().having(
+        (state) => state.status,
+        'status',
+        AccountFormStatus.failure,
       ),
     ],
   );

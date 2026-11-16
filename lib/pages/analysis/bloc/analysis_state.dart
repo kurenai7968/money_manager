@@ -4,7 +4,7 @@ import 'package:money_manager/models/account_model.dart';
 import 'package:money_manager/models/category_model.dart';
 import 'package:money_manager/models/account_book_kinds.dart';
 
-enum AnalysisStatus { initial, success, failure }
+enum AnalysisStatus { initial, loading, success, failure }
 
 class AnalysisState extends Equatable {
   final AnalysisStatus status;

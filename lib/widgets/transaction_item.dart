@@ -6,6 +6,7 @@ import 'package:money_manager/core/utils/money_format.dart';
 import 'package:money_manager/models/account_model.dart';
 import 'package:money_manager/models/category_model.dart';
 import 'package:money_manager/models/account_book_kinds.dart';
+import 'package:money_manager/models/day_ledger.dart';
 import 'package:money_manager/models/transaction_model.dart';
 import 'package:money_manager/routes/app_routes.dart';
 import 'package:money_manager/themes/app_themes.dart';
@@ -13,6 +14,7 @@ import 'package:money_manager/themes/account_book_palette.dart';
 
 class TransactionList extends StatelessWidget {
   final List<TransactionModel> transactions;
+  final List<DayLedger> days;
   final List<CategoryModel> categories;
   final List<AccountModel> accounts;
   final String locale;
@@ -22,6 +24,7 @@ class TransactionList extends StatelessWidget {
 
   const TransactionList({
     required this.transactions,
+    this.days = const [],
     required this.categories,
     required this.accounts,
     required this.locale,
@@ -60,21 +63,20 @@ class TransactionList extends StatelessWidget {
       );
     }
 
-    final groups = _groupByDay(transactions);
     final entries = <_Entry>[];
-    for (var index = 0; index < groups.length; index++) {
-      final group = groups[index];
+    for (var index = 0; index < days.length; index++) {
+      final day = days[index];
       entries.add(
-        _DayHeaderEntry(
-          day: group.day,
-          expense: group.expense,
-          first: index == 0,
-        ),
+        _DayHeaderEntry(day: day.day, expense: day.expense, first: index == 0),
       );
-      for (var itemIndex = 0; itemIndex < group.items.length; itemIndex++) {
+      for (
+        var itemIndex = 0;
+        itemIndex < day.transactions.length;
+        itemIndex++
+      ) {
         entries.add(
           _TransactionEntry(
-            transaction: group.items[itemIndex],
+            transaction: day.transactions[itemIndex],
             divider: itemIndex > 0,
           ),
         );
@@ -154,7 +156,7 @@ class TransactionItem extends StatelessWidget {
       type: MaterialType.transparency,
       child: InkWell(
         onTap: () async {
-          await context.push('${AppRoutes.record.path}?id=${transaction.id}');
+          await context.push(AppRoutes.recordLocation(id: transaction.id));
           if (!context.mounted) {
             return;
           }
@@ -441,22 +443,7 @@ class _TransactionDayHeader extends StatelessWidget {
   }
 }
 
-class _DayGroup {
-  final DateTime day;
-  final List<TransactionModel> items;
-
-  _DayGroup(this.day, this.items);
-
-  double get expense {
-    var total = 0.0;
-    for (final item in items) {
-      if (item.type == TransactionType.expense) {
-        total += item.amount;
-      }
-    }
-    return total;
-  }
-}
+final _noteTag = RegExp(r'#[^\s#]+');
 
 sealed class _Entry {}
 
@@ -479,8 +466,6 @@ class _TransactionEntry extends _Entry {
   _TransactionEntry({required this.transaction, required this.divider});
 }
 
-final _noteTag = RegExp(r'#[^\s#]+');
-
 Map<int, T> _firstById<T>(List<T> items, int? Function(T item) idOf) {
   final index = <int, T>{};
   for (final item in items) {
@@ -490,24 +475,4 @@ Map<int, T> _firstById<T>(List<T> items, int? Function(T item) idOf) {
     }
   }
   return index;
-}
-
-List<_DayGroup> _groupByDay(List<TransactionModel> transactions) {
-  final groups = <_DayGroup>[];
-  final indexByDay = <DateTime, int>{};
-  for (final transaction in transactions) {
-    final day = DateTime(
-      transaction.date.year,
-      transaction.date.month,
-      transaction.date.day,
-    );
-    final index = indexByDay[day];
-    if (index == null) {
-      indexByDay[day] = groups.length;
-      groups.add(_DayGroup(day, [transaction]));
-    } else {
-      groups[index].items.add(transaction);
-    }
-  }
-  return groups;
 }

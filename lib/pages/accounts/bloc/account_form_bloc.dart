@@ -42,6 +42,7 @@ class AccountFormBloc extends Bloc<AccountFormEvent, AccountFormState> {
       emit(next);
       return;
     }
+    emit(next.copyWith(status: AccountFormStatus.loading));
     try {
       final loaded = await _accountBook.loadAccounts();
       _accountRows = [for (final book in loaded) book.account];
@@ -52,6 +53,8 @@ class AccountFormBloc extends Bloc<AccountFormEvent, AccountFormState> {
     } catch (_) {
       _accountRows = const [];
       _balances = const {};
+      emit(next.copyWith(status: AccountFormStatus.failure));
+      return;
     }
     _emitPrepared(emit, next);
   }

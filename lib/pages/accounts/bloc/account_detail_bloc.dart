@@ -1,6 +1,7 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:money_manager/models/account_book_model.dart';
 import 'package:money_manager/models/category_model.dart';
+import 'package:money_manager/models/day_ledger.dart';
 import 'package:money_manager/pages/accounts/bloc/account_detail_event.dart';
 import 'package:money_manager/pages/accounts/bloc/account_detail_state.dart';
 import 'package:money_manager/services/account_book_service.dart';
@@ -21,6 +22,7 @@ class AccountDetailBloc extends Bloc<AccountDetailEvent, AccountDetailState> {
     AccountDetailInitialized event,
     Emitter<AccountDetailState> emit,
   ) async {
+    emit(state.copyWith(status: AccountDetailStatus.loading));
     try {
       final loaded = await _accountBook.loadAccounts();
       final categories = await _accountBook.loadCategories();
@@ -63,6 +65,7 @@ class AccountDetailBloc extends Bloc<AccountDetailEvent, AccountDetailState> {
         account: selected.account,
         balance: selected.balance,
         history: selected.transactions,
+        days: daysOf(selected.transactions),
         categories: categories,
         accounts: accounts,
       ),

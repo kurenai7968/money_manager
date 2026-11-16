@@ -50,6 +50,12 @@ class RecordBloc extends Bloc<RecordEvent, RecordState> {
     _transactionId = event.transactionId;
     _initialType = event.initialType;
     _initialAccountId = event.initialAccountId;
+    emit(
+      state.copyWith(
+        status: RecordStatus.loading,
+        transactionId: event.transactionId,
+      ),
+    );
     try {
       final loaded = await _accountBook.loadAccounts();
       _accountRows = [for (final book in loaded) book.account];
@@ -59,8 +65,22 @@ class RecordBloc extends Bloc<RecordEvent, RecordState> {
       _accountRows = const [];
       _transactionRows = const [];
       _categoryRows = const [];
+      emit(
+        state.copyWith(
+          status: RecordStatus.failure,
+          transactionId: event.transactionId,
+        ),
+      );
+      return;
     }
-    emit(_refresh(state.copyWith(transactionId: event.transactionId)));
+    emit(
+      _refresh(
+        state.copyWith(
+          status: RecordStatus.success,
+          transactionId: event.transactionId,
+        ),
+      ),
+    );
   }
 
   void _onTypeSelected(RecordTypeSelected event, Emitter<RecordState> emit) {

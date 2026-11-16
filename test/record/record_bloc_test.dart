@@ -8,6 +8,7 @@ import 'package:money_manager/models/transaction_model.dart';
 import 'package:money_manager/pages/record/bloc/record_bloc.dart';
 import 'package:money_manager/pages/record/bloc/record_event.dart';
 import 'package:money_manager/pages/record/bloc/record_state.dart';
+import 'package:money_manager/repositories/transaction_repository.dart';
 import 'package:money_manager/services/account_book_service.dart';
 
 import '../support/memory_account_repository.dart';
@@ -94,6 +95,11 @@ void main() {
       );
     },
     expect: () => [
+      isA<RecordState>().having(
+        (state) => state.status,
+        'status',
+        RecordStatus.loading,
+      ),
       isA<RecordState>()
           .having((state) => state.accountId, 'account', 1)
           .having((state) => state.categoryId, 'category', 3),
@@ -126,6 +132,11 @@ void main() {
     },
     expect: () => [
       isA<RecordState>().having(
+        (state) => state.status,
+        'status',
+        RecordStatus.loading,
+      ),
+      isA<RecordState>().having(
         (state) => state.type,
         'type',
         TransactionType.transfer,
@@ -154,6 +165,11 @@ void main() {
       bloc.add(const RecordEqualsPressed());
     },
     expect: () => [
+      isA<RecordState>().having(
+        (state) => state.status,
+        'status',
+        RecordStatus.loading,
+      ),
       isA<RecordState>()
           .having((state) => state.note, 'note', 'Lunch')
           .having((state) => state.expression.display, 'amount', '7'),
@@ -168,4 +184,44 @@ void main() {
       ),
     ],
   );
+
+  blocTest<RecordBloc, RecordState>(
+    'emits failure when transactions cannot be read',
+    build: () => RecordBloc(
+      accountBook: AccountBookServiceImpl(
+        accounts: accountRepo,
+        categories: categoryRepo,
+        transactions: _FailingTransactions(),
+      ),
+    ),
+    act: (bloc) => bloc.add(const RecordInitialized()),
+    expect: () => [
+      isA<RecordState>().having(
+        (state) => state.status,
+        'status',
+        RecordStatus.loading,
+      ),
+      isA<RecordState>().having(
+        (state) => state.status,
+        'status',
+        RecordStatus.failure,
+      ),
+    ],
+  );
+}
+
+class _FailingTransactions implements TransactionRepository {
+  @override
+  Future<int> countForCategory(int categoryId) async => 0;
+
+  @override
+  Future<void> delete(int id) async {}
+
+  @override
+  Future<List<TransactionModel>> getAll() async {
+    throw StateError('unavailable');
+  }
+
+  @override
+  Future<int> save(TransactionModel transaction) async => 0;
 }

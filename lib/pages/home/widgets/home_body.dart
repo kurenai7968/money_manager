@@ -28,6 +28,7 @@ class HomeBody extends StatelessWidget {
     if (state.view == HomeView.summary) {
       return HomeSummaryView(
         figures: state.figures,
+        days: state.days,
         transactions: state.transactions,
         categories: state.categories,
         accounts: state.accounts,

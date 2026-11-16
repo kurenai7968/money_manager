@@ -82,6 +82,11 @@ void main() {
     },
     expect: () => [
       isA<AccountDetailState>().having(
+        (state) => state.status,
+        'status',
+        AccountDetailStatus.loading,
+      ),
+      isA<AccountDetailState>().having(
         (state) => state.account?.id,
         'account',
         1,
@@ -94,7 +99,17 @@ void main() {
     build: () => buildBloc(7),
     act: (bloc) => bloc.add(const AccountDetailInitialized()),
     expect: () => [
+      isA<AccountDetailState>().having(
+        (state) => state.status,
+        'status',
+        AccountDetailStatus.loading,
+      ),
       isA<AccountDetailState>()
+          .having(
+            (state) => state.status,
+            'status',
+            AccountDetailStatus.success,
+          )
           .having((state) => state.account, 'account', isNull)
           .having((state) => state.history, 'history', isEmpty),
     ],
@@ -108,6 +123,11 @@ void main() {
     build: () => buildBloc(1),
     act: (bloc) => bloc.add(const AccountDetailInitialized()),
     expect: () => [
+      isA<AccountDetailState>().having(
+        (state) => state.status,
+        'status',
+        AccountDetailStatus.loading,
+      ),
       isA<AccountDetailState>()
           .having(
             (state) => state.status,
