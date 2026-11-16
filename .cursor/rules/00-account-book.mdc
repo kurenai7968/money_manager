@@ -1,0 +1,12 @@
+---
+description: Account-book contract for this app
+alwaysApply: true
+---
+
+# money_manager
+
+Before changing `lib/` or `test/`, read `.cursor/skills/account-book/SKILL.md` and `DESIGN.md`. Those two files are the contract.
+
+`DESIGN.md` decides colors, type, motion, sheets, and navigation. Do not reseed a `ColorScheme` or add another theme.
+
+After changing `lib/` or `test/`, run `flutter test` and finish only after it passes.
