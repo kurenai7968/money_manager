@@ -1,6 +1,7 @@
 import 'package:equatable/equatable.dart';
 import 'package:money_manager/models/enums/app_theme_mode.dart';
 import 'package:money_manager/models/enums/first_day_of_week.dart';
+import 'package:money_manager/models/enums/ledger_color.dart';
 
 sealed class AppSettingEvent extends Equatable {
   const AppSettingEvent();
@@ -42,4 +43,13 @@ class AppSettingFirstDayOfWeekChanged extends AppSettingEvent {
 
   @override
   List<Object?> get props => [firstDayOfWeek];
+}
+
+class AppSettingColorPairChanged extends AppSettingEvent {
+  final LedgerColorPair colorPair;
+
+  const AppSettingColorPairChanged({required this.colorPair});
+
+  @override
+  List<Object?> get props => [colorPair];
 }

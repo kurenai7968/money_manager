@@ -9,12 +9,15 @@ class AppSettingEntity extends Equatable {
   final String countryCode;
   final String appearance;
   final String firstDayOfWeek;
+  @JsonKey(defaultValue: 'redGreen')
+  final String colorPair;
 
   const AppSettingEntity({
     required this.languageCode,
     required this.countryCode,
     required this.appearance,
     required this.firstDayOfWeek,
+    required this.colorPair,
   });
 
   factory AppSettingEntity.fromJson(Map<String, dynamic> json) =>
@@ -28,5 +31,6 @@ class AppSettingEntity extends Equatable {
     countryCode,
     appearance,
     firstDayOfWeek,
+    colorPair,
   ];
 }

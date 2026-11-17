@@ -8,6 +8,7 @@ import 'package:money_manager/database/shared_preferences/shared_preference_stor
 import 'package:money_manager/models/app_setting_model.dart';
 import 'package:money_manager/models/enums/app_theme_mode.dart';
 import 'package:money_manager/models/enums/first_day_of_week.dart';
+import 'package:money_manager/models/enums/ledger_color.dart';
 import 'package:money_manager/repositories/app_setting_repository.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -31,17 +32,20 @@ void main() {
       countryCode: 'CN',
       appThemeMode: AppThemeMode.dark,
       firstDayOfWeek: FirstDayOfWeek.wednesday,
+      colorPair: LedgerColorPair.coralTeal,
     );
 
     await repository.updateLanguage(setting.languageCode, setting.countryCode);
     await repository.updateThemeMode(setting.appThemeMode);
     await repository.updateFirstDayOfWeek(setting.firstDayOfWeek);
+    await repository.updateColorPair(setting.colorPair);
 
     expect(jsonDecode(preferences.getString(AppConfig.appSettingKey)!), {
       'language_code': 'zh',
       'country_code': 'CN',
       'appearance': 'dark',
       'first_day_of_week': 'wednesday',
+      'color_pair': 'coralTeal',
     });
     expect(await repository.getAppSetting(), setting);
     expect(setting.locale, const Locale('zh', 'CN'));
@@ -70,6 +74,42 @@ void main() {
 
   test('rejects JSON that is not an object', () async {
     await preferences.setString(AppConfig.appSettingKey, '[]');
+
+    expect(repository.getAppSetting(), throwsA(isA<CacheException>()));
+  });
+
+  test('loads the default colors when older settings omit them', () async {
+    await preferences.setString(
+      AppConfig.appSettingKey,
+      jsonEncode({
+        'language_code': 'en',
+        'country_code': '',
+        'appearance': 'light',
+        'first_day_of_week': 'sunday',
+      }),
+    );
+
+    final loaded = await repository.getAppSetting();
+
+    expect(loaded.languageCode, 'en');
+    expect(loaded.appThemeMode, AppThemeMode.light);
+    expect(loaded.firstDayOfWeek, FirstDayOfWeek.sunday);
+    expect(loaded.colorPair, LedgerColorPair.redGreen);
+    expect(loaded.incomeColor, LedgerColor.green);
+    expect(loaded.expenseColor, LedgerColor.red);
+  });
+
+  test('rejects an unrecognized color pair', () async {
+    await preferences.setString(
+      AppConfig.appSettingKey,
+      jsonEncode({
+        'language_code': 'en',
+        'country_code': '',
+        'appearance': 'light',
+        'first_day_of_week': 'monday',
+        'color_pair': 'crimson',
+      }),
+    );
 
     expect(repository.getAppSetting(), throwsA(isA<CacheException>()));
   });

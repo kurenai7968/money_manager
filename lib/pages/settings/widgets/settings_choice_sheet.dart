@@ -8,13 +8,15 @@ Future<void> showSettingsChoice<T>(
   required List<(T, String)> options,
   required T selected,
   required ValueChanged<T> onSelected,
+  Widget Function(T value)? leading,
 }) async {
   await showAccountBookSheet<void>(
     context: context,
+    maxHeightFactor: 0.5,
     builder: (context) {
       return SafeArea(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
+        child: ListView(
+          shrinkWrap: true,
           children: [
             Padding(
               padding: const EdgeInsets.all(AppSpacing.l),
@@ -25,6 +27,7 @@ Future<void> showSettingsChoice<T>(
             ),
             for (final option in options)
               ListTile(
+                leading: leading?.call(option.$1),
                 title: Text(option.$2),
                 trailing: option.$1 == selected
                     ? Icon(

@@ -63,7 +63,7 @@ class RecordCategoryGrid extends StatelessWidget {
                 final category = categories[index];
                 final selected = category.id == selectedId;
                 final label = category.labelFor(context.categoryLanguageCode);
-                final color = AccountBookPalette.directionColor(
+                final color = context.ledgerColor(
                   income: category.type == CategoryKind.income,
                 );
                 final scheme = Theme.of(context).colorScheme;

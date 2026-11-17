@@ -7,6 +7,7 @@ import 'package:money_manager/core/errors/app_exception.dart';
 import 'package:money_manager/models/app_setting_model.dart';
 import 'package:money_manager/models/enums/app_theme_mode.dart';
 import 'package:money_manager/models/enums/first_day_of_week.dart';
+import 'package:money_manager/models/enums/ledger_color.dart';
 import 'package:money_manager/repositories/app_setting_repository.dart';
 
 class _MemoryAppSettingRepository implements AppSettingRepository {
@@ -28,10 +29,7 @@ class _MemoryAppSettingRepository implements AppSettingRepository {
     String countryCode,
   ) {
     return _write(
-      appSetting.copyWith(
-        languageCode: languageCode,
-        countryCode: countryCode,
-      ),
+      appSetting.copyWith(languageCode: languageCode, countryCode: countryCode),
     );
   }
 
@@ -43,6 +41,11 @@ class _MemoryAppSettingRepository implements AppSettingRepository {
   @override
   Future<AppSettingModel> updateFirstDayOfWeek(FirstDayOfWeek firstDayOfWeek) {
     return _write(appSetting.copyWith(firstDayOfWeek: firstDayOfWeek));
+  }
+
+  @override
+  Future<AppSettingModel> updateColorPair(LedgerColorPair colorPair) {
+    return _write(appSetting.copyWith(colorPair: colorPair));
   }
 
   Future<AppSettingModel> _write(AppSettingModel next) async {
@@ -87,6 +90,26 @@ void main() {
     verify: (bloc) {
       expect(bloc.state.appSetting.appThemeMode, AppThemeMode.dark);
       expect(repository.appSetting.appThemeMode, AppThemeMode.dark);
+    },
+  );
+
+  blocTest<AppSettingBloc, AppSettingState>(
+    'saves a color pair change',
+    build: () => AppSettingBloc(appSettingRepository: repository),
+    act: (bloc) => bloc.add(
+      const AppSettingColorPairChanged(colorPair: LedgerColorPair.coralTeal),
+    ),
+    expect: () => const [
+      AppSettingState(status: AppSettingStatus.loading),
+      AppSettingState(status: AppSettingStatus.success),
+      AppSettingState(
+        status: AppSettingStatus.success,
+        appSetting: AppSettingModel(colorPair: LedgerColorPair.coralTeal),
+      ),
+    ],
+    verify: (bloc) {
+      expect(bloc.state.appSetting.expenseColor, LedgerColor.coral);
+      expect(bloc.state.appSetting.incomeColor, LedgerColor.teal);
     },
   );
 

@@ -136,6 +136,30 @@ class AppLocalizationsZh extends AppLocalizations {
   String get color => '顏色';
 
   @override
+  String get colorCoral => '珊瑚';
+
+  @override
+  String get colorRed => '紅';
+
+  @override
+  String get colorBlue => '藍';
+
+  @override
+  String get colorAmber => '琥珀';
+
+  @override
+  String get colorTeal => '青綠';
+
+  @override
+  String get colorPink => '粉紅';
+
+  @override
+  String get colorGreen => '綠';
+
+  @override
+  String get colorSlate => '石板';
+
+  @override
   String get categoryFood => '飲食';
 
   @override
@@ -412,6 +436,30 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
 
   @override
   String get color => '颜色';
+
+  @override
+  String get colorCoral => '珊瑚';
+
+  @override
+  String get colorRed => '红';
+
+  @override
+  String get colorBlue => '蓝';
+
+  @override
+  String get colorAmber => '琥珀';
+
+  @override
+  String get colorTeal => '青绿';
+
+  @override
+  String get colorPink => '粉红';
+
+  @override
+  String get colorGreen => '绿';
+
+  @override
+  String get colorSlate => '石板';
 
   @override
   String get categoryFood => '饮食';

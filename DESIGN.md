@@ -4,7 +4,8 @@ Personal account book for one person. Phone first. Utility register.
 
 - Style: Minimal and clean. Off-white and near-black, one neutral sans, weight-led hierarchy. Hairlines, no shadows.
 - Primary theme: Light. Settings can follow the system, or force light or dark. Dark is derived after light is right.
-- Accent: Coral `#C2410C` for the record button, the selected tab, the selected day, and the month expense total. The month income total uses green `#0E7A42`. The month balance stays near-black. A transaction amount uses its category color. Transfer amounts stay near-black. Labels, the keypad, and app bars stay near-black on off-white.
+- Accent: Coral `#C2410C` for the record button, the selected tab, and the selected day. The month balance stays near-black. Transfer amounts stay near-black. Labels, the keypad, and app bars stay near-black on off-white.
+- Category colors: Settings stores one pair. Expense and income change together. The default pair is red `#B91C1C` and green `#0E7A42`. The other pairs are coral `#C2410C` with teal `#0F766E`, pink `#BE185D` with blue `#1D4ED8`, and amber `#B45309` with slate `#3F4A57`. The month income and expense totals, the donut, category icons, and a transaction amount use the selected pair.
 - Surfaces: one page color `#F7F7F6` for the screen and the keyboard. Hairline `#E6E6E4`, ink `#171717`, muted `#5C5C5C`. No separate keyboard panel.
 - Motion: Calm. Press feedback only. Sheets use the platform transition.
 - Sheets: the page background, a 12 top radius, and no shadow. An account sheet is at most half the screen tall and scrolls past that.
@@ -37,8 +38,8 @@ Accounts is a tab. An account opens its own page: balance, this month's movement
 
 Analysis is a tab. It shows this month against the previous month, the last six months, then totals by category and by account.
 
-Settings holds language, appearance, currency, the first weekday, and categories. Single currency. Amounts are plain numbers. The currency symbol comes from settings. Category create and edit live under Settings. The record page only picks a category.
+Settings holds language, appearance, currency, the first weekday, the color pair, and categories. Single currency. Amounts are plain numbers. The currency symbol comes from settings. Category create and edit live under Settings. The record page only picks a category.
 
 ## Transaction row
 
-A row shows the category icon, category name, note, amount, and account. The amount uses the category color. Transfer amounts stay near-black. A `#tag` in the note uses the income green. Home summary, the home calendar, and account history share that row and group it by day. The day header shows the date and that day's expense. Tapping the header collapses that day. The calendar lists the selected day.
+A row shows the category icon, category name, note, amount, and account. The amount uses the category color. Transfer amounts stay near-black. A `#tag` in the note uses the income color. Home summary, the home calendar, and account history share that row and group it by day. The day header shows the date and that day's expense. Tapping the header collapses that day. The calendar lists the selected day.

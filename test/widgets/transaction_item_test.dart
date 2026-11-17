@@ -70,7 +70,7 @@ void main() {
     expect(_noteTagColor(tester), AccountBookPalette.green);
     expect(
       tester.widget<Text>(find.text('-88')).style?.color,
-      AccountBookPalette.coral,
+      AccountBookPalette.red,
     );
     expect(tester.widget<InkWell>(find.byType(InkWell)).onTap, isNotNull);
   });

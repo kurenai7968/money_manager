@@ -315,7 +315,7 @@ class TransactionItem extends StatelessWidget {
     if (transaction.type == TransactionType.transfer) {
       return scheme.onSurface;
     }
-    return AccountBookPalette.directionColor(
+    return context.ledgerColor(
       income: transaction.type == TransactionType.income,
     );
   }
@@ -336,9 +336,7 @@ class _TransactionIcon extends StatelessWidget {
     final known = category;
     if (known != null) {
       icon = AccountBookPalette.icon(known.icon);
-      background = AccountBookPalette.directionColor(
-        income: type == TransactionType.income,
-      );
+      background = context.ledgerColor(income: type == TransactionType.income);
       foreground = scheme.onPrimary;
     } else {
       background = scheme.surfaceContainerHighest;
@@ -382,7 +380,7 @@ class _NoteText extends StatelessWidget {
       spans.add(
         TextSpan(
           text: match.group(0),
-          style: base.copyWith(color: AccountBookPalette.green),
+          style: base.copyWith(color: context.ledgerColor(income: true)),
         ),
       );
       cursor = match.end;

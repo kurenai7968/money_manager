@@ -157,7 +157,7 @@ void main() {
     await tester.tap(find.byTooltip('shopping'));
     await tester.pump();
     expect(_iconSelected(tester, 'shopping'), isTrue);
-    expect(_iconFill(tester, 'shopping'), AccountBookPalette.coral);
+    expect(_iconFill(tester, 'shopping'), AccountBookPalette.red);
     expect(_iconFill(tester, 'other'), Colors.transparent);
 
     await tester.tap(find.text('Save'));

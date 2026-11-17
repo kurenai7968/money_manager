@@ -12,6 +12,7 @@ AppSettingEntity _$AppSettingEntityFromJson(Map<String, dynamic> json) =>
       countryCode: json['country_code'] as String,
       appearance: json['appearance'] as String,
       firstDayOfWeek: json['first_day_of_week'] as String,
+      colorPair: json['color_pair'] as String? ?? 'redGreen',
     );
 
 Map<String, dynamic> _$AppSettingEntityToJson(AppSettingEntity instance) =>
@@ -20,4 +21,5 @@ Map<String, dynamic> _$AppSettingEntityToJson(AppSettingEntity instance) =>
       'country_code': instance.countryCode,
       'appearance': instance.appearance,
       'first_day_of_week': instance.firstDayOfWeek,
+      'color_pair': instance.colorPair,
     };

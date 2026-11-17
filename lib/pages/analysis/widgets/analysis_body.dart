@@ -10,7 +10,6 @@ import 'package:money_manager/pages/analysis/bloc/analysis_state.dart';
 import 'package:money_manager/pages/analysis/widgets/analysis_month_bars.dart';
 import 'package:money_manager/pages/analysis/widgets/analysis_total_row.dart';
 import 'package:money_manager/themes/app_themes.dart';
-import 'package:money_manager/themes/account_book_palette.dart';
 
 class AnalysisBody extends StatelessWidget {
   const AnalysisBody({super.key});
@@ -64,7 +63,7 @@ class AnalysisBody extends StatelessWidget {
             ),
             for (final entry in rollup.byCategory)
               AnalysisTotalRow(
-                color: AccountBookPalette.directionColor(
+                color: context.ledgerColor(
                   income:
                       _category(state.categories, entry.id)?.type ==
                       CategoryKind.income,

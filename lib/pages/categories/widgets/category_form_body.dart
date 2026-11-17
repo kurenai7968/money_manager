@@ -139,7 +139,7 @@ class _CategoryFormBodyState extends State<CategoryFormBody> {
                   CategoryIconChoice(
                     iconKey: key,
                     selected: key == _icon,
-                    color: AccountBookPalette.directionColor(
+                    color: context.ledgerColor(
                       income: _type == CategoryKind.income,
                     ),
                     onPressed: () => setState(() => _icon = key),

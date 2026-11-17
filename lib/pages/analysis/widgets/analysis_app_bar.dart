@@ -5,7 +5,6 @@ import 'package:money_manager/models/account_book_kinds.dart';
 import 'package:money_manager/pages/analysis/bloc/analysis_bloc.dart';
 import 'package:money_manager/pages/analysis/bloc/analysis_event.dart';
 import 'package:money_manager/pages/analysis/bloc/analysis_state.dart';
-import 'package:money_manager/themes/account_book_palette.dart';
 import 'package:money_manager/widgets/base_app_bar.dart';
 
 class AnalysisAppBar extends StatelessWidget implements PreferredSizeWidget {
@@ -34,7 +33,7 @@ class AnalysisAppBar extends StatelessWidget implements PreferredSizeWidget {
                   l10n.expense,
                   style: TextStyle(
                     color: kind == CategoryKind.expense
-                        ? Theme.of(context).colorScheme.primary
+                        ? context.ledgerColor(income: false)
                         : Theme.of(context).colorScheme.onSurfaceVariant,
                   ),
                 ),
@@ -47,7 +46,7 @@ class AnalysisAppBar extends StatelessWidget implements PreferredSizeWidget {
                   l10n.income,
                   style: TextStyle(
                     color: kind == CategoryKind.income
-                        ? AccountBookPalette.green
+                        ? context.ledgerColor(income: true)
                         : Theme.of(context).colorScheme.onSurfaceVariant,
                   ),
                 ),

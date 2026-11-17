@@ -8,7 +8,10 @@ import 'package:money_manager/core/extensions/context_extension.dart';
 import 'package:money_manager/l10n/app_localizations.dart';
 import 'package:money_manager/models/enums/app_theme_mode.dart';
 import 'package:money_manager/models/enums/first_day_of_week.dart';
+import 'package:money_manager/models/enums/ledger_color.dart';
 import 'package:money_manager/pages/settings/widgets/settings_choice_sheet.dart';
+import 'package:money_manager/themes/account_book_palette.dart';
+import 'package:money_manager/themes/app_themes.dart';
 import 'package:money_manager/pages/settings/widgets/settings_row.dart';
 import 'package:money_manager/pages/settings/widgets/settings_section.dart';
 import 'package:money_manager/routes/app_routes.dart';
@@ -95,6 +98,29 @@ class SettingsBody extends StatelessWidget {
               ),
             ),
             SettingsSection(l10n.accountBook),
+            SettingsRow(
+              title: l10n.color,
+              value: _pairLabel(l10n, setting.colorPair),
+              swatches: [
+                AccountBookPalette.of(setting.expenseColor),
+                AccountBookPalette.of(setting.incomeColor),
+              ],
+              onTap: () => showSettingsChoice<LedgerColorPair>(
+                context,
+                title: l10n.color,
+                options: [
+                  for (final pair in LedgerColorPair.values)
+                    (pair, _pairLabel(l10n, pair)),
+                ],
+                selected: setting.colorPair,
+                leading: _pairDots,
+                onSelected: (value) {
+                  context.read<AppSettingBloc>().add(
+                    AppSettingColorPairChanged(colorPair: value),
+                  );
+                },
+              ),
+            ),
             ListTile(
               title: Text(l10n.categories),
               subtitle: Text(l10n.expenseAndIncome),
@@ -106,6 +132,44 @@ class SettingsBody extends StatelessWidget {
       },
     );
   }
+}
+
+String _pairLabel(AppLocalizations l10n, LedgerColorPair pair) {
+  return '${_ledgerColorLabel(l10n, pair.expense)} / ${_ledgerColorLabel(l10n, pair.income)}';
+}
+
+Widget _pairDots(LedgerColorPair pair) {
+  return Row(
+    mainAxisSize: MainAxisSize.min,
+    children: [
+      _colorDot(pair.expense),
+      const SizedBox(width: AppSpacing.xs),
+      _colorDot(pair.income),
+    ],
+  );
+}
+
+String _ledgerColorLabel(AppLocalizations l10n, LedgerColor color) {
+  return switch (color) {
+    LedgerColor.coral => l10n.colorCoral,
+    LedgerColor.red => l10n.colorRed,
+    LedgerColor.blue => l10n.colorBlue,
+    LedgerColor.amber => l10n.colorAmber,
+    LedgerColor.teal => l10n.colorTeal,
+    LedgerColor.pink => l10n.colorPink,
+    LedgerColor.green => l10n.colorGreen,
+    LedgerColor.slate => l10n.colorSlate,
+  };
+}
+
+Widget _colorDot(LedgerColor color) {
+  return DecoratedBox(
+    decoration: BoxDecoration(
+      color: AccountBookPalette.of(color),
+      shape: BoxShape.circle,
+    ),
+    child: const SizedBox.square(dimension: 12),
+  );
 }
 
 String _weekdayLabel(AppLocalizations l10n, FirstDayOfWeek day) {

@@ -351,6 +351,54 @@ abstract class AppLocalizations {
   /// **'Color'**
   String get color;
 
+  /// No description provided for @colorCoral.
+  ///
+  /// In en, this message translates to:
+  /// **'Coral'**
+  String get colorCoral;
+
+  /// No description provided for @colorRed.
+  ///
+  /// In en, this message translates to:
+  /// **'Red'**
+  String get colorRed;
+
+  /// No description provided for @colorBlue.
+  ///
+  /// In en, this message translates to:
+  /// **'Blue'**
+  String get colorBlue;
+
+  /// No description provided for @colorAmber.
+  ///
+  /// In en, this message translates to:
+  /// **'Amber'**
+  String get colorAmber;
+
+  /// No description provided for @colorTeal.
+  ///
+  /// In en, this message translates to:
+  /// **'Teal'**
+  String get colorTeal;
+
+  /// No description provided for @colorPink.
+  ///
+  /// In en, this message translates to:
+  /// **'Pink'**
+  String get colorPink;
+
+  /// No description provided for @colorGreen.
+  ///
+  /// In en, this message translates to:
+  /// **'Green'**
+  String get colorGreen;
+
+  /// No description provided for @colorSlate.
+  ///
+  /// In en, this message translates to:
+  /// **'Slate'**
+  String get colorSlate;
+
   /// No description provided for @categoryFood.
   ///
   /// In en, this message translates to:

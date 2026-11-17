@@ -67,7 +67,7 @@ lib/
 
 `AccountBookServiceImpl` takes the account, category, and transaction repositories as named arguments. A page bloc calls it to load accounts with balances, load categories with defaults, and save or delete a transaction. A single-table write goes to that table's repository.
 
-`AppSettingBloc` is the only bloc provided above the router. A page creates its own bloc and dispatches that bloc's start event. Widgets on the page read and dispatch only that bloc. They may also read `AppSettingBloc` for language, theme, or the first weekday. `SettingsPage` does not create `AppSettingBloc`.
+`AppSettingBloc` is the only bloc provided above the router. A page creates its own bloc and dispatches that bloc's start event. Widgets on the page read and dispatch only that bloc. They may also read `AppSettingBloc` for language, theme, the first weekday, or the income and expense color pair. `SettingsPage` does not create `AppSettingBloc`.
 
 When the user returns from the record route, the page that opened it dispatches its start event again. Home and account detail do this. When the user returns from the new-account route, the accounts page dispatches its start event again.
 

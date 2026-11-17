@@ -2,6 +2,7 @@ import 'package:money_manager/entities/app_setting_entity.dart';
 import 'package:money_manager/models/app_setting_model.dart';
 import 'package:money_manager/models/enums/app_theme_mode.dart';
 import 'package:money_manager/models/enums/first_day_of_week.dart';
+import 'package:money_manager/models/enums/ledger_color.dart';
 
 extension AppSettingEntityMapping on AppSettingEntity {
   AppSettingModel toModel() {
@@ -10,6 +11,7 @@ extension AppSettingEntityMapping on AppSettingEntity {
       countryCode: countryCode,
       appThemeMode: AppThemeMode.values.byName(appearance),
       firstDayOfWeek: FirstDayOfWeek.values.byName(firstDayOfWeek),
+      colorPair: LedgerColorPair.values.byName(colorPair),
     );
   }
 }
@@ -21,6 +23,7 @@ extension AppSettingModelMapping on AppSettingModel {
       countryCode: countryCode,
       appearance: appThemeMode.name,
       firstDayOfWeek: firstDayOfWeek.name,
+      colorPair: colorPair.name,
     );
   }
 }

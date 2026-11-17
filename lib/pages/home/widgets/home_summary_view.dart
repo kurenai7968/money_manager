@@ -6,7 +6,6 @@ import 'package:money_manager/models/category_model.dart';
 import 'package:money_manager/models/day_ledger.dart';
 import 'package:money_manager/pages/home/widgets/home_month_donut.dart';
 import 'package:money_manager/themes/app_themes.dart';
-import 'package:money_manager/themes/account_book_palette.dart';
 import 'package:money_manager/widgets/transaction_item.dart';
 
 class HomeSummaryView extends StatelessWidget {
@@ -60,7 +59,7 @@ class HomeSummaryView extends StatelessWidget {
                     Text(
                       formatAmount(income, locale: locale),
                       style: Theme.of(context).textTheme.titleLarge
-                          ?.copyWith(color: AccountBookPalette.green),
+                          ?.copyWith(color: context.ledgerColor(income: true)),
                     ),
                   ],
                 ),
@@ -78,7 +77,7 @@ class HomeSummaryView extends StatelessWidget {
                     Text(
                       formatAmount(expense, locale: locale),
                       style: Theme.of(context).textTheme.titleLarge
-                          ?.copyWith(color: AccountBookPalette.coral),
+                          ?.copyWith(color: context.ledgerColor(income: false)),
                     ),
                   ],
                 ),

@@ -14,6 +14,7 @@ class AppSettingBloc extends Bloc<AppSettingEvent, AppSettingState> {
     on<AppSettingLanguageChanged>(_onAppSettingLanguageChanged);
     on<AppSettingThemeModeChanged>(_onAppSettingThemeModeChanged);
     on<AppSettingFirstDayOfWeekChanged>(_onAppSettingFirstDayOfWeekChanged);
+    on<AppSettingColorPairChanged>(_onAppSettingColorPairChanged);
     add(const AppSettingInitialized());
   }
 
@@ -66,6 +67,16 @@ class AppSettingBloc extends Bloc<AppSettingEvent, AppSettingState> {
   ) {
     return _appSettingUpdate(
       appSettingRepository.updateFirstDayOfWeek(event.firstDayOfWeek),
+      emit,
+    );
+  }
+
+  Future<void> _onAppSettingColorPairChanged(
+    AppSettingColorPairChanged event,
+    Emitter<AppSettingState> emit,
+  ) {
+    return _appSettingUpdate(
+      appSettingRepository.updateColorPair(event.colorPair),
       emit,
     );
   }

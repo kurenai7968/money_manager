@@ -1,7 +1,9 @@
 import 'package:material_ui/material_ui.dart';
+import 'package:money_manager/models/enums/ledger_color.dart';
 
 abstract final class AccountBookPalette {
   static const coral = Color(0xFFC2410C);
+  static const red = Color(0xFFB91C1C);
   static const blue = Color(0xFF1D4ED8);
   static const amber = Color(0xFFB45309);
   static const teal = Color(0xFF0F766E);
@@ -11,6 +13,7 @@ abstract final class AccountBookPalette {
 
   static const colorKeys = [
     'coral',
+    'red',
     'blue',
     'amber',
     'teal',
@@ -31,20 +34,34 @@ abstract final class AccountBookPalette {
     'bonus',
   ];
 
-  static Color directionColor({required bool income}) {
-    return income ? green : coral;
+  static Color of(LedgerColor color) {
+    return switch (color) {
+      LedgerColor.coral => coral,
+      LedgerColor.red => red,
+      LedgerColor.blue => blue,
+      LedgerColor.amber => amber,
+      LedgerColor.teal => teal,
+      LedgerColor.pink => pink,
+      LedgerColor.green => green,
+      LedgerColor.slate => slate,
+    };
+  }
+
+  static Color directionColor({
+    required bool income,
+    LedgerColor incomeColor = LedgerColor.green,
+    LedgerColor expenseColor = LedgerColor.red,
+  }) {
+    return of(income ? incomeColor : expenseColor);
   }
 
   static Color color(String key) {
-    return switch (key) {
-      'blue' => blue,
-      'amber' => amber,
-      'teal' => teal,
-      'pink' => pink,
-      'green' => green,
-      'slate' => slate,
-      _ => coral,
-    };
+    for (final color in LedgerColor.values) {
+      if (color.name == key) {
+        return of(color);
+      }
+    }
+    return coral;
   }
 
   static IconData icon(String key) {

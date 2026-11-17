@@ -52,7 +52,7 @@ class _CategoryListState extends State<CategoryList> {
             }
           },
           leading: CircleAvatar(
-            backgroundColor: AccountBookPalette.directionColor(
+            backgroundColor: context.ledgerColor(
               income: category.type == CategoryKind.income,
             ),
             child: Icon(
