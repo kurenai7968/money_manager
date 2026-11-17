@@ -8,7 +8,7 @@ import 'package:money_manager/database/shared_preferences/shared_preference_stor
 import 'package:money_manager/models/app_setting_model.dart';
 import 'package:money_manager/models/enums/app_theme_mode.dart';
 import 'package:money_manager/models/enums/first_day_of_week.dart';
-import 'package:money_manager/models/enums/ledger_color.dart';
+import 'package:money_manager/models/enums/account_book_color.dart';
 import 'package:money_manager/repositories/app_setting_repository.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -32,7 +32,7 @@ void main() {
       countryCode: 'CN',
       appThemeMode: AppThemeMode.dark,
       firstDayOfWeek: FirstDayOfWeek.wednesday,
-      colorPair: LedgerColorPair.coralTeal,
+      colorPair: AccountBookColorPair.coralTeal,
     );
 
     await repository.updateLanguage(setting.languageCode, setting.countryCode);
@@ -94,9 +94,9 @@ void main() {
     expect(loaded.languageCode, 'en');
     expect(loaded.appThemeMode, AppThemeMode.light);
     expect(loaded.firstDayOfWeek, FirstDayOfWeek.sunday);
-    expect(loaded.colorPair, LedgerColorPair.redGreen);
-    expect(loaded.incomeColor, LedgerColor.green);
-    expect(loaded.expenseColor, LedgerColor.red);
+    expect(loaded.colorPair, AccountBookColorPair.redGreen);
+    expect(loaded.incomeColor, AccountBookColor.green);
+    expect(loaded.expenseColor, AccountBookColor.red);
   });
 
   test('rejects an unrecognized color pair', () async {

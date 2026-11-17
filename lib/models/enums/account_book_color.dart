@@ -1,13 +1,13 @@
-enum LedgerColor { coral, red, blue, amber, teal, pink, green, slate }
+enum AccountBookColor { coral, red, blue, amber, teal, pink, green, slate }
 
-enum LedgerColorPair {
-  redGreen(LedgerColor.red, LedgerColor.green),
-  coralTeal(LedgerColor.coral, LedgerColor.teal),
-  pinkBlue(LedgerColor.pink, LedgerColor.blue),
-  amberSlate(LedgerColor.amber, LedgerColor.slate);
+enum AccountBookColorPair {
+  redGreen(AccountBookColor.red, AccountBookColor.green),
+  coralTeal(AccountBookColor.coral, AccountBookColor.teal),
+  pinkBlue(AccountBookColor.pink, AccountBookColor.blue),
+  amberSlate(AccountBookColor.amber, AccountBookColor.slate);
 
-  final LedgerColor expense;
-  final LedgerColor income;
+  final AccountBookColor expense;
+  final AccountBookColor income;
 
-  const LedgerColorPair(this.expense, this.income);
+  const AccountBookColorPair(this.expense, this.income);
 }

@@ -1,5 +1,5 @@
 import 'package:material_ui/material_ui.dart';
-import 'package:money_manager/models/enums/ledger_color.dart';
+import 'package:money_manager/models/enums/account_book_color.dart';
 
 abstract final class AccountBookPalette {
   static const coral = Color(0xFFC2410C);
@@ -34,29 +34,29 @@ abstract final class AccountBookPalette {
     'bonus',
   ];
 
-  static Color of(LedgerColor color) {
+  static Color of(AccountBookColor color) {
     return switch (color) {
-      LedgerColor.coral => coral,
-      LedgerColor.red => red,
-      LedgerColor.blue => blue,
-      LedgerColor.amber => amber,
-      LedgerColor.teal => teal,
-      LedgerColor.pink => pink,
-      LedgerColor.green => green,
-      LedgerColor.slate => slate,
+      AccountBookColor.coral => coral,
+      AccountBookColor.red => red,
+      AccountBookColor.blue => blue,
+      AccountBookColor.amber => amber,
+      AccountBookColor.teal => teal,
+      AccountBookColor.pink => pink,
+      AccountBookColor.green => green,
+      AccountBookColor.slate => slate,
     };
   }
 
   static Color directionColor({
     required bool income,
-    LedgerColor incomeColor = LedgerColor.green,
-    LedgerColor expenseColor = LedgerColor.red,
+    AccountBookColor incomeColor = AccountBookColor.green,
+    AccountBookColor expenseColor = AccountBookColor.red,
   }) {
     return of(income ? incomeColor : expenseColor);
   }
 
   static Color color(String key) {
-    for (final color in LedgerColor.values) {
+    for (final color in AccountBookColor.values) {
       if (color.name == key) {
         return of(color);
       }

@@ -8,7 +8,7 @@ import 'package:money_manager/entities/app_setting_entity.dart';
 import 'package:money_manager/models/app_setting_model.dart';
 import 'package:money_manager/models/enums/app_theme_mode.dart';
 import 'package:money_manager/models/enums/first_day_of_week.dart';
-import 'package:money_manager/models/enums/ledger_color.dart';
+import 'package:money_manager/models/enums/account_book_color.dart';
 
 abstract interface class AppSettingRepository {
   Future<AppSettingModel> getAppSetting();
@@ -18,7 +18,7 @@ abstract interface class AppSettingRepository {
   );
   Future<AppSettingModel> updateThemeMode(AppThemeMode appThemeMode);
   Future<AppSettingModel> updateFirstDayOfWeek(FirstDayOfWeek firstDayOfWeek);
-  Future<AppSettingModel> updateColorPair(LedgerColorPair colorPair);
+  Future<AppSettingModel> updateColorPair(AccountBookColorPair colorPair);
 }
 
 class AppSettingRepositoryImpl implements AppSettingRepository {
@@ -80,7 +80,7 @@ class AppSettingRepositoryImpl implements AppSettingRepository {
   }
 
   @override
-  Future<AppSettingModel> updateColorPair(LedgerColorPair colorPair) {
+  Future<AppSettingModel> updateColorPair(AccountBookColorPair colorPair) {
     return guard('App setting could not be saved.', () async {
       final appSetting = await getAppSetting();
       final updatedSetting = appSetting.copyWith(colorPair: colorPair);

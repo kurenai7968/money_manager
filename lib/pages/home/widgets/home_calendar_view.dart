@@ -1,5 +1,5 @@
 import 'package:material_ui/material_ui.dart';
-import 'package:money_manager/models/day_ledger.dart';
+import 'package:money_manager/models/day_account_book.dart';
 import 'package:money_manager/core/extensions/context_extension.dart';
 import 'package:money_manager/core/utils/money_format.dart';
 import 'package:money_manager/models/account_model.dart';
@@ -11,7 +11,7 @@ import 'package:money_manager/widgets/transaction_item.dart';
 
 class HomeCalendarView extends StatelessWidget {
   final DateTime month;
-  final List<DayLedger> days;
+  final List<DayAccountBook> days;
   final List<CategoryModel> categories;
   final List<AccountModel> accounts;
   final DateTime? selectedDay;
@@ -38,7 +38,7 @@ class HomeCalendarView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final selected = selectedDay;
-    final selectedLedger = _ledgerOn(days, selected);
+    final selectedAccountBook = _accountBookOn(days, selected);
     final focused =
         selected != null &&
             selected.year == month.year &&
@@ -67,18 +67,19 @@ class HomeCalendarView extends StatelessWidget {
                   formatAmount(net, locale: locale, signed: true),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                  style: Theme.of(context).textTheme.labelMedium
-                      ?.copyWith(color: context.ledgerColor(income: net > 0)),
+                  style: Theme.of(context).textTheme.labelMedium?.copyWith(
+                    color: context.accountBookColor(income: net > 0),
+                  ),
                 );
               },
             ),
           ),
         ),
         Expanded(
-          child: selectedLedger == null
+          child: selectedAccountBook == null
               ? const SizedBox.shrink()
               : TransactionList(
-                  days: [selectedLedger],
+                  days: [selectedAccountBook],
                   categories: categories,
                   accounts: accounts,
                   locale: locale,
@@ -91,7 +92,7 @@ class HomeCalendarView extends StatelessWidget {
   }
 }
 
-DayLedger? _ledgerOn(List<DayLedger> days, DateTime? day) {
+DayAccountBook? _accountBookOn(List<DayAccountBook> days, DateTime? day) {
   if (day == null) {
     return null;
   }

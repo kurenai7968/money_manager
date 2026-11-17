@@ -71,7 +71,7 @@ lib/
 
 When the user returns from the record route, the page that opened it dispatches its start event again. Home and account detail do this. When the user returns from the new-account route, the accounts page dispatches its start event again.
 
-## Ledger
+## AccountBook
 
 - Cash, bank, and savings are assets. Credit is a liability, and its balance is the amount owed.
 - Balance is income and transfers in, minus expenses and transfers out. Spending on a credit account increases the amount owed. A transfer into a credit account decreases it.

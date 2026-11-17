@@ -3,26 +3,26 @@ import 'dart:ui';
 import 'package:equatable/equatable.dart';
 import 'package:money_manager/models/enums/app_theme_mode.dart';
 import 'package:money_manager/models/enums/first_day_of_week.dart';
-import 'package:money_manager/models/enums/ledger_color.dart';
+import 'package:money_manager/models/enums/account_book_color.dart';
 
 class AppSettingModel extends Equatable {
   final String languageCode;
   final String countryCode;
   final AppThemeMode appThemeMode;
   final FirstDayOfWeek firstDayOfWeek;
-  final LedgerColorPair colorPair;
+  final AccountBookColorPair colorPair;
 
   const AppSettingModel({
     this.languageCode = '',
     this.countryCode = '',
     this.appThemeMode = AppThemeMode.system,
     this.firstDayOfWeek = FirstDayOfWeek.monday,
-    this.colorPair = LedgerColorPair.redGreen,
+    this.colorPair = AccountBookColorPair.redGreen,
   });
 
-  LedgerColor get incomeColor => colorPair.income;
+  AccountBookColor get incomeColor => colorPair.income;
 
-  LedgerColor get expenseColor => colorPair.expense;
+  AccountBookColor get expenseColor => colorPair.expense;
 
   Locale? get locale {
     if (languageCode.isEmpty) return null;
@@ -35,7 +35,7 @@ class AppSettingModel extends Equatable {
     String? countryCode,
     AppThemeMode? appThemeMode,
     FirstDayOfWeek? firstDayOfWeek,
-    LedgerColorPair? colorPair,
+    AccountBookColorPair? colorPair,
   }) {
     return AppSettingModel(
       languageCode: languageCode ?? this.languageCode,

@@ -5,7 +5,7 @@ import 'package:money_manager/l10n/app_localizations.dart';
 import 'package:money_manager/models/account_model.dart';
 import 'package:money_manager/models/category_model.dart';
 import 'package:money_manager/models/account_book_kinds.dart';
-import 'package:money_manager/models/day_ledger.dart';
+import 'package:money_manager/models/day_account_book.dart';
 import 'package:money_manager/models/transaction_model.dart';
 import 'package:money_manager/themes/app_themes.dart';
 import 'package:money_manager/themes/account_book_palette.dart';

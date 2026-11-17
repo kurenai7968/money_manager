@@ -1,7 +1,7 @@
 import 'package:money_manager/models/app_setting_model.dart';
 import 'package:money_manager/models/enums/app_theme_mode.dart';
 import 'package:money_manager/models/enums/first_day_of_week.dart';
-import 'package:money_manager/models/enums/ledger_color.dart';
+import 'package:money_manager/models/enums/account_book_color.dart';
 import 'package:money_manager/repositories/app_setting_repository.dart';
 
 class MemoryAppSettingRepository implements AppSettingRepository {
@@ -37,7 +37,9 @@ class MemoryAppSettingRepository implements AppSettingRepository {
   }
 
   @override
-  Future<AppSettingModel> updateColorPair(LedgerColorPair colorPair) async {
+  Future<AppSettingModel> updateColorPair(
+    AccountBookColorPair colorPair,
+  ) async {
     appSetting = appSetting.copyWith(colorPair: colorPair);
     return appSetting;
   }

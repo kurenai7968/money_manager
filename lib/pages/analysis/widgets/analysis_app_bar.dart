@@ -32,7 +32,7 @@ class AnalysisAppBar extends StatelessWidget implements PreferredSizeWidget {
                   context.l10n.expense,
                   style: TextStyle(
                     color: kind == CategoryKind.expense
-                        ? context.ledgerColor(income: false)
+                        ? context.accountBookColor(income: false)
                         : Theme.of(context).colorScheme.onSurfaceVariant,
                   ),
                 ),
@@ -45,7 +45,7 @@ class AnalysisAppBar extends StatelessWidget implements PreferredSizeWidget {
                   context.l10n.income,
                   style: TextStyle(
                     color: kind == CategoryKind.income
-                        ? context.ledgerColor(income: true)
+                        ? context.accountBookColor(income: true)
                         : Theme.of(context).colorScheme.onSurfaceVariant,
                   ),
                 ),

@@ -2,13 +2,13 @@ import 'package:equatable/equatable.dart';
 import 'package:money_manager/models/account_book_kinds.dart';
 import 'package:money_manager/models/transaction_model.dart';
 
-class DayLedger extends Equatable {
+class DayAccountBook extends Equatable {
   final DateTime day;
   final double net;
   final double expense;
   final List<TransactionModel> transactions;
 
-  const DayLedger({
+  const DayAccountBook({
     required this.day,
     required this.net,
     required this.expense,
@@ -19,7 +19,7 @@ class DayLedger extends Equatable {
   List<Object?> get props => [day, net, expense, transactions];
 }
 
-List<DayLedger> daysOf(Iterable<TransactionModel> transactions) {
+List<DayAccountBook> daysOf(Iterable<TransactionModel> transactions) {
   final items = <DateTime, List<TransactionModel>>{};
   final nets = <DateTime, double>{};
   final expenses = <DateTime, double>{};
@@ -45,7 +45,7 @@ List<DayLedger> daysOf(Iterable<TransactionModel> transactions) {
   }
   return [
     for (final entry in items.entries)
-      DayLedger(
+      DayAccountBook(
         day: entry.key,
         net: nets[entry.key] ?? 0,
         expense: expenses[entry.key] ?? 0,
@@ -54,7 +54,7 @@ List<DayLedger> daysOf(Iterable<TransactionModel> transactions) {
   ];
 }
 
-double netOn(List<DayLedger> days, DateTime day) {
+double netOn(List<DayAccountBook> days, DateTime day) {
   final key = DateTime(day.year, day.month, day.day);
   for (final item in days) {
     if (item.day == key) {

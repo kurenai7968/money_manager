@@ -1,7 +1,7 @@
 import 'package:equatable/equatable.dart';
 import 'package:money_manager/models/account_model.dart';
 import 'package:money_manager/models/category_model.dart';
-import 'package:money_manager/models/day_ledger.dart';
+import 'package:money_manager/models/day_account_book.dart';
 import 'package:money_manager/models/transaction_model.dart';
 
 enum HomeView { summary, calendar }
@@ -17,7 +17,7 @@ class HomeState extends Equatable {
   final double income;
   final double expense;
   final double balance;
-  final List<DayLedger> days;
+  final List<DayAccountBook> days;
   final List<CategoryModel> categories;
   final List<AccountModel> accounts;
   final int? selectedAccountId;
@@ -62,7 +62,7 @@ class HomeState extends Equatable {
     List<TransactionModel>? transactions,
     double? income,
     double? expense,
-    List<DayLedger>? days,
+    List<DayAccountBook>? days,
     List<CategoryModel>? categories,
     List<AccountModel>? accounts,
     int? selectedAccountId,

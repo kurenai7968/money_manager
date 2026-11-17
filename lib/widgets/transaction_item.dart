@@ -6,14 +6,14 @@ import 'package:money_manager/core/utils/money_format.dart';
 import 'package:money_manager/models/account_model.dart';
 import 'package:money_manager/models/category_model.dart';
 import 'package:money_manager/models/account_book_kinds.dart';
-import 'package:money_manager/models/day_ledger.dart';
+import 'package:money_manager/models/day_account_book.dart';
 import 'package:money_manager/models/transaction_model.dart';
 import 'package:money_manager/routes/app_routes.dart';
 import 'package:money_manager/themes/app_themes.dart';
 import 'package:money_manager/themes/account_book_palette.dart';
 
 class TransactionList extends StatefulWidget {
-  final List<DayLedger> days;
+  final List<DayAccountBook> days;
   final List<CategoryModel> categories;
   final List<AccountModel> accounts;
   final String locale;
@@ -313,7 +313,7 @@ class TransactionItem extends StatelessWidget {
     if (transaction.type == TransactionType.transfer) {
       return scheme.onSurface;
     }
-    return context.ledgerColor(
+    return context.accountBookColor(
       income: transaction.type == TransactionType.income,
     );
   }
@@ -334,7 +334,9 @@ class _TransactionIcon extends StatelessWidget {
     final known = category;
     if (known != null) {
       icon = AccountBookPalette.icon(known.icon);
-      background = context.ledgerColor(income: type == TransactionType.income);
+      background = context.accountBookColor(
+        income: type == TransactionType.income,
+      );
       foreground = scheme.onPrimary;
     } else {
       background = scheme.surfaceContainerHighest;
@@ -378,7 +380,7 @@ class _NoteText extends StatelessWidget {
       spans.add(
         TextSpan(
           text: match.group(0),
-          style: base.copyWith(color: context.ledgerColor(income: true)),
+          style: base.copyWith(color: context.accountBookColor(income: true)),
         ),
       );
       cursor = match.end;

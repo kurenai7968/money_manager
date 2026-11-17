@@ -7,7 +7,7 @@ import 'package:money_manager/core/errors/app_exception.dart';
 import 'package:money_manager/models/app_setting_model.dart';
 import 'package:money_manager/models/enums/app_theme_mode.dart';
 import 'package:money_manager/models/enums/first_day_of_week.dart';
-import 'package:money_manager/models/enums/ledger_color.dart';
+import 'package:money_manager/models/enums/account_book_color.dart';
 import 'package:money_manager/repositories/app_setting_repository.dart';
 
 class _MemoryAppSettingRepository implements AppSettingRepository {
@@ -44,7 +44,7 @@ class _MemoryAppSettingRepository implements AppSettingRepository {
   }
 
   @override
-  Future<AppSettingModel> updateColorPair(LedgerColorPair colorPair) {
+  Future<AppSettingModel> updateColorPair(AccountBookColorPair colorPair) {
     return _write(appSetting.copyWith(colorPair: colorPair));
   }
 
@@ -97,19 +97,21 @@ void main() {
     'saves a color pair change',
     build: () => AppSettingBloc(appSettingRepository: repository),
     act: (bloc) => bloc.add(
-      const AppSettingColorPairChanged(colorPair: LedgerColorPair.coralTeal),
+      const AppSettingColorPairChanged(
+        colorPair: AccountBookColorPair.coralTeal,
+      ),
     ),
     expect: () => const [
       AppSettingState(status: AppSettingStatus.loading),
       AppSettingState(status: AppSettingStatus.success),
       AppSettingState(
         status: AppSettingStatus.success,
-        appSetting: AppSettingModel(colorPair: LedgerColorPair.coralTeal),
+        appSetting: AppSettingModel(colorPair: AccountBookColorPair.coralTeal),
       ),
     ],
     verify: (bloc) {
-      expect(bloc.state.appSetting.expenseColor, LedgerColor.coral);
-      expect(bloc.state.appSetting.incomeColor, LedgerColor.teal);
+      expect(bloc.state.appSetting.expenseColor, AccountBookColor.coral);
+      expect(bloc.state.appSetting.incomeColor, AccountBookColor.teal);
     },
   );
 

@@ -28,8 +28,8 @@ class HomeMonthDonut extends StatelessWidget {
           painter: _DonutPainter(
             income: income,
             expense: expense,
-            incomeColor: context.ledgerColor(income: true),
-            expenseColor: context.ledgerColor(income: false),
+            incomeColor: context.accountBookColor(income: true),
+            expenseColor: context.accountBookColor(income: false),
             trackColor: scheme.outline,
           ),
           child: Center(

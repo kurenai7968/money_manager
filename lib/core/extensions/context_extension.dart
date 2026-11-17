@@ -30,7 +30,7 @@ extension ContextExtension on BuildContext {
     }
   }
 
-  Color ledgerColor({required bool income}) {
+  Color accountBookColor({required bool income}) {
     final setting = appSetting;
     return AccountBookPalette.directionColor(
       income: income,

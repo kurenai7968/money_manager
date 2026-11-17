@@ -1,7 +1,7 @@
 import 'package:equatable/equatable.dart';
 import 'package:money_manager/models/account_model.dart';
 import 'package:money_manager/models/category_model.dart';
-import 'package:money_manager/models/day_ledger.dart';
+import 'package:money_manager/models/day_account_book.dart';
 import 'package:money_manager/models/transaction_model.dart';
 
 enum AccountDetailStatus { initial, loading, success, failure }
@@ -11,7 +11,7 @@ class AccountDetailState extends Equatable {
   final AccountModel? account;
   final double balance;
   final List<TransactionModel> history;
-  final List<DayLedger> days;
+  final List<DayAccountBook> days;
   final List<CategoryModel> categories;
   final List<AccountModel> accounts;
 
@@ -31,7 +31,7 @@ class AccountDetailState extends Equatable {
     bool clearAccount = false,
     double? balance,
     List<TransactionModel>? history,
-    List<DayLedger>? days,
+    List<DayAccountBook>? days,
     List<CategoryModel>? categories,
     List<AccountModel>? accounts,
   }) {

@@ -8,7 +8,7 @@ import 'package:money_manager/core/extensions/context_extension.dart';
 import 'package:money_manager/l10n/app_localizations.dart';
 import 'package:money_manager/models/enums/app_theme_mode.dart';
 import 'package:money_manager/models/enums/first_day_of_week.dart';
-import 'package:money_manager/models/enums/ledger_color.dart';
+import 'package:money_manager/models/enums/account_book_color.dart';
 import 'package:money_manager/pages/settings/widgets/settings_choice_sheet.dart';
 import 'package:money_manager/themes/account_book_palette.dart';
 import 'package:money_manager/themes/app_themes.dart';
@@ -104,11 +104,11 @@ class SettingsBody extends StatelessWidget {
                 AccountBookPalette.of(setting.expenseColor),
                 AccountBookPalette.of(setting.incomeColor),
               ],
-              onTap: () => showSettingsChoice<LedgerColorPair>(
+              onTap: () => showSettingsChoice<AccountBookColorPair>(
                 context,
                 title: context.l10n.color,
                 options: [
-                  for (final pair in LedgerColorPair.values)
+                  for (final pair in AccountBookColorPair.values)
                     (pair, _pairLabel(context.l10n, pair)),
                 ],
                 selected: setting.colorPair,
@@ -133,11 +133,11 @@ class SettingsBody extends StatelessWidget {
   }
 }
 
-String _pairLabel(AppLocalizations l10n, LedgerColorPair pair) {
-  return '${_ledgerColorLabel(l10n, pair.expense)} / ${_ledgerColorLabel(l10n, pair.income)}';
+String _pairLabel(AppLocalizations l10n, AccountBookColorPair pair) {
+  return '${_accountBookColorLabel(l10n, pair.expense)} / ${_accountBookColorLabel(l10n, pair.income)}';
 }
 
-Widget _pairDots(LedgerColorPair pair) {
+Widget _pairDots(AccountBookColorPair pair) {
   return Row(
     mainAxisSize: MainAxisSize.min,
     children: [
@@ -148,20 +148,20 @@ Widget _pairDots(LedgerColorPair pair) {
   );
 }
 
-String _ledgerColorLabel(AppLocalizations l10n, LedgerColor color) {
+String _accountBookColorLabel(AppLocalizations l10n, AccountBookColor color) {
   return switch (color) {
-    LedgerColor.coral => l10n.colorCoral,
-    LedgerColor.red => l10n.colorRed,
-    LedgerColor.blue => l10n.colorBlue,
-    LedgerColor.amber => l10n.colorAmber,
-    LedgerColor.teal => l10n.colorTeal,
-    LedgerColor.pink => l10n.colorPink,
-    LedgerColor.green => l10n.colorGreen,
-    LedgerColor.slate => l10n.colorSlate,
+    AccountBookColor.coral => l10n.colorCoral,
+    AccountBookColor.red => l10n.colorRed,
+    AccountBookColor.blue => l10n.colorBlue,
+    AccountBookColor.amber => l10n.colorAmber,
+    AccountBookColor.teal => l10n.colorTeal,
+    AccountBookColor.pink => l10n.colorPink,
+    AccountBookColor.green => l10n.colorGreen,
+    AccountBookColor.slate => l10n.colorSlate,
   };
 }
 
-Widget _colorDot(LedgerColor color) {
+Widget _colorDot(AccountBookColor color) {
   return DecoratedBox(
     decoration: BoxDecoration(
       color: AccountBookPalette.of(color),

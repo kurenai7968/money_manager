@@ -62,7 +62,7 @@ class AnalysisBody extends StatelessWidget {
             ),
             for (final entry in rollup.byCategory)
               AnalysisTotalRow(
-                color: context.ledgerColor(
+                color: context.accountBookColor(
                   income:
                       _category(state.categories, entry.id)?.type ==
                       CategoryKind.income,

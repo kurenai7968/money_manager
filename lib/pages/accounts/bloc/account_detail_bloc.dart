@@ -1,7 +1,7 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:money_manager/models/account_book_model.dart';
 import 'package:money_manager/models/category_model.dart';
-import 'package:money_manager/models/day_ledger.dart';
+import 'package:money_manager/models/day_account_book.dart';
 import 'package:money_manager/pages/accounts/bloc/account_detail_event.dart';
 import 'package:money_manager/pages/accounts/bloc/account_detail_state.dart';
 import 'package:money_manager/services/account_book_service.dart';
