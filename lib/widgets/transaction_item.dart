@@ -12,63 +12,63 @@ import 'package:money_manager/routes/app_routes.dart';
 import 'package:money_manager/themes/app_themes.dart';
 import 'package:money_manager/themes/account_book_palette.dart';
 
-class TransactionList extends StatelessWidget {
-  final List<TransactionModel> transactions;
+class TransactionList extends StatefulWidget {
   final List<DayLedger> days;
   final List<CategoryModel> categories;
   final List<AccountModel> accounts;
   final String locale;
-  final bool showDayHeaders;
   final EdgeInsets? padding;
   final VoidCallback? onReturned;
 
   const TransactionList({
-    required this.transactions,
-    this.days = const [],
+    required this.days,
     required this.categories,
     required this.accounts,
     required this.locale,
-    this.showDayHeaders = true,
     this.padding,
     this.onReturned,
     super.key,
   });
 
   @override
-  Widget build(BuildContext context) {
-    final categoriesById = _firstById(categories, (category) => category.id);
-    final accountsById = _firstById(accounts, (account) => account.id);
-    final listPadding =
-        padding ??
-        (showDayHeaders
-            ? const EdgeInsets.only(bottom: AppSpacing.s)
-            : EdgeInsets.zero);
-    if (!showDayHeaders) {
-      return ListView.separated(
-        padding: listPadding,
-        itemCount: transactions.length,
-        separatorBuilder: (context, _) =>
-            Divider(height: 1, color: Theme.of(context).colorScheme.outline),
-        itemBuilder: (context, index) {
-          return TransactionItem(
-            transaction: transactions[index],
-            categories: categories,
-            accounts: accounts,
-            categoriesById: categoriesById,
-            accountsById: accountsById,
-            locale: locale,
-            onReturned: onReturned,
-          );
-        },
-      );
-    }
+  State<TransactionList> createState() => _TransactionListState();
+}
 
+class _TransactionListState extends State<TransactionList> {
+  final _collapsed = <DateTime>{};
+
+  void _toggle(DateTime day) {
+    setState(() {
+      if (!_collapsed.remove(day)) {
+        _collapsed.add(day);
+      }
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final categoriesById = _firstById(
+      widget.categories,
+      (category) => category.id,
+    );
+    final accountsById = _firstById(widget.accounts, (account) => account.id);
+    final listPadding =
+        widget.padding ?? const EdgeInsets.only(bottom: AppSpacing.s);
     final entries = <_Entry>[];
-    for (var index = 0; index < days.length; index++) {
-      final day = days[index];
+    for (var index = 0; index < widget.days.length; index++) {
+      final day = widget.days[index];
+      final collapsed = _collapsed.contains(day.day);
       entries.add(
-        _DayHeaderEntry(day: day.day, expense: day.expense, first: index == 0),
+        _DayHeaderEntry(
+          day: day.day,
+          expense: day.expense,
+          first: index == 0,
+          collapsed: collapsed,
+        ),
       );
+      if (collapsed) {
+        continue;
+      }
       for (
         var itemIndex = 0;
         itemIndex < day.transactions.length;
@@ -88,12 +88,19 @@ class TransactionList extends StatelessWidget {
       itemBuilder: (context, index) {
         final entry = entries[index];
         return switch (entry) {
-          _DayHeaderEntry(:final day, :final expense, :final first) =>
+          _DayHeaderEntry(
+            :final day,
+            :final expense,
+            :final first,
+            :final collapsed,
+          ) =>
             _TransactionDayHeader(
               day: day,
               expense: expense,
-              locale: locale,
+              locale: widget.locale,
               first: first,
+              collapsed: collapsed,
+              onToggle: () => _toggle(day),
             ),
           _TransactionEntry(:final transaction, :final divider) => Column(
             mainAxisSize: MainAxisSize.min,
@@ -105,12 +112,12 @@ class TransactionList extends StatelessWidget {
                 ),
               TransactionItem(
                 transaction: transaction,
-                categories: categories,
-                accounts: accounts,
+                categories: widget.categories,
+                accounts: widget.accounts,
                 categoriesById: categoriesById,
                 accountsById: accountsById,
-                locale: locale,
-                onReturned: onReturned,
+                locale: widget.locale,
+                onReturned: widget.onReturned,
               ),
             ],
           ),
@@ -396,12 +403,16 @@ class _TransactionDayHeader extends StatelessWidget {
   final double expense;
   final String locale;
   final bool first;
+  final bool collapsed;
+  final VoidCallback onToggle;
 
   const _TransactionDayHeader({
     required this.day,
     required this.expense,
     required this.locale,
     required this.first,
+    required this.collapsed,
+    required this.onToggle,
   });
 
   @override
@@ -409,35 +420,50 @@ class _TransactionDayHeader extends StatelessWidget {
     final scheme = Theme.of(context).colorScheme;
     final style = Theme.of(context).textTheme.labelMedium
         ?.copyWith(color: scheme.onSurfaceVariant);
-    return Padding(
-      padding: EdgeInsets.fromLTRB(
-        AppSpacing.l,
-        first ? AppSpacing.s : AppSpacing.m,
-        AppSpacing.l,
-        AppSpacing.xs,
-      ),
-      child: Row(
-        children: [
-          Expanded(
-            child: Text(
-              cachedDateFormat(locale, 'M/d (E)').format(day),
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: style,
-            ),
+    return Semantics(
+      button: true,
+      expanded: !collapsed,
+      child: InkWell(
+        onTap: onToggle,
+        child: Padding(
+          padding: EdgeInsets.fromLTRB(
+            AppSpacing.l,
+            first ? AppSpacing.s : AppSpacing.m,
+            AppSpacing.l,
+            AppSpacing.s,
           ),
-          if (expense > 0) ...[
-            const SizedBox(width: AppSpacing.s),
-            Flexible(
-              child: Text(
-                '${context.l10n.expense} ${formatAmount(expense, locale: locale)}',
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: style,
+          child: Row(
+            children: [
+              ExcludeSemantics(
+                child: Icon(
+                  collapsed ? Icons.chevron_right : Icons.expand_more,
+                  size: 18,
+                  color: scheme.onSurfaceVariant,
+                ),
               ),
-            ),
-          ],
-        ],
+              const SizedBox(width: AppSpacing.xs),
+              Expanded(
+                child: Text(
+                  cachedDateFormat(locale, 'M/d (E)').format(day),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: style,
+                ),
+              ),
+              if (expense > 0) ...[
+                const SizedBox(width: AppSpacing.s),
+                Flexible(
+                  child: Text(
+                    '${context.l10n.expense} ${formatAmount(expense, locale: locale)}',
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: style,
+                  ),
+                ),
+              ],
+            ],
+          ),
+        ),
       ),
     );
   }
@@ -451,11 +477,13 @@ class _DayHeaderEntry extends _Entry {
   final DateTime day;
   final double expense;
   final bool first;
+  final bool collapsed;
 
   _DayHeaderEntry({
     required this.day,
     required this.expense,
     required this.first,
+    required this.collapsed,
   });
 }
 

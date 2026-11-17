@@ -111,7 +111,6 @@ class HomeSummaryView extends StatelessWidget {
           child: transactions.isEmpty
               ? Center(child: Text(l10n.emptyMonth))
               : TransactionList(
-                  transactions: transactions,
                   days: days,
                   categories: categories,
                   accounts: accounts,

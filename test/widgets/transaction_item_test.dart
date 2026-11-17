@@ -151,7 +151,6 @@ void main() {
         theme: AppThemes.light,
         home: Scaffold(
           body: TransactionList(
-            transactions: transactions,
             days: daysOf(transactions),
             categories: const [_food],
             accounts: const [_cash],
@@ -167,11 +166,34 @@ void main() {
       findsOneWidget,
     );
     expect(find.text('Expense 88'), findsOneWidget);
+    expect(find.text('Food'), findsOneWidget);
     expect(
       find.text(DateFormat('M/d (E)', 'en').format(DateTime(2026, 10, 29))),
       findsOneWidget,
     );
     expect(find.text('Expense 1'), findsNothing);
+    expect(find.byIcon(Icons.expand_more), findsNWidgets(2));
+
+    await tester.tap(
+      find.text(DateFormat('M/d (E)', 'en').format(DateTime(2026, 10, 30))),
+    );
+    await tester.pump();
+
+    expect(find.text('Food'), findsNothing);
+    expect(find.text('-88'), findsNothing);
+    expect(find.text('Expense 88'), findsOneWidget);
+    expect(find.text('+1'), findsOneWidget);
+    expect(find.byIcon(Icons.chevron_right), findsOneWidget);
+    expect(find.byIcon(Icons.expand_more), findsOneWidget);
+
+    await tester.tap(
+      find.text(DateFormat('M/d (E)', 'en').format(DateTime(2026, 10, 30))),
+    );
+    await tester.pump();
+
+    expect(find.text('Food'), findsOneWidget);
+    expect(find.text('-88'), findsOneWidget);
+    expect(find.byIcon(Icons.chevron_right), findsNothing);
   });
 
   testWidgets('a long row fits a narrow screen at larger text', (tester) async {
@@ -212,7 +234,9 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
-  testWidgets('home and account history use the same row', (tester) async {
+  testWidgets('summary, calendar, and account history use the same row', (
+    tester,
+  ) async {
     tester.platformDispatcher.localeTestValue = const Locale('en');
     addTearDown(tester.platformDispatcher.clearLocaleTestValue);
     final now = DateTime.now();
@@ -247,6 +271,17 @@ void main() {
     expect(_rowText('-88'), findsOneWidget);
     expect(_rowText('Wallet'), findsOneWidget);
     expect(find.text(DateFormat('M/d (E)', 'en').format(now)), findsOneWidget);
+    expect(find.text('Expense 88'), findsOneWidget);
+
+    await tester.tap(find.byTooltip('Calendar'));
+    await tester.pumpAndSettle();
+
+    expect(_rowText('Food'), findsOneWidget);
+    expect(_rowText('Lunch #work'), findsOneWidget);
+    expect(_rowText('-88'), findsOneWidget);
+    expect(_rowText('Wallet'), findsOneWidget);
+    expect(find.text(DateFormat('M/d (E)', 'en').format(now)), findsOneWidget);
+    expect(find.text('Expense 88'), findsOneWidget);
 
     await tester.tap(
       find.descendant(

@@ -1,4 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:intl/intl.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:money_manager/models/account_model.dart';
 import 'package:money_manager/models/account_book_kinds.dart';
@@ -48,6 +49,15 @@ void main() {
     );
     expect(find.text('-0.20'), findsWidgets);
     expect(find.text('Lunch'), findsOneWidget);
+    final header = DateFormat('M/d (E)', 'en').format(now);
+    expect(find.text(header), findsOneWidget);
+    expect(find.text('Expense 0.20'), findsOneWidget);
+    await tester.tap(find.text(header));
+    await tester.pump();
+    expect(find.text('Lunch'), findsNothing);
+    await tester.tap(find.text(header));
+    await tester.pump();
+    expect(find.text('Lunch'), findsOneWidget);
     final calendar = find.byWidgetPredicate(
       (widget) => widget is TableCalendar,
     );
@@ -56,11 +66,17 @@ void main() {
     await tester.tap(find.byTooltip('Next month'));
     await tester.pumpAndSettle();
     expect(find.text('Lunch'), findsNothing);
+    expect(_selectedDay(tester, calendar), 1);
     expect(tester.getSize(calendar).height, height);
 
     await tester.tap(find.byTooltip('Previous month'));
     await tester.pumpAndSettle();
-    expect(find.text('Lunch'), findsOneWidget);
+    final lastDay = DateTime(now.year, now.month + 1, 0).day;
+    expect(_selectedDay(tester, calendar), lastDay);
+    expect(
+      find.text('Lunch'),
+      lastDay == now.day ? findsOneWidget : findsNothing,
+    );
     expect(tester.getSize(calendar).height, height);
 
     final other = now.day == 1 ? 2 : 1;
@@ -72,4 +88,24 @@ void main() {
     expect(tester.getSize(calendar).height, height);
     expect(tester.takeException(), isNull);
   });
+}
+
+int _selectedDay(WidgetTester tester, Finder calendar) {
+  final selected = tester.widget<Text>(
+    find.descendant(
+      of: find.descendant(
+        of: calendar,
+        matching: find.byWidgetPredicate((widget) {
+          if (widget is! DecoratedBox) {
+            return false;
+          }
+          final decoration = widget.decoration;
+          return decoration is BoxDecoration &&
+              decoration.shape == BoxShape.circle;
+        }),
+      ),
+      matching: find.byType(Text),
+    ),
+  );
+  return int.parse(selected.data!);
 }

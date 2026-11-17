@@ -4,7 +4,6 @@ import 'package:money_manager/core/utils/money_format.dart';
 import 'package:money_manager/models/account_model.dart';
 import 'package:money_manager/models/category_model.dart';
 import 'package:money_manager/models/enums/first_day_of_week.dart';
-import 'package:money_manager/models/transaction_model.dart';
 import 'package:money_manager/themes/app_themes.dart';
 import 'package:money_manager/themes/account_book_palette.dart';
 import 'package:money_manager/widgets/account_book_calendar.dart';
@@ -13,7 +12,6 @@ import 'package:money_manager/widgets/transaction_item.dart';
 class HomeCalendarView extends StatelessWidget {
   final DateTime month;
   final List<DayLedger> days;
-  final List<TransactionModel> dayItems;
   final List<CategoryModel> categories;
   final List<AccountModel> accounts;
   final DateTime? selectedDay;
@@ -26,7 +24,6 @@ class HomeCalendarView extends StatelessWidget {
   const HomeCalendarView({
     required this.month,
     required this.days,
-    required this.dayItems,
     required this.categories,
     required this.accounts,
     required this.selectedDay,
@@ -41,6 +38,7 @@ class HomeCalendarView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final selected = selectedDay;
+    final selectedLedger = _ledgerOn(days, selected);
     final focused =
         selected != null &&
             selected.year == month.year &&
@@ -80,14 +78,13 @@ class HomeCalendarView extends StatelessWidget {
           ),
         ),
         Expanded(
-          child: dayItems.isEmpty
+          child: selectedLedger == null
               ? const SizedBox.shrink()
               : TransactionList(
-                  transactions: dayItems,
+                  days: [selectedLedger],
                   categories: categories,
                   accounts: accounts,
                   locale: locale,
-                  showDayHeaders: false,
                   padding: listPadding,
                   onReturned: onRecordReturned,
                 ),
@@ -95,4 +92,17 @@ class HomeCalendarView extends StatelessWidget {
       ],
     );
   }
+}
+
+DayLedger? _ledgerOn(List<DayLedger> days, DateTime? day) {
+  if (day == null) {
+    return null;
+  }
+  final key = DateTime(day.year, day.month, day.day);
+  for (final item in days) {
+    if (item.day == key) {
+      return item;
+    }
+  }
+  return null;
 }

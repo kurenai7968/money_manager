@@ -28,7 +28,6 @@ class HomeBody extends StatelessWidget {
               previous.figures != current.figures ||
               previous.days != current.days ||
               previous.transactions != current.transactions ||
-              previous.selectedTransactions != current.selectedTransactions ||
               previous.categories != current.categories ||
               previous.accounts != current.accounts,
           builder: (context, state) {
@@ -51,7 +50,6 @@ class HomeBody extends StatelessWidget {
             return HomeCalendarView(
               month: state.month,
               days: state.days,
-              dayItems: state.selectedTransactions,
               categories: state.categories,
               accounts: state.accounts,
               selectedDay: state.selectedDay,

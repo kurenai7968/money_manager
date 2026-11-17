@@ -82,7 +82,7 @@ void main() {
   );
 
   blocTest<HomeBloc, HomeState>(
-    'clears the selected day when the month is not the current one',
+    'selects the first day of the next month and the last day of the previous month',
     build: buildBloc,
     act: (bloc) async {
       bloc.add(const HomeInitialized());
@@ -90,6 +90,10 @@ void main() {
         (state) => state.status == HomeStatus.success,
       );
       bloc.add(const HomeMonthShifted(1));
+      await bloc.stream.firstWhere((state) => state.month == nextMonth);
+      bloc
+        ..add(const HomeMonthShifted(-1))
+        ..add(const HomeMonthShifted(-1));
     },
     expect: () => [
       isA<HomeState>().having(
@@ -100,8 +104,34 @@ void main() {
       isA<HomeState>().having((state) => state.selectedDay, 'today', day),
       isA<HomeState>()
           .having((state) => state.month, 'month', nextMonth)
-          .having((state) => state.selectedDay, 'day', isNull)
+          .having(
+            (state) => state.selectedDay,
+            'day',
+            DateTime(nextMonth.year, nextMonth.month, 1),
+          )
           .having((state) => state.transactions, 'rows', isEmpty),
+      isA<HomeState>()
+          .having(
+            (state) => state.month,
+            'month',
+            DateTime(today.year, today.month),
+          )
+          .having(
+            (state) => state.selectedDay,
+            'day',
+            DateTime(today.year, today.month + 1, 0),
+          ),
+      isA<HomeState>()
+          .having(
+            (state) => state.month,
+            'month',
+            DateTime(today.year, today.month - 1),
+          )
+          .having(
+            (state) => state.selectedDay,
+            'day',
+            DateTime(today.year, today.month, 0),
+          ),
     ],
   );
 

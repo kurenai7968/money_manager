@@ -21,7 +21,7 @@ The bottom bar is 主頁, 分析, 帳戶, 設定, with the record button in the 
 
 Home is one page. The month stays in the centered title. Its step controls are compact so the leading account keeps room. A long account name ellipsizes after the first characters. A leading control selects one account or all accounts and opens a sheet. All is the default. One action switches summary and calendar. Its icon is the other mode: calendar opens the calendar, bars return to the summary.
 
-Summary shows a small income and expense pair, then a lower donut. 結餘 sits in the donut and is income minus expense. Transfers stay out of 結餘. The pair has no side labels on the chart. The list under that is transactions.
+Summary shows a small income and expense pair, then a lower donut. 結餘 sits in the donut and is income minus expense. Transfers stay out of 結餘. The pair has no side labels on the chart. The list under that is transactions. Stepping to the next month selects that month's first day. Stepping to the previous month selects its last day.
 
 ## Record
 
@@ -41,4 +41,4 @@ Settings holds language, appearance, currency, the first weekday, and categories
 
 ## Transaction row
 
-A row shows the category icon, category name, note, amount, and account. The amount uses the category color. Transfer amounts stay near-black. A `#tag` in the note uses the income green. Home summary and account history share that row and group it by day. The day header shows the date and that day's expense.
+A row shows the category icon, category name, note, amount, and account. The amount uses the category color. Transfer amounts stay near-black. A `#tag` in the note uses the income green. Home summary, the home calendar, and account history share that row and group it by day. The day header shows the date and that day's expense. Tapping the header collapses that day. The calendar lists the selected day.

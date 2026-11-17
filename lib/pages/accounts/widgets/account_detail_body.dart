@@ -67,7 +67,6 @@ class AccountDetailBody extends StatelessWidget {
             ),
             Expanded(
               child: TransactionList(
-                transactions: state.history,
                 days: state.days,
                 categories: state.categories,
                 accounts: state.accounts,

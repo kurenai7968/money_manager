@@ -46,18 +46,10 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
 
   void _onMonthShifted(HomeMonthShifted event, Emitter<HomeState> emit) {
     final month = DateTime(state.month.year, state.month.month + event.delta);
-    final today = DateTime.now();
-    final selected = today.year == month.year && today.month == month.month
-        ? DateTime(today.year, today.month, today.day)
-        : null;
-    _publish(
-      emit,
-      state.copyWith(
-        month: month,
-        selectedDay: selected,
-        clearSelectedDay: selected == null,
-      ),
-    );
+    final selected = event.delta < 0
+        ? DateTime(month.year, month.month + 1, 0)
+        : DateTime(month.year, month.month, 1);
+    _publish(emit, state.copyWith(month: month, selectedDay: selected));
   }
 
   void _onViewToggled(HomeViewToggled event, Emitter<HomeState> emit) {
