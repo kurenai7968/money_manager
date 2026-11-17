@@ -7,6 +7,7 @@ import 'package:money_manager/l10n/app_localizations.dart';
 import 'package:money_manager/models/account_book_kinds.dart';
 import 'package:money_manager/pages/record/bloc/record_bloc.dart';
 import 'package:money_manager/pages/record/bloc/record_event.dart';
+import 'package:money_manager/pages/record/bloc/record_state.dart';
 import 'package:money_manager/pages/record/widgets/record_date_dialog.dart';
 import 'package:money_manager/widgets/base_app_bar.dart';
 import 'package:money_manager/widgets/confirm_delete_dialog.dart';
@@ -19,49 +20,55 @@ class RecordAppBar extends StatelessWidget implements PreferredSizeWidget {
 
   @override
   Widget build(BuildContext context) {
-    final state = context.watch<RecordBloc>().state;
     final l10n = context.l10n;
     final locale = Localizations.localeOf(context).toString();
-    return BaseAppBar(
-      title: TextButton(
-        onPressed: () => _pickDate(context),
-        child: Text(
-          _title(locale, state.date),
-          style: Theme.of(context).textTheme.titleLarge,
-        ),
-      ),
-      actions: [
-        if (state.transactionId != null)
-          TextButton(
-            onPressed: () => _delete(context),
-            child: Text(l10n.delete),
+    return BlocBuilder<RecordBloc, RecordState>(
+      buildWhen: (previous, current) =>
+          previous.date != current.date ||
+          previous.transactionId != current.transactionId ||
+          previous.type != current.type,
+      builder: (context, state) => BaseAppBar(
+        title: TextButton(
+          onPressed: () => _pickDate(context),
+          child: Text(
+            _title(locale, state.date),
+            style: Theme.of(context).textTheme.titleLarge,
           ),
-      ],
-      bottom: PreferredSize(
-        preferredSize: const Size.fromHeight(48),
-        child: Row(
-          children: [
-            for (final type in TransactionType.values)
-              Expanded(
-                child: TextButton(
-                  onPressed: () =>
-                      context.read<RecordBloc>().add(RecordTypeSelected(type)),
-                  child: Text(
-                    _typeLabel(l10n, type),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: TextStyle(
-                      color: state.type == type
-                          ? Theme.of(context).colorScheme.primary
-                          : Theme.of(context).colorScheme.onSurfaceVariant,
-                      fontWeight: state.type == type
-                          ? FontWeight.w600
-                          : FontWeight.w400,
+        ),
+        actions: [
+          if (state.transactionId != null)
+            TextButton(
+              onPressed: () => _delete(context),
+              child: Text(l10n.delete),
+            ),
+        ],
+        bottom: PreferredSize(
+          preferredSize: const Size.fromHeight(48),
+          child: Row(
+            children: [
+              for (final type in TransactionType.values)
+                Expanded(
+                  child: TextButton(
+                    onPressed: () => context.read<RecordBloc>().add(
+                      RecordTypeSelected(type),
+                    ),
+                    child: Text(
+                      _typeLabel(l10n, type),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        color: state.type == type
+                            ? Theme.of(context).colorScheme.primary
+                            : Theme.of(context).colorScheme.onSurfaceVariant,
+                        fontWeight: state.type == type
+                            ? FontWeight.w600
+                            : FontWeight.w400,
+                      ),
                     ),
                   ),
                 ),
-              ),
-          ],
+            ],
+          ),
         ),
       ),
     );

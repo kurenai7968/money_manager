@@ -75,20 +75,22 @@ class _RecordError extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final message = _errorLabel(
-      context.l10n,
-      context.watch<RecordBloc>().state.error,
-    );
-    if (message == null) {
-      return const SizedBox.shrink();
-    }
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.l),
-      child: Text(
-        message,
-        style: Theme.of(context).textTheme.bodyMedium
-            ?.copyWith(color: Theme.of(context).colorScheme.error),
-      ),
+    return BlocSelector<RecordBloc, RecordState, RecordError>(
+      selector: (state) => state.error,
+      builder: (context, error) {
+        final message = _errorLabel(context.l10n, error);
+        if (message == null) {
+          return const SizedBox.shrink();
+        }
+        return Padding(
+          padding: const EdgeInsets.symmetric(horizontal: AppSpacing.l),
+          child: Text(
+            message,
+            style: Theme.of(context).textTheme.bodyMedium
+                ?.copyWith(color: Theme.of(context).colorScheme.error),
+          ),
+        );
+      },
     );
   }
 }
@@ -123,46 +125,52 @@ class _RecordMeta extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final state = context.watch<RecordBloc>().state;
     final l10n = context.l10n;
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.s),
-      child: Row(
-        children: [
-          Expanded(
-            child: Align(
-              alignment: AlignmentDirectional.centerStart,
-              child: TextButton(
-                onPressed: () => _editNote(context, state.note),
-                child: Text(
-                  state.note.isEmpty ? l10n.remark : state.note,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ),
-            ),
-          ),
-          if (state.type != TransactionType.transfer)
+    return BlocBuilder<RecordBloc, RecordState>(
+      buildWhen: (previous, current) =>
+          previous.note != current.note ||
+          previous.type != current.type ||
+          previous.accounts != current.accounts ||
+          previous.accountId != current.accountId,
+      builder: (context, state) => Padding(
+        padding: const EdgeInsets.symmetric(horizontal: AppSpacing.s),
+        child: Row(
+          children: [
             Expanded(
               child: Align(
-                alignment: AlignmentDirectional.centerEnd,
+                alignment: AlignmentDirectional.centerStart,
                 child: TextButton(
-                  onPressed: state.accounts.isEmpty
-                      ? null
-                      : () => _pickAccount(context, state),
+                  onPressed: () => _editNote(context, state.note),
                   child: Text(
-                    _accountLabel(
-                      state,
-                      context.categoryLanguageCode,
-                      l10n.chooseAccount,
-                    ),
+                    state.note.isEmpty ? l10n.remark : state.note,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),
                 ),
               ),
             ),
-        ],
+            if (state.type != TransactionType.transfer)
+              Expanded(
+                child: Align(
+                  alignment: AlignmentDirectional.centerEnd,
+                  child: TextButton(
+                    onPressed: state.accounts.isEmpty
+                        ? null
+                        : () => _pickAccount(context, state),
+                    child: Text(
+                      _accountLabel(
+                        state,
+                        context.categoryLanguageCode,
+                        l10n.chooseAccount,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                ),
+              ),
+          ],
+        ),
       ),
     );
   }

@@ -23,6 +23,7 @@ void main() {
 
     expect(find.text('All'), findsOneWidget);
     _expectAccountBeforeMonth(tester, 'All');
+    _expectMonthGroupCentered(tester);
     expect(
       tester.getSize(find.byTooltip('Previous month')).width,
       lessThanOrEqualTo(32),
@@ -129,6 +130,7 @@ void main() {
     expect(label.overflow, TextOverflow.ellipsis);
     expect(label.softWrap, isFalse);
     _expectAccountBeforeMonth(tester, name);
+    _expectMonthGroupCentered(tester);
     expect(tester.getSize(find.text(name)).width, lessThan(160));
   });
 }
@@ -146,4 +148,21 @@ void _expectAccountBeforeMonth(WidgetTester tester, String label) {
   expect(account.left, lessThan(24));
   expect(account.width, greaterThan(12));
   expect(account.right, lessThanOrEqualTo(month.left));
+}
+
+void _expectMonthGroupCentered(WidgetTester tester) {
+  final account = tester.getRect(find.byTooltip('Choose account'));
+  final previous = tester.getRect(find.byTooltip('Previous month'));
+  final next = tester.getRect(find.byTooltip('Next month'));
+  final calendar = tester.getRect(find.byTooltip('Calendar'));
+  final month = tester.getRect(_yearMonth);
+  final bar = tester.getRect(find.byType(AppBar));
+  expect(account.left - bar.left, lessThanOrEqualTo(8));
+  expect(bar.right - calendar.right, lessThanOrEqualTo(8));
+  expect(month.left - previous.right, lessThanOrEqualTo(4));
+  expect(next.left - month.right, lessThanOrEqualTo(4));
+  expect(
+    ((previous.left - account.right) - (calendar.left - next.right)).abs(),
+    lessThan(8),
+  );
 }

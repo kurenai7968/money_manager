@@ -74,11 +74,9 @@ class _CategoryFormBodyState extends State<CategoryFormBody> {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = context.l10n;
-    final state = context.watch<CategoriesBloc>().state;
-    _apply(state);
-    final editing = widget.categoryId != null;
-    return BlocListener<CategoriesBloc, CategoriesState>(
+    return BlocConsumer<CategoriesBloc, CategoriesState>(
+      listenWhen: (previous, current) =>
+          previous.status != current.status || previous.error != current.error,
       listener: (context, state) {
         if (!_waiting) {
           return;
@@ -87,73 +85,82 @@ class _CategoryFormBodyState extends State<CategoryFormBody> {
             state.error == CategoriesError.none) {
           context.pop();
         } else if (state.error == CategoriesError.nameRequired) {
-          setState(() => _error = l10n.nameRequired);
+          setState(() => _error = context.l10n.nameRequired);
           _waiting = false;
         }
       },
-      child: ListView(
-        padding: const EdgeInsets.all(AppSpacing.l),
-        children: [
-          Text(l10n.name, style: Theme.of(context).textTheme.labelLarge),
-          const SizedBox(height: AppSpacing.s),
-          TextField(controller: _name),
-          const SizedBox(height: AppSpacing.xl),
-          if (!editing)
-            SegmentedButton<CategoryKind>(
-              segments: [
-                ButtonSegment(
-                  value: CategoryKind.expense,
-                  label: Text(l10n.expense),
-                ),
-                ButtonSegment(
-                  value: CategoryKind.income,
-                  label: Text(l10n.income),
-                ),
-              ],
-              selected: {_type},
-              onSelectionChanged: (value) {
-                final type = value.first;
-                final categories = context
-                    .read<CategoriesBloc>()
-                    .state
-                    .categories;
-                setState(() {
-                  _type = type;
-                  _sortOrder = _nextSortOrder(categories, type);
-                });
-              },
-            ),
-          const SizedBox(height: AppSpacing.xl),
-          Text(l10n.icon, style: Theme.of(context).textTheme.labelLarge),
-          const SizedBox(height: AppSpacing.s),
-          Wrap(
-            spacing: AppSpacing.s,
-            runSpacing: AppSpacing.s,
-            children: [
-              for (final key in AccountBookPalette.iconKeys)
-                CategoryIconChoice(
-                  iconKey: key,
-                  selected: key == _icon,
-                  color: AccountBookPalette.directionColor(
-                    income: _type == CategoryKind.income,
+      buildWhen: (previous, current) =>
+          previous.status != current.status ||
+          previous.categories != current.categories,
+      builder: (context, state) {
+        _apply(state);
+        final l10n = context.l10n;
+        final editing = widget.categoryId != null;
+        return ListView(
+          padding: const EdgeInsets.all(AppSpacing.l),
+          children: [
+            Text(l10n.name, style: Theme.of(context).textTheme.labelLarge),
+            const SizedBox(height: AppSpacing.s),
+            TextField(controller: _name),
+            const SizedBox(height: AppSpacing.xl),
+            if (!editing)
+              SegmentedButton<CategoryKind>(
+                segments: [
+                  ButtonSegment(
+                    value: CategoryKind.expense,
+                    label: Text(l10n.expense),
                   ),
-                  onPressed: () => setState(() => _icon = key),
-                ),
-            ],
-          ),
-          if (_error != null) ...[
-            const SizedBox(height: AppSpacing.m),
-            Text(
-              _error!,
-              style: Theme.of(context).textTheme.bodyMedium
-                  ?.copyWith(color: Theme.of(context).colorScheme.error),
+                  ButtonSegment(
+                    value: CategoryKind.income,
+                    label: Text(l10n.income),
+                  ),
+                ],
+                selected: {_type},
+                onSelectionChanged: (value) {
+                  final type = value.first;
+                  final categories = context
+                      .read<CategoriesBloc>()
+                      .state
+                      .categories;
+                  setState(() {
+                    _type = type;
+                    _sortOrder = _nextSortOrder(categories, type);
+                  });
+                },
+              ),
+            const SizedBox(height: AppSpacing.xl),
+            Text(l10n.icon, style: Theme.of(context).textTheme.labelLarge),
+            const SizedBox(height: AppSpacing.s),
+            Wrap(
+              spacing: AppSpacing.s,
+              runSpacing: AppSpacing.s,
+              children: [
+                for (final key in AccountBookPalette.iconKeys)
+                  CategoryIconChoice(
+                    iconKey: key,
+                    selected: key == _icon,
+                    color: AccountBookPalette.directionColor(
+                      income: _type == CategoryKind.income,
+                    ),
+                    onPressed: () => setState(() => _icon = key),
+                  ),
+              ],
             ),
+            if (_error != null) ...[
+              const SizedBox(height: AppSpacing.m),
+              Text(
+                _error!,
+                style: Theme.of(context).textTheme.bodyMedium
+                    ?.copyWith(color: Theme.of(context).colorScheme.error),
+              ),
+            ],
+            const SizedBox(height: AppSpacing.xl),
+            FilledButton(onPressed: _save, child: Text(l10n.save)),
+            if (editing)
+              TextButton(onPressed: _delete, child: Text(l10n.delete)),
           ],
-          const SizedBox(height: AppSpacing.xl),
-          FilledButton(onPressed: _save, child: Text(l10n.save)),
-          if (editing) TextButton(onPressed: _delete, child: Text(l10n.delete)),
-        ],
-      ),
+        );
+      },
     );
   }
 

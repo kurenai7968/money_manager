@@ -16,63 +16,102 @@ class HomeAppBar extends StatelessWidget implements PreferredSizeWidget {
 
   @override
   Widget build(BuildContext context) {
-    final state = context.watch<HomeBloc>().state;
-    final l10n = context.l10n;
-    final showingSummary = state.view == HomeView.summary;
     final locale = Localizations.localeOf(context).toString();
-    final monthLabel = cachedDateFormat(locale, 'yyyy-MM').format(state.month);
     return BaseAppBar(
-      automaticallyImplyLeading: false,
-      title: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Expanded(
-            child: _HomeAccountButton(
-              label: _accountLabel(context, state),
-              tooltip: l10n.chooseAccount,
-              onPressed: () => _pickAccount(context, state),
-            ),
-          ),
-          _BarIconButton(
-            tooltip: l10n.previousMonth,
-            icon: Icons.chevron_left,
-            onPressed: () =>
-                context.read<HomeBloc>().add(const HomeMonthShifted(-1)),
-          ),
-          Flexible(
-            child: Text(
-              monthLabel,
-              maxLines: 1,
-              softWrap: false,
-              overflow: TextOverflow.ellipsis,
-              textAlign: TextAlign.center,
-            ),
-          ),
-          _BarIconButton(
-            tooltip: l10n.nextMonth,
-            icon: Icons.chevron_right,
-            onPressed: () =>
-                context.read<HomeBloc>().add(const HomeMonthShifted(1)),
-          ),
-          Expanded(
-            child: Align(
-              alignment: AlignmentDirectional.centerEnd,
-              child: _BarIconButton(
-                tooltip: showingSummary ? l10n.showCalendar : l10n.showSummary,
-                icon: showingSummary
-                    ? Icons.calendar_today_outlined
-                    : Icons.bar_chart,
-                onPressed: () =>
-                    context.read<HomeBloc>().add(const HomeViewToggled()),
-              ),
-            ),
-          ),
-        ],
+      centerTitle: false,
+      titleSpacing: 0,
+      title: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: AppSpacing.s),
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            final maxAccount =
+                (constraints.maxWidth - _BarIconButton.extent * 3 - 72).clamp(
+                  48.0,
+                  152.0,
+                );
+            return Row(
+              children: [
+                ConstrainedBox(
+                  constraints: BoxConstraints(maxWidth: maxAccount),
+                  child: BlocBuilder<HomeBloc, HomeState>(
+                    buildWhen: (previous, current) =>
+                        previous.accounts != current.accounts ||
+                        previous.selectedAccountId != current.selectedAccountId,
+                    builder: (context, state) {
+                      return _HomeAccountButton(
+                        label: _accountLabel(context, state),
+                        tooltip: context.l10n.chooseAccount,
+                        onPressed: () => _pickAccount(context),
+                      );
+                    },
+                  ),
+                ),
+                Expanded(
+                  child: BlocSelector<HomeBloc, HomeState, DateTime>(
+                    selector: (state) => state.month,
+                    builder: (context, month) {
+                      final monthLabel = cachedDateFormat(
+                        locale,
+                        'yyyy-MM',
+                      ).format(month);
+                      return Row(
+                        mainAxisSize: MainAxisSize.min,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          _BarIconButton(
+                            tooltip: context.l10n.previousMonth,
+                            icon: Icons.chevron_left,
+                            onPressed: () => context.read<HomeBloc>().add(
+                              const HomeMonthShifted(-1),
+                            ),
+                          ),
+                          Flexible(
+                            child: Text(
+                              monthLabel,
+                              maxLines: 1,
+                              softWrap: false,
+                              overflow: TextOverflow.ellipsis,
+                              textAlign: TextAlign.center,
+                            ),
+                          ),
+                          _BarIconButton(
+                            tooltip: context.l10n.nextMonth,
+                            icon: Icons.chevron_right,
+                            onPressed: () => context.read<HomeBloc>().add(
+                              const HomeMonthShifted(1),
+                            ),
+                          ),
+                        ],
+                      );
+                    },
+                  ),
+                ),
+                BlocSelector<HomeBloc, HomeState, HomeView>(
+                  selector: (state) => state.view,
+                  builder: (context, view) {
+                    final showingSummary = view == HomeView.summary;
+                    return _BarIconButton(
+                      tooltip: showingSummary
+                          ? context.l10n.showCalendar
+                          : context.l10n.showSummary,
+                      icon: showingSummary
+                          ? Icons.calendar_today_outlined
+                          : Icons.bar_chart,
+                      onPressed: () =>
+                          context.read<HomeBloc>().add(const HomeViewToggled()),
+                    );
+                  },
+                ),
+              ],
+            );
+          },
+        ),
       ),
     );
   }
 
-  Future<void> _pickAccount(BuildContext context, HomeState state) async {
+  Future<void> _pickAccount(BuildContext context) async {
+    final state = context.read<HomeBloc>().state;
     final picked = await showAccountBookSheet<HomeAccountPick>(
       context: context,
       maxHeightFactor: 0.5,
@@ -164,6 +203,7 @@ class _HomeAccountButton extends StatelessWidget {
             builder: (context, constraints) {
               final showIcon = constraints.maxWidth >= 36;
               return Row(
+                mainAxisSize: MainAxisSize.min,
                 children: [
                   Flexible(
                     child: Text(
@@ -177,7 +217,6 @@ class _HomeAccountButton extends StatelessWidget {
                   if (showIcon) ...[
                     const SizedBox(width: AppSpacing.xs),
                     const Icon(Icons.expand_more, size: 18),
-                    const SizedBox(width: AppSpacing.s),
                   ],
                 ],
               );

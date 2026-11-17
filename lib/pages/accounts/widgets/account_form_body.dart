@@ -41,74 +41,81 @@ class _AccountFormBodyState extends State<AccountFormBody> {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = context.l10n;
-    final state = context.watch<AccountFormBloc>().state;
-    _apply(state);
-    final scheme = Theme.of(context).colorScheme;
-    return BlocListener<AccountFormBloc, AccountFormState>(
+    return BlocConsumer<AccountFormBloc, AccountFormState>(
       listenWhen: (previous, current) => current.saved && !previous.saved,
       listener: (context, state) => context.pop(),
-      child: ListView(
-        padding: const EdgeInsets.all(AppSpacing.l),
-        children: [
-          Text(l10n.name, style: Theme.of(context).textTheme.labelLarge),
-          const SizedBox(height: AppSpacing.s),
-          TextField(controller: _name, textInputAction: TextInputAction.next),
-          const SizedBox(height: AppSpacing.xl),
-          Text(l10n.icon, style: Theme.of(context).textTheme.labelLarge),
-          const SizedBox(height: AppSpacing.s),
-          Wrap(
-            spacing: AppSpacing.s,
-            runSpacing: AppSpacing.s,
-            children: [
-              for (final key in AccountBookPalette.iconKeys)
-                CategoryIconChoice(
-                  iconKey: key,
-                  selected: key == state.icon,
-                  color: scheme.primary,
-                  onPressed: () => context.read<AccountFormBloc>().add(
-                    AccountFormIconSelected(key),
+      buildWhen: (previous, current) =>
+          previous.prepared != current.prepared ||
+          previous.name != current.name ||
+          previous.icon != current.icon ||
+          previous.type != current.type ||
+          previous.error != current.error,
+      builder: (context, state) {
+        _apply(state);
+        final l10n = context.l10n;
+        final scheme = Theme.of(context).colorScheme;
+        return ListView(
+          padding: const EdgeInsets.all(AppSpacing.l),
+          children: [
+            Text(l10n.name, style: Theme.of(context).textTheme.labelLarge),
+            const SizedBox(height: AppSpacing.s),
+            TextField(controller: _name, textInputAction: TextInputAction.next),
+            const SizedBox(height: AppSpacing.xl),
+            Text(l10n.icon, style: Theme.of(context).textTheme.labelLarge),
+            const SizedBox(height: AppSpacing.s),
+            Wrap(
+              spacing: AppSpacing.s,
+              runSpacing: AppSpacing.s,
+              children: [
+                for (final key in AccountBookPalette.iconKeys)
+                  CategoryIconChoice(
+                    iconKey: key,
+                    selected: key == state.icon,
+                    color: scheme.primary,
+                    onPressed: () => context.read<AccountFormBloc>().add(
+                      AccountFormIconSelected(key),
+                    ),
                   ),
-                ),
-            ],
-          ),
-          const SizedBox(height: AppSpacing.xl),
-          Wrap(
-            spacing: AppSpacing.s,
-            runSpacing: AppSpacing.s,
-            children: [
-              for (final type in AccountType.values)
-                ChoiceChip(
-                  label: Text(_typeLabel(l10n, type)),
-                  selected: state.type == type,
-                  onSelected: (_) => context.read<AccountFormBloc>().add(
-                    AccountFormTypeSelected(type),
-                  ),
-                ),
-            ],
-          ),
-          if (state.error != AccountFormError.none) ...[
-            const SizedBox(height: AppSpacing.m),
-            Text(
-              _errorLabel(l10n, state.error),
-              style: Theme.of(context).textTheme.bodyMedium
-                  ?.copyWith(color: Theme.of(context).colorScheme.error),
+              ],
             ),
-          ],
-          const SizedBox(height: AppSpacing.xl),
-          FilledButton(
-            onPressed: () => context.read<AccountFormBloc>().add(
-              AccountFormSavePressed(
-                name: _name.text,
-                languageCode: context.categoryLanguageCode,
+            const SizedBox(height: AppSpacing.xl),
+            Wrap(
+              spacing: AppSpacing.s,
+              runSpacing: AppSpacing.s,
+              children: [
+                for (final type in AccountType.values)
+                  ChoiceChip(
+                    label: Text(_typeLabel(l10n, type)),
+                    selected: state.type == type,
+                    onSelected: (_) => context.read<AccountFormBloc>().add(
+                      AccountFormTypeSelected(type),
+                    ),
+                  ),
+              ],
+            ),
+            if (state.error != AccountFormError.none) ...[
+              const SizedBox(height: AppSpacing.m),
+              Text(
+                _errorLabel(l10n, state.error),
+                style: Theme.of(context).textTheme.bodyMedium
+                    ?.copyWith(color: Theme.of(context).colorScheme.error),
               ),
+            ],
+            const SizedBox(height: AppSpacing.xl),
+            FilledButton(
+              onPressed: () => context.read<AccountFormBloc>().add(
+                AccountFormSavePressed(
+                  name: _name.text,
+                  languageCode: context.categoryLanguageCode,
+                ),
+              ),
+              child: Text(l10n.save),
             ),
-            child: Text(l10n.save),
-          ),
-          if (widget.accountId != null)
-            TextButton(onPressed: _delete, child: Text(l10n.delete)),
-        ],
-      ),
+            if (widget.accountId != null)
+              TextButton(onPressed: _delete, child: Text(l10n.delete)),
+          ],
+        );
+      },
     );
   }
 

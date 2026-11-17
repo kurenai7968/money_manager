@@ -8,6 +8,7 @@ class BaseAppBar extends StatelessWidget implements PreferredSizeWidget {
   final PreferredSizeWidget? bottom;
   final bool centerTitle;
   final bool automaticallyImplyLeading;
+  final double? titleSpacing;
   final double? appBarHeight;
 
   const BaseAppBar({
@@ -18,6 +19,7 @@ class BaseAppBar extends StatelessWidget implements PreferredSizeWidget {
     this.bottom,
     this.centerTitle = true,
     this.automaticallyImplyLeading = true,
+    this.titleSpacing,
     this.appBarHeight,
     super.key,
   });
@@ -32,6 +34,7 @@ class BaseAppBar extends StatelessWidget implements PreferredSizeWidget {
       bottom: bottom,
       centerTitle: centerTitle,
       automaticallyImplyLeading: automaticallyImplyLeading,
+      titleSpacing: titleSpacing,
     );
   }
 

@@ -6,6 +6,7 @@ import 'package:money_manager/models/account_book_kinds.dart';
 import 'package:money_manager/models/account_model.dart';
 import 'package:money_manager/models/category_model.dart';
 import 'package:money_manager/pages/analysis/bloc/analysis_bloc.dart';
+import 'package:money_manager/pages/analysis/bloc/analysis_state.dart';
 import 'package:money_manager/pages/analysis/widgets/analysis_month_bars.dart';
 import 'package:money_manager/pages/analysis/widgets/analysis_total_row.dart';
 import 'package:money_manager/themes/app_themes.dart';
@@ -18,69 +19,83 @@ class AnalysisBody extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = context.l10n;
     final locale = Localizations.localeOf(context).toString();
-    final state = context.watch<AnalysisBloc>().state;
-    final rollup = state.rollup;
-    final current = rollup.current;
-    return ListView(
-      padding: const EdgeInsets.all(AppSpacing.l),
-      children: [
-        Text(
-          l10n.comparedWithLastMonth,
-          style: Theme.of(context).textTheme.labelLarge
-              ?.copyWith(color: Theme.of(context).colorScheme.onSurfaceVariant),
-        ),
-        Text(
-          formatAmount(current, locale: locale),
-          style: Theme.of(context).textTheme.headlineMedium,
-        ),
-        Text(
-          '${formatAmount(rollup.delta, locale: locale, signed: true)} · ${l10n.lastMonth} ${formatAmount(rollup.previous, locale: locale)}',
-          style: Theme.of(context).textTheme.bodyMedium
-              ?.copyWith(color: Theme.of(context).colorScheme.onSurfaceVariant),
-        ),
-        const SizedBox(height: AppSpacing.xl),
-        Text(
-          l10n.lastSixMonths,
-          style: Theme.of(context).textTheme.titleMedium,
-        ),
-        const SizedBox(height: AppSpacing.m),
-        AnalysisMonthBars(
-          months: rollup.months,
-          values: rollup.monthValues,
-          maxValue: rollup.maxValue,
-        ),
-        const SizedBox(height: AppSpacing.xl),
-        Text(l10n.categories, style: Theme.of(context).textTheme.titleMedium),
-        for (final entry in rollup.byCategory)
-          AnalysisTotalRow(
-            color: AccountBookPalette.directionColor(
-              income:
-                  _category(state.categories, entry.id)?.type ==
-                  CategoryKind.income,
+    return BlocBuilder<AnalysisBloc, AnalysisState>(
+      buildWhen: (previous, current) =>
+          previous.rollup != current.rollup ||
+          previous.categories != current.categories ||
+          previous.accounts != current.accounts,
+      builder: (context, state) {
+        final rollup = state.rollup;
+        final current = rollup.current;
+        return ListView(
+          padding: const EdgeInsets.all(AppSpacing.l),
+          children: [
+            Text(
+              l10n.comparedWithLastMonth,
+              style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
+              ),
             ),
-            title:
-                _category(
-                  state.categories,
-                  entry.id,
-                )?.labelFor(context.categoryLanguageCode) ??
-                '',
-            amount: formatAmount(entry.amount, locale: locale),
-            share: entry.sharePercent == null ? '' : '${entry.sharePercent}%',
-          ),
-        const SizedBox(height: AppSpacing.xl),
-        Text(l10n.accounts, style: Theme.of(context).textTheme.titleMedium),
-        for (final entry in rollup.byAccount)
-          AnalysisTotalRow(
-            color: Theme.of(context).colorScheme.primary,
-            title:
-                _account(
-                  state.accounts,
-                  entry.id,
-                )?.labelFor(context.categoryLanguageCode) ??
-                '',
-            amount: formatAmount(entry.amount, locale: locale),
-          ),
-      ],
+            Text(
+              formatAmount(current, locale: locale),
+              style: Theme.of(context).textTheme.headlineMedium,
+            ),
+            Text(
+              '${formatAmount(rollup.delta, locale: locale, signed: true)} · ${l10n.lastMonth} ${formatAmount(rollup.previous, locale: locale)}',
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
+              ),
+            ),
+            const SizedBox(height: AppSpacing.xl),
+            Text(
+              l10n.lastSixMonths,
+              style: Theme.of(context).textTheme.titleMedium,
+            ),
+            const SizedBox(height: AppSpacing.m),
+            AnalysisMonthBars(
+              months: rollup.months,
+              values: rollup.monthValues,
+              maxValue: rollup.maxValue,
+            ),
+            const SizedBox(height: AppSpacing.xl),
+            Text(
+              l10n.categories,
+              style: Theme.of(context).textTheme.titleMedium,
+            ),
+            for (final entry in rollup.byCategory)
+              AnalysisTotalRow(
+                color: AccountBookPalette.directionColor(
+                  income:
+                      _category(state.categories, entry.id)?.type ==
+                      CategoryKind.income,
+                ),
+                title:
+                    _category(
+                      state.categories,
+                      entry.id,
+                    )?.labelFor(context.categoryLanguageCode) ??
+                    '',
+                amount: formatAmount(entry.amount, locale: locale),
+                share: entry.sharePercent == null
+                    ? ''
+                    : '${entry.sharePercent}%',
+              ),
+            const SizedBox(height: AppSpacing.xl),
+            Text(l10n.accounts, style: Theme.of(context).textTheme.titleMedium),
+            for (final entry in rollup.byAccount)
+              AnalysisTotalRow(
+                color: Theme.of(context).colorScheme.primary,
+                title:
+                    _account(
+                      state.accounts,
+                      entry.id,
+                    )?.labelFor(context.categoryLanguageCode) ??
+                    '',
+                amount: formatAmount(entry.amount, locale: locale),
+              ),
+          ],
+        );
+      },
     );
   }
 }
