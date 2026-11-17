@@ -48,7 +48,6 @@ class AccountBookCalendar extends StatelessWidget {
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
-    final l10n = context.l10n;
     final locale = Localizations.localeOf(context).toString();
     final weekday = textTheme.labelMedium?.copyWith(
       color: scheme.onSurfaceVariant,
@@ -89,12 +88,12 @@ class AccountBookCalendar extends StatelessWidget {
         leftChevronIcon: Icon(
           Icons.chevron_left,
           color: scheme.onSurface,
-          semanticLabel: l10n.previousMonth,
+          semanticLabel: context.l10n.previousMonth,
         ),
         rightChevronIcon: Icon(
           Icons.chevron_right,
           color: scheme.onSurface,
-          semanticLabel: l10n.nextMonth,
+          semanticLabel: context.l10n.nextMonth,
         ),
         leftChevronPadding: const EdgeInsets.all(AppSpacing.s),
         rightChevronPadding: const EdgeInsets.all(AppSpacing.s),

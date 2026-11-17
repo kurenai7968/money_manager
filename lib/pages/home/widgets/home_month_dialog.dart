@@ -18,7 +18,6 @@ class _HomeMonthDialogState extends State<HomeMonthDialog> {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = context.l10n;
     final locale = Localizations.localeOf(context).toString();
     final scheme = Theme.of(context).colorScheme;
     final firstYear = AccountBookCalendar.firstDay.year;
@@ -34,7 +33,7 @@ class _HomeMonthDialogState extends State<HomeMonthDialog> {
             Row(
               children: [
                 IconButton(
-                  tooltip: l10n.previousYear,
+                  tooltip: context.l10n.previousYear,
                   onPressed: _year <= firstYear
                       ? null
                       : () => setState(() => _year -= 1),
@@ -48,7 +47,7 @@ class _HomeMonthDialogState extends State<HomeMonthDialog> {
                   ),
                 ),
                 IconButton(
-                  tooltip: l10n.nextYear,
+                  tooltip: context.l10n.nextYear,
                   onPressed: _year >= lastYear
                       ? null
                       : () => setState(() => _year += 1),

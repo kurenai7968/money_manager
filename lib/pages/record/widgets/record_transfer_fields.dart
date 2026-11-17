@@ -23,27 +23,34 @@ class RecordTransferFields extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = context.l10n;
     return ListView(
       children: [
         ListTile(
-          title: Text(l10n.fromAccount),
+          title: Text(context.l10n.fromAccount),
           trailing: Text(
-            _name(fromId, l10n.chooseAccount, context.categoryLanguageCode),
+            _name(
+              fromId,
+              context.l10n.chooseAccount,
+              context.categoryLanguageCode,
+            ),
           ),
           onTap: () => _pick(context, onFrom, fromId),
         ),
         ListTile(
-          title: Text(l10n.toAccount),
+          title: Text(context.l10n.toAccount),
           trailing: Text(
-            _name(toId, l10n.chooseAccount, context.categoryLanguageCode),
+            _name(
+              toId,
+              context.l10n.chooseAccount,
+              context.categoryLanguageCode,
+            ),
           ),
           onTap: () => _pick(context, onTo, toId),
         ),
         Padding(
           padding: const EdgeInsets.all(AppSpacing.l),
           child: Text(
-            l10n.netUnchanged,
+            context.l10n.netUnchanged,
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
               color: Theme.of(context).colorScheme.onSurfaceVariant,
             ),

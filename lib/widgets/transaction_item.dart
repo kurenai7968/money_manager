@@ -150,13 +150,12 @@ class TransactionItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
-    final languageCode = context.categoryLanguageCode;
     final category = _category();
     final title = category == null
         ? _typeLabel(context)
-        : category.labelFor(languageCode);
+        : category.labelFor(context.categoryLanguageCode);
     final note = transaction.note.trim();
-    final accountLabel = _accountLabel(languageCode);
+    final accountLabel = _accountLabel(context.categoryLanguageCode);
     final muted = Theme.of(context).textTheme.bodyMedium
         ?.copyWith(color: scheme.onSurfaceVariant);
     return Material(
@@ -259,11 +258,10 @@ class TransactionItem extends StatelessWidget {
   }
 
   String _typeLabel(BuildContext context) {
-    final l10n = context.l10n;
     return switch (transaction.type) {
-      TransactionType.expense => l10n.expense,
-      TransactionType.income => l10n.income,
-      TransactionType.transfer => l10n.transfer,
+      TransactionType.expense => context.l10n.expense,
+      TransactionType.income => context.l10n.income,
+      TransactionType.transfer => context.l10n.transfer,
     };
   }
 

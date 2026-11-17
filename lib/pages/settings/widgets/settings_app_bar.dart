@@ -6,10 +6,10 @@ class SettingsAppBar extends StatelessWidget implements PreferredSizeWidget {
   const SettingsAppBar({super.key});
 
   @override
-  Size get preferredSize => const Size.fromHeight(kToolbarHeight);
-
-  @override
   Widget build(BuildContext context) {
     return BaseAppBar(title: Text(context.l10n.settings));
   }
+
+  @override
+  Size get preferredSize => const Size.fromHeight(kToolbarHeight);
 }

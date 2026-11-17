@@ -165,7 +165,6 @@ class _CommitKey extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = context.l10n;
     final scheme = Theme.of(context).colorScheme;
     return LayoutBuilder(
       builder: (context, constraints) {
@@ -180,7 +179,7 @@ class _CommitKey extends StatelessWidget {
               width: width,
               height: _height,
               child: Tooltip(
-                message: calculating ? l10n.equals : l10n.save,
+                message: calculating ? context.l10n.equals : context.l10n.save,
                 child: FilledButton(
                   onPressed: calculating ? onEquals : onSubmit,
                   style: FilledButton.styleFrom(

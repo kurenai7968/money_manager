@@ -52,16 +52,21 @@ class _AccountFormBodyState extends State<AccountFormBody> {
           previous.error != current.error,
       builder: (context, state) {
         _apply(state);
-        final l10n = context.l10n;
         final scheme = Theme.of(context).colorScheme;
         return ListView(
           padding: const EdgeInsets.all(AppSpacing.l),
           children: [
-            Text(l10n.name, style: Theme.of(context).textTheme.labelLarge),
+            Text(
+              context.l10n.name,
+              style: Theme.of(context).textTheme.labelLarge,
+            ),
             const SizedBox(height: AppSpacing.s),
             TextField(controller: _name, textInputAction: TextInputAction.next),
             const SizedBox(height: AppSpacing.xl),
-            Text(l10n.icon, style: Theme.of(context).textTheme.labelLarge),
+            Text(
+              context.l10n.icon,
+              style: Theme.of(context).textTheme.labelLarge,
+            ),
             const SizedBox(height: AppSpacing.s),
             Wrap(
               spacing: AppSpacing.s,
@@ -85,7 +90,7 @@ class _AccountFormBodyState extends State<AccountFormBody> {
               children: [
                 for (final type in AccountType.values)
                   ChoiceChip(
-                    label: Text(_typeLabel(l10n, type)),
+                    label: Text(_typeLabel(context.l10n, type)),
                     selected: state.type == type,
                     onSelected: (_) => context.read<AccountFormBloc>().add(
                       AccountFormTypeSelected(type),
@@ -96,7 +101,7 @@ class _AccountFormBodyState extends State<AccountFormBody> {
             if (state.error != AccountFormError.none) ...[
               const SizedBox(height: AppSpacing.m),
               Text(
-                _errorLabel(l10n, state.error),
+                _errorLabel(context.l10n, state.error),
                 style: Theme.of(context).textTheme.bodyMedium
                     ?.copyWith(color: Theme.of(context).colorScheme.error),
               ),
@@ -109,10 +114,10 @@ class _AccountFormBodyState extends State<AccountFormBody> {
                   languageCode: context.categoryLanguageCode,
                 ),
               ),
-              child: Text(l10n.save),
+              child: Text(context.l10n.save),
             ),
             if (widget.accountId != null)
-              TextButton(onPressed: _delete, child: Text(l10n.delete)),
+              TextButton(onPressed: _delete, child: Text(context.l10n.delete)),
           ],
         );
       },

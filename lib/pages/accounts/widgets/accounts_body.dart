@@ -14,18 +14,19 @@ class AccountsBody extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = context.l10n;
     return BlocConsumer<AccountsBloc, AccountsState>(
       listener: (context, state) {
         if (state.error == AccountsError.archiveBlocked) {
           ScaffoldMessenger.of(context)
             ..hideCurrentSnackBar()
-            ..showSnackBar(SnackBar(content: Text(l10n.archiveBlocked)));
+            ..showSnackBar(
+              SnackBar(content: Text(context.l10n.archiveBlocked)),
+            );
         }
       },
       builder: (context, overview) {
         if (overview.assets.isEmpty && overview.liabilities.isEmpty) {
-          return Center(child: Text(l10n.emptyAccounts));
+          return Center(child: Text(context.l10n.emptyAccounts));
         }
         final locale = Localizations.localeOf(context).toString();
         return CustomScrollView(
@@ -42,7 +43,7 @@ class AccountsBody extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      l10n.netWorth,
+                      context.l10n.netWorth,
                       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                         color: Theme.of(context).colorScheme.onSurfaceVariant,
                       ),
@@ -56,7 +57,9 @@ class AccountsBody extends StatelessWidget {
               ),
             ),
             if (overview.assets.isNotEmpty) ...[
-              SliverToBoxAdapter(child: AccountSectionLabel(l10n.assets)),
+              SliverToBoxAdapter(
+                child: AccountSectionLabel(context.l10n.assets),
+              ),
               AccountSliver(
                 key: const ValueKey('assets'),
                 lines: overview.assets,
@@ -66,7 +69,9 @@ class AccountsBody extends StatelessWidget {
               ),
             ],
             if (overview.liabilities.isNotEmpty) ...[
-              SliverToBoxAdapter(child: AccountSectionLabel(l10n.liabilities)),
+              SliverToBoxAdapter(
+                child: AccountSectionLabel(context.l10n.liabilities),
+              ),
               AccountSliver(
                 key: const ValueKey('liabilities'),
                 lines: overview.liabilities,

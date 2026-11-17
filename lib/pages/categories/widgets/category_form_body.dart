@@ -94,12 +94,14 @@ class _CategoryFormBodyState extends State<CategoryFormBody> {
           previous.categories != current.categories,
       builder: (context, state) {
         _apply(state);
-        final l10n = context.l10n;
         final editing = widget.categoryId != null;
         return ListView(
           padding: const EdgeInsets.all(AppSpacing.l),
           children: [
-            Text(l10n.name, style: Theme.of(context).textTheme.labelLarge),
+            Text(
+              context.l10n.name,
+              style: Theme.of(context).textTheme.labelLarge,
+            ),
             const SizedBox(height: AppSpacing.s),
             TextField(controller: _name),
             const SizedBox(height: AppSpacing.xl),
@@ -108,11 +110,11 @@ class _CategoryFormBodyState extends State<CategoryFormBody> {
                 segments: [
                   ButtonSegment(
                     value: CategoryKind.expense,
-                    label: Text(l10n.expense),
+                    label: Text(context.l10n.expense),
                   ),
                   ButtonSegment(
                     value: CategoryKind.income,
-                    label: Text(l10n.income),
+                    label: Text(context.l10n.income),
                   ),
                 ],
                 selected: {_type},
@@ -129,7 +131,10 @@ class _CategoryFormBodyState extends State<CategoryFormBody> {
                 },
               ),
             const SizedBox(height: AppSpacing.xl),
-            Text(l10n.icon, style: Theme.of(context).textTheme.labelLarge),
+            Text(
+              context.l10n.icon,
+              style: Theme.of(context).textTheme.labelLarge,
+            ),
             const SizedBox(height: AppSpacing.s),
             Wrap(
               spacing: AppSpacing.s,
@@ -155,9 +160,9 @@ class _CategoryFormBodyState extends State<CategoryFormBody> {
               ),
             ],
             const SizedBox(height: AppSpacing.xl),
-            FilledButton(onPressed: _save, child: Text(l10n.save)),
+            FilledButton(onPressed: _save, child: Text(context.l10n.save)),
             if (editing)
-              TextButton(onPressed: _delete, child: Text(l10n.delete)),
+              TextButton(onPressed: _delete, child: Text(context.l10n.delete)),
           ],
         );
       },
@@ -165,15 +170,14 @@ class _CategoryFormBodyState extends State<CategoryFormBody> {
   }
 
   void _save() {
-    final l10n = context.l10n;
     final text = _name.text.trim();
     if (text.isEmpty) {
-      setState(() => _error = l10n.nameRequired);
+      setState(() => _error = context.l10n.nameRequired);
       return;
     }
     final icon = _icon;
     if (icon == null) {
-      setState(() => _error = l10n.iconRequired);
+      setState(() => _error = context.l10n.iconRequired);
       return;
     }
     _waiting = true;

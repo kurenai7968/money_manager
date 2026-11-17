@@ -13,9 +13,10 @@ class CategoryFormAppBar extends StatelessWidget
 
   @override
   Widget build(BuildContext context) {
-    final l10n = context.l10n;
     return BaseAppBar(
-      title: Text(editing ? l10n.editCategory : l10n.newCategory),
+      title: Text(
+        editing ? context.l10n.editCategory : context.l10n.newCategory,
+      ),
     );
   }
 }

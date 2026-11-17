@@ -16,7 +16,6 @@ class AnalysisBody extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = context.l10n;
     final locale = Localizations.localeOf(context).toString();
     return BlocBuilder<AnalysisBloc, AnalysisState>(
       buildWhen: (previous, current) =>
@@ -30,7 +29,7 @@ class AnalysisBody extends StatelessWidget {
           padding: const EdgeInsets.all(AppSpacing.l),
           children: [
             Text(
-              l10n.comparedWithLastMonth,
+              context.l10n.comparedWithLastMonth,
               style: Theme.of(context).textTheme.labelLarge?.copyWith(
                 color: Theme.of(context).colorScheme.onSurfaceVariant,
               ),
@@ -40,14 +39,14 @@ class AnalysisBody extends StatelessWidget {
               style: Theme.of(context).textTheme.headlineMedium,
             ),
             Text(
-              '${formatAmount(rollup.delta, locale: locale, signed: true)} · ${l10n.lastMonth} ${formatAmount(rollup.previous, locale: locale)}',
+              '${formatAmount(rollup.delta, locale: locale, signed: true)} · ${context.l10n.lastMonth} ${formatAmount(rollup.previous, locale: locale)}',
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                 color: Theme.of(context).colorScheme.onSurfaceVariant,
               ),
             ),
             const SizedBox(height: AppSpacing.xl),
             Text(
-              l10n.lastSixMonths,
+              context.l10n.lastSixMonths,
               style: Theme.of(context).textTheme.titleMedium,
             ),
             const SizedBox(height: AppSpacing.m),
@@ -58,7 +57,7 @@ class AnalysisBody extends StatelessWidget {
             ),
             const SizedBox(height: AppSpacing.xl),
             Text(
-              l10n.categories,
+              context.l10n.categories,
               style: Theme.of(context).textTheme.titleMedium,
             ),
             for (final entry in rollup.byCategory)
@@ -80,7 +79,10 @@ class AnalysisBody extends StatelessWidget {
                     : '${entry.sharePercent}%',
               ),
             const SizedBox(height: AppSpacing.xl),
-            Text(l10n.accounts, style: Theme.of(context).textTheme.titleMedium),
+            Text(
+              context.l10n.accounts,
+              style: Theme.of(context).textTheme.titleMedium,
+            ),
             for (final entry in rollup.byAccount)
               AnalysisTotalRow(
                 color: Theme.of(context).colorScheme.primary,

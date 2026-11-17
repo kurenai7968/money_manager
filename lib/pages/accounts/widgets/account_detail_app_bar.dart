@@ -19,12 +19,11 @@ class AccountDetailAppBar extends StatelessWidget
 
   @override
   Widget build(BuildContext context) {
-    final l10n = context.l10n;
     return BlocSelector<AccountDetailBloc, AccountDetailState, AccountModel?>(
       selector: (state) => state.account,
       builder: (context, account) {
         final title = account == null
-            ? l10n.accounts
+            ? context.l10n.accounts
             : account.labelFor(context.categoryLanguageCode);
         return BaseAppBar(
           title: Text(title),
@@ -32,7 +31,7 @@ class AccountDetailAppBar extends StatelessWidget
             if (account != null)
               TextButton(
                 onPressed: () => context.push(AppRoutes.editAccount(accountId)),
-                child: Text(l10n.edit),
+                child: Text(context.l10n.edit),
               ),
           ],
         );

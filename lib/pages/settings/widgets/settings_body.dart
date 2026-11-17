@@ -21,29 +21,28 @@ class SettingsBody extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = context.l10n;
     return BlocBuilder<AppSettingBloc, AppSettingState>(
       builder: (context, state) {
         final setting = state.appSetting;
         return ListView(
           children: [
-            SettingsSection(l10n.general),
+            SettingsSection(context.l10n.general),
             SettingsRow(
-              title: l10n.language,
+              title: context.l10n.language,
               value: switch ((setting.languageCode, setting.countryCode)) {
-                ('zh', 'CN') => l10n.simplifiedChinese,
-                ('zh', _) => l10n.traditionalChinese,
-                ('en', _) => l10n.english,
-                _ => l10n.followSystem,
+                ('zh', 'CN') => context.l10n.simplifiedChinese,
+                ('zh', _) => context.l10n.traditionalChinese,
+                ('en', _) => context.l10n.english,
+                _ => context.l10n.followSystem,
               },
               onTap: () => showSettingsChoice<(String, String)>(
                 context,
-                title: l10n.language,
+                title: context.l10n.language,
                 options: [
-                  (('', ''), l10n.followSystem),
-                  (('zh', ''), l10n.traditionalChinese),
-                  (('zh', 'CN'), l10n.simplifiedChinese),
-                  (('en', ''), l10n.english),
+                  (('', ''), context.l10n.followSystem),
+                  (('zh', ''), context.l10n.traditionalChinese),
+                  (('zh', 'CN'), context.l10n.simplifiedChinese),
+                  (('en', ''), context.l10n.english),
                 ],
                 selected: (setting.languageCode, setting.countryCode),
                 onSelected: (value) {
@@ -57,19 +56,19 @@ class SettingsBody extends StatelessWidget {
               ),
             ),
             SettingsRow(
-              title: l10n.appearance,
+              title: context.l10n.appearance,
               value: switch (setting.appThemeMode) {
-                AppThemeMode.light => l10n.light,
-                AppThemeMode.dark => l10n.dark,
-                AppThemeMode.system => l10n.followSystem,
+                AppThemeMode.light => context.l10n.light,
+                AppThemeMode.dark => context.l10n.dark,
+                AppThemeMode.system => context.l10n.followSystem,
               },
               onTap: () => showSettingsChoice<AppThemeMode>(
                 context,
-                title: l10n.appearance,
+                title: context.l10n.appearance,
                 options: [
-                  (AppThemeMode.system, l10n.followSystem),
-                  (AppThemeMode.light, l10n.light),
-                  (AppThemeMode.dark, l10n.dark),
+                  (AppThemeMode.system, context.l10n.followSystem),
+                  (AppThemeMode.light, context.l10n.light),
+                  (AppThemeMode.dark, context.l10n.dark),
                 ],
                 selected: setting.appThemeMode,
                 onSelected: (value) {
@@ -80,14 +79,14 @@ class SettingsBody extends StatelessWidget {
               ),
             ),
             SettingsRow(
-              title: l10n.weekStart,
-              value: _weekdayLabel(l10n, setting.firstDayOfWeek),
+              title: context.l10n.weekStart,
+              value: _weekdayLabel(context.l10n, setting.firstDayOfWeek),
               onTap: () => showSettingsChoice<FirstDayOfWeek>(
                 context,
-                title: l10n.weekStart,
+                title: context.l10n.weekStart,
                 options: [
                   for (final day in FirstDayOfWeek.values)
-                    (day, _weekdayLabel(l10n, day)),
+                    (day, _weekdayLabel(context.l10n, day)),
                 ],
                 selected: setting.firstDayOfWeek,
                 onSelected: (value) {
@@ -97,20 +96,20 @@ class SettingsBody extends StatelessWidget {
                 },
               ),
             ),
-            SettingsSection(l10n.accountBook),
+            SettingsSection(context.l10n.accountBook),
             SettingsRow(
-              title: l10n.color,
-              value: _pairLabel(l10n, setting.colorPair),
+              title: context.l10n.color,
+              value: _pairLabel(context.l10n, setting.colorPair),
               swatches: [
                 AccountBookPalette.of(setting.expenseColor),
                 AccountBookPalette.of(setting.incomeColor),
               ],
               onTap: () => showSettingsChoice<LedgerColorPair>(
                 context,
-                title: l10n.color,
+                title: context.l10n.color,
                 options: [
                   for (final pair in LedgerColorPair.values)
-                    (pair, _pairLabel(l10n, pair)),
+                    (pair, _pairLabel(context.l10n, pair)),
                 ],
                 selected: setting.colorPair,
                 leading: _pairDots,
@@ -122,8 +121,8 @@ class SettingsBody extends StatelessWidget {
               ),
             ),
             ListTile(
-              title: Text(l10n.categories),
-              subtitle: Text(l10n.expenseAndIncome),
+              title: Text(context.l10n.categories),
+              subtitle: Text(context.l10n.expenseAndIncome),
               trailing: const Icon(Icons.chevron_right),
               onTap: () => context.push(AppRoutes.categories.path),
             ),

@@ -15,11 +15,10 @@ class AnalysisAppBar extends StatelessWidget implements PreferredSizeWidget {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = context.l10n;
     return BlocSelector<AnalysisBloc, AnalysisState, CategoryKind>(
       selector: (state) => state.kind,
       builder: (context, kind) => BaseAppBar(
-        title: Text(l10n.analysis),
+        title: Text(context.l10n.analysis),
         bottom: PreferredSize(
           preferredSize: const Size.fromHeight(48),
           child: Row(
@@ -30,7 +29,7 @@ class AnalysisAppBar extends StatelessWidget implements PreferredSizeWidget {
                   const AnalysisKindSelected(CategoryKind.expense),
                 ),
                 child: Text(
-                  l10n.expense,
+                  context.l10n.expense,
                   style: TextStyle(
                     color: kind == CategoryKind.expense
                         ? context.ledgerColor(income: false)
@@ -43,7 +42,7 @@ class AnalysisAppBar extends StatelessWidget implements PreferredSizeWidget {
                   const AnalysisKindSelected(CategoryKind.income),
                 ),
                 child: Text(
-                  l10n.income,
+                  context.l10n.income,
                   style: TextStyle(
                     color: kind == CategoryKind.income
                         ? context.ledgerColor(income: true)

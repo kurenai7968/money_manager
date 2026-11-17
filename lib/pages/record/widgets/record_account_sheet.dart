@@ -15,7 +15,6 @@ class RecordAccountSheet extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = context.l10n;
     return SafeArea(
       child: ListView(
         shrinkWrap: true,
@@ -23,7 +22,7 @@ class RecordAccountSheet extends StatelessWidget {
           Padding(
             padding: const EdgeInsets.all(AppSpacing.l),
             child: Text(
-              l10n.chooseAccount,
+              context.l10n.chooseAccount,
               style: Theme.of(context).textTheme.titleMedium,
             ),
           ),

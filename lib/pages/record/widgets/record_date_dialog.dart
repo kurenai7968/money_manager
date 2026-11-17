@@ -38,7 +38,6 @@ class _RecordDateDialogState extends State<RecordDateDialog> {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = context.l10n;
     final scheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
     final locale = Localizations.localeOf(context).toString();
@@ -66,7 +65,7 @@ class _RecordDateDialogState extends State<RecordDateDialog> {
               Row(
                 children: [
                   IconButton(
-                    tooltip: l10n.previousMonth,
+                    tooltip: context.l10n.previousMonth,
                     onPressed: () => _shiftMonth(-1),
                     icon: const Icon(Icons.chevron_left),
                   ),
@@ -78,7 +77,7 @@ class _RecordDateDialogState extends State<RecordDateDialog> {
                     ),
                   ),
                   IconButton(
-                    tooltip: l10n.nextMonth,
+                    tooltip: context.l10n.nextMonth,
                     onPressed: () => _shiftMonth(1),
                     icon: const Icon(Icons.chevron_right),
                   ),
@@ -115,11 +114,11 @@ class _RecordDateDialogState extends State<RecordDateDialog> {
                 children: [
                   TextButton(
                     onPressed: () => Navigator.pop(context),
-                    child: Text(l10n.cancel),
+                    child: Text(context.l10n.cancel),
                   ),
                   TextButton(
                     onPressed: () => Navigator.pop(context, _day),
-                    child: Text(l10n.done),
+                    child: Text(context.l10n.done),
                   ),
                 ],
               ),

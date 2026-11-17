@@ -125,7 +125,6 @@ class _RecordMeta extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = context.l10n;
     return BlocBuilder<RecordBloc, RecordState>(
       buildWhen: (previous, current) =>
           previous.note != current.note ||
@@ -142,7 +141,7 @@ class _RecordMeta extends StatelessWidget {
                 child: TextButton(
                   onPressed: () => _editNote(context, state.note),
                   child: Text(
-                    state.note.isEmpty ? l10n.remark : state.note,
+                    state.note.isEmpty ? context.l10n.remark : state.note,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),
@@ -161,7 +160,7 @@ class _RecordMeta extends StatelessWidget {
                       _accountLabel(
                         state,
                         context.categoryLanguageCode,
-                        l10n.chooseAccount,
+                        context.l10n.chooseAccount,
                       ),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,

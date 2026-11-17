@@ -18,7 +18,6 @@ class AccountDetailBody extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = context.l10n;
     return BlocBuilder<AccountDetailBloc, AccountDetailState>(
       buildWhen: (previous, current) =>
           previous.account != current.account ||
@@ -49,7 +48,7 @@ class AccountDetailBody extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    isCredit ? l10n.owed : l10n.balance,
+                    isCredit ? context.l10n.owed : context.l10n.balance,
                     style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                       color: Theme.of(context).colorScheme.onSurfaceVariant,
                     ),
@@ -91,7 +90,7 @@ class AccountDetailBody extends StatelessWidget {
                     }
                     reload();
                   },
-                  child: Text(l10n.transfer),
+                  child: Text(context.l10n.transfer),
                 ),
               ),
             ),

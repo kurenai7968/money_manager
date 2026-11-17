@@ -8,17 +8,16 @@ class ConfirmDeleteDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = context.l10n;
     return AlertDialog(
       content: Text(message),
       actions: [
         TextButton(
           onPressed: () => Navigator.pop(context, false),
-          child: Text(l10n.cancel),
+          child: Text(context.l10n.cancel),
         ),
         TextButton(
           onPressed: () => Navigator.pop(context, true),
-          child: Text(l10n.delete),
+          child: Text(context.l10n.delete),
         ),
       ],
     );

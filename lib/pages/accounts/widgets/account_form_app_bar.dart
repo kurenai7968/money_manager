@@ -12,9 +12,8 @@ class AccountFormAppBar extends StatelessWidget implements PreferredSizeWidget {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = context.l10n;
     return BaseAppBar(
-      title: Text(editing ? l10n.editAccount : l10n.newAccount),
+      title: Text(editing ? context.l10n.editAccount : context.l10n.newAccount),
     );
   }
 }

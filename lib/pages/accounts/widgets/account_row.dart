@@ -22,7 +22,6 @@ class AccountRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = context.l10n;
     final locale = Localizations.localeOf(context).toString();
     final scheme = Theme.of(context).colorScheme;
     final isCredit = account.type == AccountType.credit;
@@ -41,7 +40,7 @@ class AccountRow extends StatelessWidget {
       },
       leading: Icon(Icons.circle, color: color, size: 12),
       title: Text(account.labelFor(context.categoryLanguageCode)),
-      subtitle: isCredit ? Text(l10n.owed) : null,
+      subtitle: isCredit ? Text(context.l10n.owed) : null,
       trailing: Row(
         mainAxisSize: MainAxisSize.min,
         children: [

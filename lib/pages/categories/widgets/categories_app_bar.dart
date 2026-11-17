@@ -16,16 +16,15 @@ class CategoriesAppBar extends StatelessWidget implements PreferredSizeWidget {
   @override
   Widget build(BuildContext context) {
     final frame = CategoriesFrame.of(context);
-    final l10n = context.l10n;
     return BaseAppBar(
-      title: Text(l10n.categories),
+      title: Text(context.l10n.categories),
       actions: [
         TextButton(
           onPressed: () => context.push(
             AppRoutes.categoryNew.path,
             extra: CategoryKind.values[frame.tabs.index],
           ),
-          child: Text(l10n.add),
+          child: Text(context.l10n.add),
         ),
       ],
       bottom: TabBar(
@@ -33,7 +32,9 @@ class CategoriesAppBar extends StatelessWidget implements PreferredSizeWidget {
         tabs: [
           for (final kind in CategoryKind.values)
             Tab(
-              text: kind == CategoryKind.expense ? l10n.expense : l10n.income,
+              text: kind == CategoryKind.expense
+                  ? context.l10n.expense
+                  : context.l10n.income,
             ),
         ],
       ),

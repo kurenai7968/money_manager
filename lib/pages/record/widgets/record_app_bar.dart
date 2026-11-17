@@ -20,7 +20,6 @@ class RecordAppBar extends StatelessWidget implements PreferredSizeWidget {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = context.l10n;
     final locale = Localizations.localeOf(context).toString();
     return BlocBuilder<RecordBloc, RecordState>(
       buildWhen: (previous, current) =>
@@ -39,7 +38,7 @@ class RecordAppBar extends StatelessWidget implements PreferredSizeWidget {
           if (state.transactionId != null)
             TextButton(
               onPressed: () => _delete(context),
-              child: Text(l10n.delete),
+              child: Text(context.l10n.delete),
             ),
         ],
         bottom: PreferredSize(
@@ -53,7 +52,7 @@ class RecordAppBar extends StatelessWidget implements PreferredSizeWidget {
                       RecordTypeSelected(type),
                     ),
                     child: Text(
-                      _typeLabel(l10n, type),
+                      _typeLabel(context.l10n, type),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: TextStyle(

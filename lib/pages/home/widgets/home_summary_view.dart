@@ -34,7 +34,6 @@ class HomeSummaryView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = context.l10n;
     final scheme = Theme.of(context).colorScheme;
     return Column(
       children: [
@@ -52,7 +51,7 @@ class HomeSummaryView extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      l10n.income,
+                      context.l10n.income,
                       style: Theme.of(context).textTheme.labelMedium
                           ?.copyWith(color: scheme.onSurfaceVariant),
                     ),
@@ -70,7 +69,7 @@ class HomeSummaryView extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
                     Text(
-                      l10n.expense,
+                      context.l10n.expense,
                       style: Theme.of(context).textTheme.labelMedium
                           ?.copyWith(color: scheme.onSurfaceVariant),
                     ),
@@ -89,7 +88,7 @@ class HomeSummaryView extends StatelessWidget {
         HomeMonthDonut(
           income: income,
           expense: expense,
-          label: l10n.monthBalance,
+          label: context.l10n.monthBalance,
           amount: formatAmount(balance, locale: locale),
         ),
         Padding(
@@ -102,14 +101,14 @@ class HomeSummaryView extends StatelessWidget {
           child: Align(
             alignment: AlignmentDirectional.centerStart,
             child: Text(
-              l10n.recent,
+              context.l10n.recent,
               style: Theme.of(context).textTheme.titleMedium,
             ),
           ),
         ),
         Expanded(
           child: days.isEmpty
-              ? Center(child: Text(l10n.emptyMonth))
+              ? Center(child: Text(context.l10n.emptyMonth))
               : TransactionList(
                   days: days,
                   categories: categories,

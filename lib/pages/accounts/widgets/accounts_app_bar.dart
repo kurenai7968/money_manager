@@ -15,9 +15,8 @@ class AccountsAppBar extends StatelessWidget implements PreferredSizeWidget {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = context.l10n;
     return BaseAppBar(
-      title: Text(l10n.accounts),
+      title: Text(context.l10n.accounts),
       actions: [
         TextButton(
           onPressed: () async {
@@ -27,7 +26,7 @@ class AccountsAppBar extends StatelessWidget implements PreferredSizeWidget {
             }
             context.read<AccountsBloc>().add(const AccountsInitialized());
           },
-          child: Text(l10n.add),
+          child: Text(context.l10n.add),
         ),
       ],
     );

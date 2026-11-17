@@ -15,7 +15,6 @@ class AppTabBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
-    final l10n = context.l10n;
 
     return Material(
       color: scheme.surface,
@@ -32,25 +31,25 @@ class AppTabBar extends StatelessWidget {
                 _TabItem(
                   selected: selectedIndex == 0,
                   icon: Icons.home_outlined,
-                  label: l10n.home,
+                  label: context.l10n.home,
                   onTap: () => onSelected(0),
                 ),
                 _TabItem(
                   selected: selectedIndex == 1,
                   icon: Icons.pie_chart_outline,
-                  label: l10n.analysis,
+                  label: context.l10n.analysis,
                   onTap: () => onSelected(1),
                 ),
                 _TabItem(
                   selected: selectedIndex == 2,
                   icon: Icons.account_balance_wallet_outlined,
-                  label: l10n.accounts,
+                  label: context.l10n.accounts,
                   onTap: () => onSelected(2),
                 ),
                 _TabItem(
                   selected: selectedIndex == 3,
                   icon: Icons.settings_outlined,
-                  label: l10n.settings,
+                  label: context.l10n.settings,
                   onTap: () => onSelected(3),
                 ),
               ],

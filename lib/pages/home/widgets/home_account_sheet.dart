@@ -12,7 +12,6 @@ class HomeAccountSheet extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = context.l10n;
     final primary = Theme.of(context).colorScheme.primary;
     return SafeArea(
       child: ListView(
@@ -21,12 +20,12 @@ class HomeAccountSheet extends StatelessWidget {
           Padding(
             padding: const EdgeInsets.all(AppSpacing.l),
             child: Text(
-              l10n.chooseAccount,
+              context.l10n.chooseAccount,
               style: Theme.of(context).textTheme.titleMedium,
             ),
           ),
           ListTile(
-            title: Text(l10n.allAccounts),
+            title: Text(context.l10n.allAccounts),
             trailing: selectedId == null
                 ? Icon(Icons.check, color: primary)
                 : null,
