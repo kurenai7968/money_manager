@@ -40,6 +40,15 @@ class AppLocalizationsZh extends AppLocalizations {
   String get nextMonth => '下個月';
 
   @override
+  String get chooseMonth => '選擇月份';
+
+  @override
+  String get previousYear => '上一年';
+
+  @override
+  String get nextYear => '下一年';
+
+  @override
   String get add => '新增';
 
   @override
@@ -307,6 +316,15 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
 
   @override
   String get nextMonth => '下个月';
+
+  @override
+  String get chooseMonth => '选择月份';
+
+  @override
+  String get previousYear => '上一年';
+
+  @override
+  String get nextYear => '下一年';
 
   @override
   String get add => '新增';

@@ -63,16 +63,3 @@ double netOn(List<DayLedger> days, DateTime day) {
   }
   return 0;
 }
-
-List<TransactionModel> transactionsOn(List<DayLedger> days, DateTime? day) {
-  if (day == null) {
-    return const [];
-  }
-  final key = DateTime(day.year, day.month, day.day);
-  for (final item in days) {
-    if (item.day == key) {
-      return item.transactions;
-    }
-  }
-  return const [];
-}

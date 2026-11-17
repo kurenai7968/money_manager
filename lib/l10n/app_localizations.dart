@@ -159,6 +159,24 @@ abstract class AppLocalizations {
   /// **'Next month'**
   String get nextMonth;
 
+  /// No description provided for @chooseMonth.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose month'**
+  String get chooseMonth;
+
+  /// No description provided for @previousYear.
+  ///
+  /// In en, this message translates to:
+  /// **'Previous year'**
+  String get previousYear;
+
+  /// No description provided for @nextYear.
+  ///
+  /// In en, this message translates to:
+  /// **'Next year'**
+  String get nextYear;
+
   /// No description provided for @add.
   ///
   /// In en, this message translates to:

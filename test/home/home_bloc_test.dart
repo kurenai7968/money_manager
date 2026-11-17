@@ -73,10 +73,15 @@ void main() {
       ),
       isA<HomeState>()
           .having((state) => state.status, 'status', HomeStatus.success)
-          .having((state) => state.figures.expense, 'expense', 18)
-          .having((state) => state.figures.income, 'income', 0)
+          .having((state) => state.expense, 'expense', 18)
+          .having((state) => state.income, 'income', 0)
+          .having((state) => state.balance, 'balance', -18)
           .having((state) => state.transactions, 'month', hasLength(2))
-          .having((state) => state.selectedTransactions, 'day', hasLength(2))
+          .having(
+            (state) => state.days.single.transactions,
+            'day',
+            hasLength(2),
+          )
           .having((state) => state.days.single.net, 'net', -18),
     ],
   );
@@ -136,6 +141,35 @@ void main() {
   );
 
   blocTest<HomeBloc, HomeState>(
+    'jumps to a later month on its first day and an earlier month on its last day',
+    build: buildBloc,
+    act: (bloc) async {
+      bloc.add(const HomeInitialized());
+      await bloc.stream.firstWhere(
+        (state) => state.status == HomeStatus.success,
+      );
+      bloc
+        ..add(HomeMonthSelected(DateTime(today.year, today.month, 20)))
+        ..add(HomeMonthSelected(DateTime(2031, 8, 15)))
+        ..add(HomeMonthSelected(DateTime(2020, 2, 15)));
+    },
+    expect: () => [
+      isA<HomeState>().having(
+        (state) => state.status,
+        'status',
+        HomeStatus.loading,
+      ),
+      isA<HomeState>().having((state) => state.selectedDay, 'today', day),
+      isA<HomeState>()
+          .having((state) => state.month, 'month', DateTime(2031, 8))
+          .having((state) => state.selectedDay, 'day', DateTime(2031, 8, 1)),
+      isA<HomeState>()
+          .having((state) => state.month, 'month', DateTime(2020, 2))
+          .having((state) => state.selectedDay, 'day', DateTime(2020, 2, 29)),
+    ],
+  );
+
+  blocTest<HomeBloc, HomeState>(
     'emits failure when the account book cannot be read',
     build: () => buildBloc(transactions: _FailingTransactions()),
     act: (bloc) => bloc.add(const HomeInitialized()),
@@ -147,7 +181,9 @@ void main() {
       ),
       isA<HomeState>()
           .having((state) => state.status, 'status', HomeStatus.failure)
-          .having((state) => state.figures.expense, 'expense', 0)
+          .having((state) => state.expense, 'expense', 0)
+          .having((state) => state.income, 'income', 0)
+          .having((state) => state.balance, 'balance', 0)
           .having((state) => state.transactions, 'rows', isEmpty),
     ],
   );
@@ -185,18 +221,21 @@ void main() {
       ),
       isA<HomeState>()
           .having((state) => state.selectedAccountId, 'account', isNull)
-          .having((state) => state.figures.income, 'income', 9)
-          .having((state) => state.figures.expense, 'expense', 18)
+          .having((state) => state.income, 'income', 9)
+          .having((state) => state.expense, 'expense', 18)
+          .having((state) => state.balance, 'balance', -9)
           .having((state) => state.transactions, 'rows', hasLength(3)),
       isA<HomeState>()
           .having((state) => state.selectedAccountId, 'account', 2)
-          .having((state) => state.figures.income, 'income', 9)
-          .having((state) => state.figures.expense, 'expense', 0)
+          .having((state) => state.income, 'income', 9)
+          .having((state) => state.expense, 'expense', 0)
+          .having((state) => state.balance, 'balance', 9)
           .having((state) => state.transactions, 'rows', hasLength(2)),
       isA<HomeState>()
           .having((state) => state.selectedAccountId, 'account', 1)
-          .having((state) => state.figures.income, 'income', 0)
-          .having((state) => state.figures.expense, 'expense', 18)
+          .having((state) => state.income, 'income', 0)
+          .having((state) => state.expense, 'expense', 18)
+          .having((state) => state.balance, 'balance', -18)
           .having((state) => state.transactions, 'rows', hasLength(2))
           .having((state) => state.days.single.net, 'net', -18),
       isA<HomeState>()

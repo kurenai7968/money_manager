@@ -155,7 +155,7 @@ void _expectMonthGroupCentered(WidgetTester tester) {
   final previous = tester.getRect(find.byTooltip('Previous month'));
   final next = tester.getRect(find.byTooltip('Next month'));
   final calendar = tester.getRect(find.byTooltip('Calendar'));
-  final month = tester.getRect(_yearMonth);
+  final month = tester.getRect(find.byTooltip('Choose month'));
   final bar = tester.getRect(find.byType(AppBar));
   expect(account.left - bar.left, lessThanOrEqualTo(8));
   expect(bar.right - calendar.right, lessThanOrEqualTo(8));

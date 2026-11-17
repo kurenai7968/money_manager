@@ -1,18 +1,36 @@
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:money_manager/core/extensions/context_extension.dart';
 import 'package:money_manager/core/utils/cached_date_format.dart';
-import 'package:money_manager/pages/home/bloc/home_bloc.dart';
-import 'package:money_manager/pages/home/bloc/home_event.dart';
+import 'package:money_manager/models/account_model.dart';
 import 'package:money_manager/pages/home/bloc/home_state.dart';
 import 'package:money_manager/pages/home/models/home_account_pick.dart';
 import 'package:money_manager/pages/home/widgets/home_account_sheet.dart';
+import 'package:money_manager/pages/home/widgets/home_month_dialog.dart';
 import 'package:money_manager/themes/app_themes.dart';
 import 'package:money_manager/widgets/account_book_sheet.dart';
 import 'package:money_manager/widgets/base_app_bar.dart';
 
 class HomeAppBar extends StatelessWidget implements PreferredSizeWidget {
-  const HomeAppBar({super.key});
+  final List<AccountModel> accounts;
+  final int? selectedAccountId;
+  final DateTime month;
+  final HomeView view;
+  final ValueChanged<int?> onAccountSelected;
+  final ValueChanged<int> onMonthShifted;
+  final ValueChanged<DateTime> onMonthSelected;
+  final VoidCallback onViewToggled;
+
+  const HomeAppBar({
+    required this.accounts,
+    required this.selectedAccountId,
+    required this.month,
+    required this.view,
+    required this.onAccountSelected,
+    required this.onMonthShifted,
+    required this.onMonthSelected,
+    required this.onViewToggled,
+    super.key,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -25,7 +43,7 @@ class HomeAppBar extends StatelessWidget implements PreferredSizeWidget {
         child: LayoutBuilder(
           builder: (context, constraints) {
             final maxAccount =
-                (constraints.maxWidth - _BarIconButton.extent * 3 - 72).clamp(
+                (constraints.maxWidth - _BarIconButton.extent * 3 - 96).clamp(
                   48.0,
                   152.0,
                 );
@@ -33,74 +51,65 @@ class HomeAppBar extends StatelessWidget implements PreferredSizeWidget {
               children: [
                 ConstrainedBox(
                   constraints: BoxConstraints(maxWidth: maxAccount),
-                  child: BlocBuilder<HomeBloc, HomeState>(
-                    buildWhen: (previous, current) =>
-                        previous.accounts != current.accounts ||
-                        previous.selectedAccountId != current.selectedAccountId,
-                    builder: (context, state) {
-                      return _HomeAccountButton(
-                        label: _accountLabel(context, state),
-                        tooltip: context.l10n.chooseAccount,
-                        onPressed: () => _pickAccount(context),
-                      );
-                    },
+                  child: _HomeAccountButton(
+                    label: _accountLabel(context, accounts, selectedAccountId),
+                    tooltip: context.l10n.chooseAccount,
+                    onPressed: () => _pickAccount(context),
                   ),
                 ),
                 Expanded(
-                  child: BlocSelector<HomeBloc, HomeState, DateTime>(
-                    selector: (state) => state.month,
-                    builder: (context, month) {
-                      final monthLabel = cachedDateFormat(
-                        locale,
-                        'yyyy-MM',
-                      ).format(month);
-                      return Row(
-                        mainAxisSize: MainAxisSize.min,
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          _BarIconButton(
-                            tooltip: context.l10n.previousMonth,
-                            icon: Icons.chevron_left,
-                            onPressed: () => context.read<HomeBloc>().add(
-                              const HomeMonthShifted(-1),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      _BarIconButton(
+                        tooltip: context.l10n.previousMonth,
+                        icon: Icons.chevron_left,
+                        onPressed: () => onMonthShifted(-1),
+                      ),
+                      Flexible(
+                        child: Tooltip(
+                          message: context.l10n.chooseMonth,
+                          child: InkWell(
+                            onTap: () => _pickMonth(context),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Flexible(
+                                  child: Text(
+                                    cachedDateFormat(
+                                      locale,
+                                      'yyyy-MM',
+                                    ).format(month),
+                                    maxLines: 1,
+                                    softWrap: false,
+                                    overflow: TextOverflow.ellipsis,
+                                    textAlign: TextAlign.center,
+                                  ),
+                                ),
+                                const SizedBox(width: AppSpacing.xs),
+                                const Icon(Icons.expand_more, size: 18),
+                              ],
                             ),
                           ),
-                          Flexible(
-                            child: Text(
-                              monthLabel,
-                              maxLines: 1,
-                              softWrap: false,
-                              overflow: TextOverflow.ellipsis,
-                              textAlign: TextAlign.center,
-                            ),
-                          ),
-                          _BarIconButton(
-                            tooltip: context.l10n.nextMonth,
-                            icon: Icons.chevron_right,
-                            onPressed: () => context.read<HomeBloc>().add(
-                              const HomeMonthShifted(1),
-                            ),
-                          ),
-                        ],
-                      );
-                    },
+                        ),
+                      ),
+                      _BarIconButton(
+                        tooltip: context.l10n.nextMonth,
+                        icon: Icons.chevron_right,
+                        onPressed: () => onMonthShifted(1),
+                      ),
+                    ],
                   ),
                 ),
-                BlocSelector<HomeBloc, HomeState, HomeView>(
-                  selector: (state) => state.view,
-                  builder: (context, view) {
-                    final showingSummary = view == HomeView.summary;
-                    return _BarIconButton(
-                      tooltip: showingSummary
-                          ? context.l10n.showCalendar
-                          : context.l10n.showSummary,
-                      icon: showingSummary
-                          ? Icons.calendar_today_outlined
-                          : Icons.bar_chart,
-                      onPressed: () =>
-                          context.read<HomeBloc>().add(const HomeViewToggled()),
-                    );
-                  },
+                _BarIconButton(
+                  tooltip: view == HomeView.summary
+                      ? context.l10n.showCalendar
+                      : context.l10n.showSummary,
+                  icon: view == HomeView.summary
+                      ? Icons.calendar_today_outlined
+                      : Icons.bar_chart,
+                  onPressed: onViewToggled,
                 ),
               ],
             );
@@ -111,22 +120,31 @@ class HomeAppBar extends StatelessWidget implements PreferredSizeWidget {
   }
 
   Future<void> _pickAccount(BuildContext context) async {
-    final state = context.read<HomeBloc>().state;
     final picked = await showAccountBookSheet<HomeAccountPick>(
       context: context,
       maxHeightFactor: 0.5,
       builder: (context) {
         return HomeAccountSheet(
           accounts: [
-            for (final account in state.accounts)
+            for (final account in accounts)
               if (account.isActive) account,
           ],
-          selectedId: state.selectedAccountId,
+          selectedId: selectedAccountId,
         );
       },
     );
     if (picked != null && context.mounted) {
-      context.read<HomeBloc>().add(HomeAccountSelected(picked.accountId));
+      onAccountSelected(picked.accountId);
+    }
+  }
+
+  Future<void> _pickMonth(BuildContext context) async {
+    final picked = await showDialog<DateTime>(
+      context: context,
+      builder: (context) => HomeMonthDialog(month: month),
+    );
+    if (picked != null && context.mounted) {
+      onMonthSelected(picked);
     }
   }
 
@@ -134,12 +152,15 @@ class HomeAppBar extends StatelessWidget implements PreferredSizeWidget {
   Size get preferredSize => const Size.fromHeight(kToolbarHeight);
 }
 
-String _accountLabel(BuildContext context, HomeState state) {
-  final selectedId = state.selectedAccountId;
+String _accountLabel(
+  BuildContext context,
+  List<AccountModel> accounts,
+  int? selectedId,
+) {
   if (selectedId == null) {
     return context.l10n.allAccounts;
   }
-  for (final account in state.accounts) {
+  for (final account in accounts) {
     if (account.id == selectedId) {
       return account.labelFor(context.categoryLanguageCode);
     }

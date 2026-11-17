@@ -88,6 +88,42 @@ void main() {
     expect(tester.getSize(calendar).height, height);
     expect(tester.takeException(), isNull);
   });
+
+  testWidgets('month dialog jumps to a later month', (tester) async {
+    tester.platformDispatcher.localeTestValue = const Locale('en');
+    addTearDown(tester.platformDispatcher.clearLocaleTestValue);
+    final now = DateTime.now();
+    await pumpApp(tester);
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.byTooltip('Choose month'));
+    await tester.pumpAndSettle();
+    expect(find.byType(Dialog), findsOneWidget);
+    expect(find.byType(BottomSheet), findsNothing);
+    expect(find.text('Jan'), findsOneWidget);
+    expect(find.text('Dec'), findsOneWidget);
+    expect(find.text('${now.year}'), findsOneWidget);
+
+    await tester.tap(find.byTooltip('Next year'));
+    await tester.pump();
+    expect(find.text('${now.year + 1}'), findsOneWidget);
+    await tester.tap(find.text('Mar'));
+    await tester.pumpAndSettle();
+
+    expect(
+      find.text(DateFormat('yyyy-MM').format(DateTime(now.year + 1, 3))),
+      findsOneWidget,
+    );
+    await tester.tap(find.byTooltip('Calendar'));
+    await tester.pumpAndSettle();
+    expect(
+      _selectedDay(
+        tester,
+        find.byWidgetPredicate((widget) => widget is TableCalendar),
+      ),
+      1,
+    );
+  });
 }
 
 int _selectedDay(WidgetTester tester, Finder calendar) {

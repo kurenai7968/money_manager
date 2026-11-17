@@ -1,11 +1,12 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:money_manager/models/account_book_kinds.dart';
 import 'package:money_manager/models/account_book_model.dart';
 import 'package:money_manager/models/account_model.dart';
 import 'package:money_manager/models/category_model.dart';
+import 'package:money_manager/models/day_ledger.dart';
 import 'package:money_manager/models/transaction_model.dart';
 import 'package:money_manager/pages/home/bloc/home_event.dart';
 import 'package:money_manager/pages/home/bloc/home_state.dart';
-import 'package:money_manager/pages/home/models/home_figures.dart';
 import 'package:money_manager/services/account_book_service.dart';
 
 class HomeBloc extends Bloc<HomeEvent, HomeState> {
@@ -18,6 +19,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
   HomeBloc({required this._accountBookService}) : super(HomeState.initial()) {
     on<HomeInitialized>(_onInitialized);
     on<HomeMonthShifted>(_onMonthShifted);
+    on<HomeMonthSelected>(_onMonthSelected);
     on<HomeViewToggled>(_onViewToggled);
     on<HomeDaySelected>(_onDaySelected);
     on<HomeAccountSelected>(_onAccountSelected);
@@ -45,10 +47,24 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
   }
 
   void _onMonthShifted(HomeMonthShifted event, Emitter<HomeState> emit) {
-    final month = DateTime(state.month.year, state.month.month + event.delta);
-    final selected = event.delta < 0
-        ? DateTime(month.year, month.month + 1, 0)
-        : DateTime(month.year, month.month, 1);
+    _showMonth(
+      emit,
+      DateTime(state.month.year, state.month.month + event.delta),
+    );
+  }
+
+  void _onMonthSelected(HomeMonthSelected event, Emitter<HomeState> emit) {
+    _showMonth(emit, DateTime(event.month.year, event.month.month));
+  }
+
+  void _showMonth(Emitter<HomeState> emit, DateTime month) {
+    final current = DateTime(state.month.year, state.month.month);
+    if (month == current) {
+      return;
+    }
+    final selected = month.isAfter(current)
+        ? DateTime(month.year, month.month, 1)
+        : DateTime(month.year, month.month + 1, 0);
     _publish(emit, state.copyWith(month: month, selectedDay: selected));
   }
 
@@ -86,16 +102,27 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     ];
     final accountId = _activeAccountId(base.selectedAccountId);
     final transactions = _forAccount(inMonth, accountId);
-    final days = daysOf(transactions);
+    var income = 0.0;
+    var expense = 0.0;
+    for (final transaction in transactions) {
+      switch (transaction.type) {
+        case TransactionType.income:
+          income += transaction.amount;
+        case TransactionType.expense:
+          expense += transaction.amount;
+        case TransactionType.transfer:
+          break;
+      }
+    }
     emit(
       base.copyWith(
         status: _failed ? HomeStatus.failure : HomeStatus.success,
         selectedAccountId: accountId,
         clearSelectedAccount: accountId == null,
         transactions: transactions,
-        figures: monthFigures(transactions, month),
-        days: days,
-        selectedTransactions: transactionsOn(days, base.selectedDay),
+        income: income,
+        expense: expense,
+        days: daysOf(transactions),
         categories: _categoryRows,
         accounts: _accountRows,
       ),

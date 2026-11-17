@@ -1,19 +1,19 @@
 import 'package:material_ui/material_ui.dart';
 import 'package:money_manager/core/extensions/context_extension.dart';
-import 'package:money_manager/pages/home/models/home_figures.dart';
 import 'package:money_manager/core/utils/money_format.dart';
 import 'package:money_manager/models/account_model.dart';
 import 'package:money_manager/models/category_model.dart';
-import 'package:money_manager/models/transaction_model.dart';
+import 'package:money_manager/models/day_ledger.dart';
 import 'package:money_manager/pages/home/widgets/home_month_donut.dart';
 import 'package:money_manager/themes/app_themes.dart';
 import 'package:money_manager/themes/account_book_palette.dart';
 import 'package:money_manager/widgets/transaction_item.dart';
 
 class HomeSummaryView extends StatelessWidget {
-  final MonthFigures figures;
+  final double income;
+  final double expense;
+  final double balance;
   final List<DayLedger> days;
-  final List<TransactionModel> transactions;
   final List<CategoryModel> categories;
   final List<AccountModel> accounts;
   final String locale;
@@ -21,9 +21,10 @@ class HomeSummaryView extends StatelessWidget {
   final VoidCallback onRecordReturned;
 
   const HomeSummaryView({
-    required this.figures,
+    required this.income,
+    required this.expense,
+    required this.balance,
     required this.days,
-    required this.transactions,
     required this.categories,
     required this.accounts,
     required this.locale,
@@ -57,7 +58,7 @@ class HomeSummaryView extends StatelessWidget {
                           ?.copyWith(color: scheme.onSurfaceVariant),
                     ),
                     Text(
-                      formatAmount(figures.income, locale: locale),
+                      formatAmount(income, locale: locale),
                       style: Theme.of(context).textTheme.titleLarge
                           ?.copyWith(color: AccountBookPalette.green),
                     ),
@@ -75,7 +76,7 @@ class HomeSummaryView extends StatelessWidget {
                           ?.copyWith(color: scheme.onSurfaceVariant),
                     ),
                     Text(
-                      formatAmount(figures.expense, locale: locale),
+                      formatAmount(expense, locale: locale),
                       style: Theme.of(context).textTheme.titleLarge
                           ?.copyWith(color: AccountBookPalette.coral),
                     ),
@@ -87,10 +88,10 @@ class HomeSummaryView extends StatelessWidget {
         ),
         const SizedBox(height: AppSpacing.xl),
         HomeMonthDonut(
-          income: figures.income,
-          expense: figures.expense,
+          income: income,
+          expense: expense,
           label: l10n.monthBalance,
-          amount: formatAmount(figures.balance, locale: locale),
+          amount: formatAmount(balance, locale: locale),
         ),
         Padding(
           padding: const EdgeInsets.fromLTRB(
@@ -108,7 +109,7 @@ class HomeSummaryView extends StatelessWidget {
           ),
         ),
         Expanded(
-          child: transactions.isEmpty
+          child: days.isEmpty
               ? Center(child: Text(l10n.emptyMonth))
               : TransactionList(
                   days: days,

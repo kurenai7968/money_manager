@@ -20,6 +20,15 @@ class HomeMonthShifted extends HomeEvent {
   List<Object?> get props => [delta];
 }
 
+class HomeMonthSelected extends HomeEvent {
+  final DateTime month;
+
+  const HomeMonthSelected(this.month);
+
+  @override
+  List<Object?> get props => [month];
+}
+
 class HomeViewToggled extends HomeEvent {
   const HomeViewToggled();
 }
